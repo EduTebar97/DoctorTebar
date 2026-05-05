@@ -30,6 +30,8 @@
 
 ```bash
 curl https://api.eduardotebarbotic.com/api/health
+npm run test:e2e -- --config e2e/playwright.config.ts
+./scripts/check-production.sh
 ```
 
 Despues:
