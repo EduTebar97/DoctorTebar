@@ -1,0 +1,23 @@
+{
+  "name": "doctor-tebar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma full-stack de metodologia clinica aplicada de Eduardo Tebarbotic.",
+  "packageManager": "pnpm@9.15.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "e2e"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace @doctor-tebar/web run dev",
+    "dev:api": "npm --workspace @doctor-tebar/api run dev",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm --workspace @doctor-tebar/api run test && npm --workspace @doctor-tebar/web run test",
+    "test:e2e": "npm --workspace @doctor-tebar/e2e run test",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

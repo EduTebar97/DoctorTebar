@@ -1,0 +1,89 @@
+import { z } from "zod";
+
+export const idParamSchema = z.object({ params: z.object({ id: z.string().min(1) }) });
+export const slugParamSchema = z.object({ params: z.object({ slug: z.string().min(1) }) });
+
+export const postSchema = z.object({
+  body: z.object({
+    title: z.string().min(5).max(180),
+    excerpt: z.string().min(20).max(500),
+    content: z.string().min(20),
+    coverImageUrl: z.string().url().optional().or(z.literal("")),
+    category: z.enum(["causalidad", "prediccion", "reporte", "stata", "errores", "general"]).default("general"),
+    tags: z.array(z.string().max(40)).default([]),
+    status: z.enum(["draft", "published", "archived"]).default("draft"),
+    featured: z.boolean().default(false),
+    seoTitle: z.string().max(180).optional().or(z.literal("")),
+    seoDescription: z.string().max(300).optional().or(z.literal(""))
+  })
+});
+
+export const newsSchema = z.object({
+  body: z.object({
+    title: z.string().min(5).max(180),
+    excerpt: z.string().min(20).max(500),
+    content: z.string().min(20),
+    coverImageUrl: z.string().url().optional().or(z.literal("")),
+    sourceName: z.string().max(120).optional().or(z.literal("")),
+    sourceUrl: z.string().url().optional().or(z.literal("")),
+    status: z.enum(["draft", "published", "archived"]).default("draft"),
+    featured: z.boolean().default(false)
+  })
+});
+
+export const resourceSchema = z.object({
+  body: z.object({
+    title: z.string().min(4).max(160),
+    description: z.string().min(20).max(700),
+    type: z.enum(["checklist", "plantilla", "guia", "codigo", "bibliografia"]),
+    fileUrl: z.string().url().optional().or(z.literal("")),
+    externalUrl: z.string().url().optional().or(z.literal("")),
+    status: z.enum(["draft", "published", "archived"]).default("draft")
+  })
+});
+
+export const serviceSchema = z.object({
+  body: z.object({
+    title: z.string().min(4).max(160),
+    shortDescription: z.string().min(20).max(300),
+    fullDescription: z.string().min(20),
+    targetAudience: z.string().min(5),
+    deliverables: z.array(z.string().min(2)).default([]),
+    status: z.enum(["draft", "published", "archived"]).default("draft"),
+    order: z.number().int().default(0)
+  })
+});
+
+export const inquirySchema = z.object({
+  body: z.object({
+    name: z.string().min(2).max(120),
+    email: z.string().email(),
+    organization: z.string().max(160).optional().or(z.literal("")),
+    projectStage: z.enum(["idea", "protocolo", "analisis", "manuscrito", "revision"]),
+    objectiveType: z.enum(["causal", "predictivo", "descriptivo", "diagnostico", "pronostico", "mixto", "no_claro"]),
+    message: z.string().min(20).max(4000),
+    consent: z.boolean().optional()
+  })
+});
+
+export const inquiryStatusSchema = z.object({
+  params: z.object({ id: z.string().min(1) }),
+  body: z.object({ status: z.enum(["new", "reviewed", "replied", "archived"]) })
+});
+
+export const inquiryNotesSchema = z.object({
+  params: z.object({ id: z.string().min(1) }),
+  body: z.object({ internalNotes: z.string().max(4000).optional().or(z.literal("")) })
+});
+
+export const settingsSchema = z.object({
+  body: z.object({
+    siteTitle: z.string().min(3),
+    heroTitle: z.string().min(10),
+    heroSubtitle: z.string().min(20),
+    aboutText: z.string().min(20),
+    contactEmail: z.string().email(),
+    linkedinUrl: z.string().url().optional().or(z.literal("")),
+    accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().or(z.literal(""))
+  })
+});
