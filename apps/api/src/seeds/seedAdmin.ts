@@ -4,7 +4,7 @@ import { User } from "../models/User.model.js";
 
 async function seedAdmin() {
   await connectDB();
-  const email = "admin@example.com";
+  const email = "dr.tebar@gmail.com";
   const existing = await User.findOne({ email });
   if (existing) {
     console.log("Admin already exists");
@@ -18,7 +18,7 @@ async function seedAdmin() {
     role: "admin",
     status: "active"
   });
-  console.log("Admin created: admin@example.com / AdminPassword123!");
+  console.log("Admin created: dr.tebar@gmail.com / AdminPassword123!");
   await disconnectDB();
 }
 
