@@ -4,7 +4,7 @@ import type {
   objectiveTypes,
   postCategories,
   resourceTypes
-} from "../constants/content";
+} from "../constants/content.js";
 
 export type ContentStatus = (typeof contentStatuses)[number];
 export type PostCategory = (typeof postCategories)[number];

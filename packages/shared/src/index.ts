@@ -1,2 +1,2 @@
-export * from "./constants/content";
-export * from "./types/content";
+export * from "./constants/content.js";
+export * from "./types/content.js";
