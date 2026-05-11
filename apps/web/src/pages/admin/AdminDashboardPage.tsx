@@ -15,14 +15,14 @@ export function AdminDashboardPage() {
   });
   return (
     <>
-      <div className="admin-heading"><h1>Dashboard</h1><Link className="btn" to="/admin/posts/new">Nuevo post</Link></div>
-      <div className="stats-grid">
+      <div className="admin-heading" data-tour="dashboard-home"><h1>Dashboard</h1><Link className="btn" to="/admin/posts/new">Nuevo post</Link></div>
+      <div className="stats-grid" data-tour="dashboard-metrics">
         <StatCard label="Posts" value={posts.data?.length ?? 0} icon={<FileText />} />
         <StatCard label="Noticias" value={news.data?.length ?? 0} icon={<Newspaper />} />
         <StatCard label="Consultas" value={inquiries.data?.length ?? 0} icon={<Inbox />} />
         <StatCard label="Recursos" value={resources.data?.length ?? 0} icon={<Wrench />} />
       </div>
-      <section className="admin-panel"><h2>Accesos rapidos</h2><div className="quick-links"><Link to="/admin/posts/new">Nuevo post</Link><Link to="/admin/news/new">Nueva noticia</Link><Link to="/admin/inquiries">Revisar consultas</Link><Link to="/admin/settings">Ajustes publicos</Link></div></section>
+      <section className="admin-panel" data-tour="dashboard-quick-actions"><h2>Accesos rapidos</h2><div className="quick-links"><Link to="/admin/posts/new">Nuevo post</Link><Link to="/admin/news/new">Nueva noticia</Link><Link to="/admin/inquiries">Revisar consultas</Link><Link to="/admin/settings">Ajustes publicos</Link></div></section>
     </>
   );
 }

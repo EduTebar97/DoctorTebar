@@ -26,6 +26,21 @@ export async function listMedia(_req: Request, res: Response) {
   res.json(await MediaAsset.find().sort({ createdAt: -1 }).limit(100));
 }
 
+export async function updateMedia(req: Request, res: Response) {
+  const asset = await MediaAsset.findByIdAndUpdate(
+    req.params.id,
+    {
+      altText: req.body.altText,
+      caption: req.body.caption,
+      credit: req.body.credit
+    },
+    { new: true, runValidators: true }
+  );
+  if (!asset) throw new ApiError(404, "Media not found");
+  await audit(req, "update", "media", String(asset._id));
+  res.json(asset);
+}
+
 export async function deleteMedia(req: Request, res: Response) {
   const asset = await MediaAsset.findByIdAndDelete(req.params.id);
   if (!asset) throw new ApiError(404, "Media not found");

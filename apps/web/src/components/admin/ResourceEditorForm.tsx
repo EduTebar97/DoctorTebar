@@ -29,12 +29,12 @@ export function ResourceEditorForm() {
 
   return (
     <form className="editor-form" onSubmit={handleSubmit(save)}>
-      <label>Titulo<input {...register("title")} /></label>
-      <label>Tipo<select {...register("type")}><option value="checklist">Checklist</option><option value="plantilla">Plantilla</option><option value="guia">Guia</option><option value="codigo">Codigo</option><option value="bibliografia">Bibliografia</option></select></label>
-      <label className="span-2">Descripcion<textarea rows={5} {...register("description")} /></label>
-      <label>URL archivo<input {...register("fileUrl")} /></label>
+      <label>Titulo<input data-tour="resource-title" {...register("title")} /></label>
+      <label>Tipo<select data-tour="resource-type" {...register("type")}><option value="checklist">Checklist</option><option value="plantilla">Plantilla</option><option value="guia">Guia</option><option value="codigo">Codigo</option><option value="bibliografia">Bibliografia</option></select></label>
+      <label className="span-2">Descripcion<textarea data-tour="resource-description" rows={5} {...register("description")} /></label>
+      <label>URL archivo<input data-tour="resource-file" {...register("fileUrl")} /></label>
       <label>URL externa<input {...register("externalUrl")} /></label>
-      <label>Estado<select {...register("status")}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label>
+      <label>Estado<select data-tour="resource-status" {...register("status")}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label>
       <Button type="submit" disabled={formState.isSubmitting}>Guardar recurso</Button>
     </form>
   );

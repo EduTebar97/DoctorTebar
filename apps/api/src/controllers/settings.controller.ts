@@ -3,11 +3,11 @@ import { SiteSettings } from "../models/SiteSettings.model.js";
 import { audit } from "../services/audit.service.js";
 
 const defaults = {
-  siteTitle: "Eduardo Tebarbotic | Metodologia Clinica",
+  siteTitle: "Eduardo Tebar Boti | Metodologia Clinica",
   heroTitle: "Metodologia clinica aplicada para investigacion rigurosa",
   heroSubtitle: "Alineo pregunta, diseno, estimando, datos, modelo estadistico, supuestos, interpretacion y reporte.",
-  aboutText: "Eduardo Tebarbotic es medico especializado en metodologia clinica aplicada, causalidad, prediccion, reporte cientifico y apoyo a investigadores clinicos.",
-  contactEmail: "contacto@eduardotebarbotic.com",
+  aboutText: "Eduardo Tebar Boti es medico especializado en metodologia clinica aplicada, causalidad, prediccion, reporte cientifico y apoyo a investigadores clinicos.",
+  contactEmail: "contacto@eduardotebarboti.com",
   accentColor: "#38bdf8"
 };
 

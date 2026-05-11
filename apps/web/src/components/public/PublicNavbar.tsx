@@ -17,7 +17,11 @@ export function PublicNavbar() {
   return (
     <header className="public-nav">
       <NavLink to="/" className="brand">
-        <Stethoscope size={22} /> Eduardo Tebarbotic
+        <span className="brand-mark"><Stethoscope size={22} /></span>
+        <span className="brand-text">
+          <span className="brand-title">Eduardo Tebar Boti</span>
+          <span className="brand-sub">Bioestadistica clinica aplicada</span>
+        </span>
       </NavLink>
       <button className="icon-btn mobile-only" onClick={() => setOpen((value) => !value)} aria-label="Abrir menu">
         {open ? <X /> : <Menu />}

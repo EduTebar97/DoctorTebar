@@ -1,7 +1,7 @@
 export function AboutPage() {
   return (
     <section className="section prose-page">
-      <h1>Sobre Eduardo Tebarbotic</h1>
+      <h1>Sobre Eduardo Tebar Boti</h1>
       <p>Medico especializado en metodologia clinica aplicada, analisis estadistico, causalidad clinica, modelos predictivos, estudios observacionales, reporte cientifico y apoyo metodologico a investigadores clinicos.</p>
       <h2>Enfoque</h2>
       <p>El trabajo se centra en convertir preguntas clinicas en disenos analizables, evitar errores habituales, mejorar manuscritos y apoyar respuestas tecnicas a revisores.</p>

@@ -33,6 +33,16 @@ export async function updateInquiryNotes(req: Request, res: Response) {
   res.json(inquiry);
 }
 
+export async function updateInquiryCrm(req: Request, res: Response) {
+  const payload = { ...req.body };
+  if (payload.estimatedValue === "") delete payload.estimatedValue;
+  if (payload.nextActionAt === "") delete payload.nextActionAt;
+  const inquiry = await Inquiry.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
+  if (!inquiry) throw new ApiError(404, "Inquiry not found");
+  await audit(req, "update-crm", "inquiry", String(inquiry._id), payload);
+  res.json(inquiry);
+}
+
 export async function deleteInquiry(req: Request, res: Response) {
   const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
   if (!inquiry) throw new ApiError(404, "Inquiry not found");

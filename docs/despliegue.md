@@ -24,5 +24,5 @@ Variables obligatorias:
 
 Variables:
 
-- `VITE_API_URL=https://api.eduardotebarbotic.com/api`
-- `VITE_APP_NAME=Eduardo Tebarbotic | Metodologia Clinica`
+- `VITE_API_URL=https://api.eduardotebarboti.com/api`
+- `VITE_APP_NAME=Eduardo Tebar Boti | Metodologia Clinica`

@@ -16,7 +16,7 @@ export interface PublicUser {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "editor";
+  role: "admin" | "editor" | "reviewer" | "viewer";
 }
 
 export interface Post {
@@ -87,8 +87,14 @@ export interface Inquiry {
   projectStage: InquiryStage;
   objectiveType: ObjectiveType;
   message: string;
-  status: "new" | "reviewed" | "replied" | "archived";
+  status: "new" | "reviewed" | "pending_reply" | "replied" | "meeting_proposed" | "proposal_sent" | "accepted" | "discarded" | "archived";
   internalNotes?: string;
+  priority?: "low" | "medium" | "high";
+  estimatedValue?: number;
+  nextAction?: string;
+  nextActionAt?: string;
+  source?: "contact_form" | "linkedin" | "email" | "referral" | "other";
+  serviceInterest?: string;
   createdAt: string;
   updatedAt: string;
 }

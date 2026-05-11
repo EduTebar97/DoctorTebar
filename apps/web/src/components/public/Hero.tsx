@@ -6,7 +6,7 @@ export function Hero() {
     <section className="hero">
       <div className="hero-copy">
         <span className="eyebrow">Metodologia clinica aplicada</span>
-        <h1>Eduardo Tebarbotic</h1>
+        <h1>Eduardo Tebar Boti</h1>
         <p className="hero-lead">
           Investigacion clinica rigurosa alineando pregunta, diseno, estimando, datos, modelo estadistico, supuestos,
           interpretacion y reporte.
@@ -21,10 +21,10 @@ export function Hero() {
         </div>
       </div>
       <div className="hero-panel" aria-hidden="true">
-        <div>causalidad</div>
-        <div>prediccion</div>
-        <div>reporte</div>
-        <div>reproducibilidad</div>
+        <div><span>Causalidad clinica</span><small>Estimandos, DAGs, target trial</small></div>
+        <div><span>Prediccion</span><small>Validacion, calibracion, utilidad</small></div>
+        <div><span>Reporte cientifico</span><small>STROBE, TRIPOD, PRISMA</small></div>
+        <div><span>Reproducibilidad</span><small>Analisis defendibles y auditables</small></div>
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ declare global {
       _id: string;
       name: string;
       email: string;
-      role: "admin" | "editor";
+      role: "admin" | "editor" | "reviewer" | "viewer";
       status: "active" | "disabled";
     }
 

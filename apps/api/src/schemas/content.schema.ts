@@ -68,12 +68,26 @@ export const inquirySchema = z.object({
 
 export const inquiryStatusSchema = z.object({
   params: z.object({ id: z.string().min(1) }),
-  body: z.object({ status: z.enum(["new", "reviewed", "replied", "archived"]) })
+  body: z.object({ status: z.enum(["new", "reviewed", "pending_reply", "replied", "meeting_proposed", "proposal_sent", "accepted", "discarded", "archived"]) })
 });
 
 export const inquiryNotesSchema = z.object({
   params: z.object({ id: z.string().min(1) }),
   body: z.object({ internalNotes: z.string().max(4000).optional().or(z.literal("")) })
+});
+
+export const inquiryCrmSchema = z.object({
+  params: z.object({ id: z.string().min(1) }),
+  body: z.object({
+    status: z.enum(["new", "reviewed", "pending_reply", "replied", "meeting_proposed", "proposal_sent", "accepted", "discarded", "archived"]).optional(),
+    internalNotes: z.string().max(4000).optional().or(z.literal("")),
+    priority: z.enum(["low", "medium", "high"]).optional(),
+    estimatedValue: z.coerce.number().min(0).optional().or(z.literal("")),
+    nextAction: z.string().max(500).optional().or(z.literal("")),
+    nextActionAt: z.string().optional().or(z.literal("")),
+    source: z.enum(["contact_form", "linkedin", "email", "referral", "other"]).optional(),
+    serviceInterest: z.string().max(160).optional().or(z.literal(""))
+  })
 });
 
 export const settingsSchema = z.object({

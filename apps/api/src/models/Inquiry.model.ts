@@ -8,8 +8,18 @@ const inquirySchema = new mongoose.Schema(
     projectStage: { type: String, enum: ["idea", "protocolo", "analisis", "manuscrito", "revision"], required: true },
     objectiveType: { type: String, enum: ["causal", "predictivo", "descriptivo", "diagnostico", "pronostico", "mixto", "no_claro"], required: true },
     message: { type: String, required: true },
-    status: { type: String, enum: ["new", "reviewed", "replied", "archived"], default: "new" },
-    internalNotes: String
+    status: {
+      type: String,
+      enum: ["new", "reviewed", "pending_reply", "replied", "meeting_proposed", "proposal_sent", "accepted", "discarded", "archived"],
+      default: "new"
+    },
+    internalNotes: String,
+    priority: { type: String, enum: ["low", "medium", "high"], default: "medium" },
+    estimatedValue: Number,
+    nextAction: String,
+    nextActionAt: Date,
+    source: { type: String, enum: ["contact_form", "linkedin", "email", "referral", "other"], default: "contact_form" },
+    serviceInterest: String
   },
   { timestamps: true }
 );

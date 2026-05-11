@@ -5,8 +5,8 @@
 - MongoDB Atlas con una base para produccion.
 - Render conectado al repositorio para `apps/api`.
 - Vercel conectado al repositorio para `apps/web`.
-- Dominio `eduardotebarbotic.com` apuntando a Vercel.
-- Subdominio `api.eduardotebarbotic.com` apuntando a Render.
+- Dominio `eduardotebarboti.com` apuntando a Vercel.
+- Subdominio `api.eduardotebarboti.com` apuntando a Render.
 
 ## Variables Render
 
@@ -16,20 +16,20 @@
 - `JWT_SECRET=<secreto largo>`
 - `JWT_EXPIRES_IN=7d`
 - `COOKIE_NAME=etb_session`
-- `CLIENT_ORIGIN=https://eduardotebarbotic.com,https://www.eduardotebarbotic.com`
+- `CLIENT_ORIGIN=https://eduardotebarboti.com,https://www.eduardotebarboti.com`
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
 
 ## Variables Vercel
 
-- `VITE_API_URL=https://api.eduardotebarbotic.com/api`
-- `VITE_APP_NAME=Eduardo Tebarbotic | Metodologia Clinica`
+- `VITE_API_URL=https://api.eduardotebarboti.com/api`
+- `VITE_APP_NAME=Eduardo Tebar Boti | Metodologia Clinica`
 
 ## Verificacion Post-Deploy
 
 ```bash
-curl https://api.eduardotebarbotic.com/api/health
+curl https://api.eduardotebarboti.com/api/health
 npm run test:e2e -- --config e2e/playwright.config.ts
 ./scripts/check-production.sh
 ```

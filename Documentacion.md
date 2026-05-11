@@ -1,8 +1,8 @@
 
-# Documento técnico maestro — Plataforma de metodología clínica aplicada de Eduardo Tebarbotic
+# Documento técnico maestro — Plataforma de metodología clínica aplicada de Eduardo Tebar Boti
 
 **Proyecto:** Plataforma web profesional de metodología clínica aplicada, blog, noticias, recursos y asesoría estadística.  
-**Autor funcional del proyecto:** Eduardo Tebarbotic, médico.  
+**Autor funcional del proyecto:** Eduardo Tebar Boti, médico.  
 **Objetivo:** transformar el prototipo HTML local en una aplicación real de producción con frontend, backend, base de datos, autenticación, panel privado de administración, zona pública, tests automatizados, despliegue y medidas de seguridad.
 
 ---
@@ -91,7 +91,7 @@ La plataforma se organiza alrededor de una tesis central:
 
 La web debe presentar a:
 
-**Eduardo Tebarbotic**  
+**Eduardo Tebar Boti**  
 Médico especializado en metodología clínica aplicada, análisis estadístico, causalidad clínica, modelos predictivos, estudios observacionales, reporte científico y apoyo metodológico a investigadores clínicos.
 
 ### 1.3. Familias de contenido
@@ -824,7 +824,7 @@ Debe incluir:
 
 Debe incluir:
 
-- Nombre: Eduardo Tebarbotic.
+- Nombre: Eduardo Tebar Boti.
 - Perfil: médico.
 - Enfoque metodológico.
 - Áreas de trabajo:
@@ -1470,7 +1470,7 @@ NOTIFICATION_EMAIL=
 
 ```env
 VITE_API_URL=http://localhost:4000/api
-VITE_APP_NAME=Eduardo Tebarbotic | Metodología Clínica
+VITE_APP_NAME=Eduardo Tebar Boti | Metodología Clínica
 ```
 
 ---
@@ -2354,7 +2354,7 @@ import { test, expect } from "@playwright/test";
 
 test("public homepage loads", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("Eduardo Tebarbotic")).toBeVisible();
+  await expect(page.getByText("Eduardo Tebar Boti")).toBeVisible();
   await expect(page.getByRole("link", { name: /blog/i })).toBeVisible();
 });
 ```
@@ -2525,7 +2525,7 @@ dist
 
 ```env
 VITE_API_URL=https://api.eduardotebarbotic.com/api
-VITE_APP_NAME=Eduardo Tebarbotic | Metodología Clínica
+VITE_APP_NAME=Eduardo Tebar Boti | Metodología Clínica
 ```
 
 ### 28.4. Dominio
@@ -2604,7 +2604,7 @@ async function seedAdmin() {
   const passwordHash = await bcrypt.hash(password, 12);
 
   await User.create({
-    name: "Eduardo Tebarbotic",
+    name: "Eduardo Tebar Boti",
     email,
     passwordHash,
     role: "admin",

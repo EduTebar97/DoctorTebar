@@ -6,6 +6,7 @@ import morgan from "morgan";
 import { env } from "./config/env.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import { authRoutes } from "./routes/auth.routes.js";
+import { auditRoutes } from "./routes/audit.routes.js";
 import { healthRoutes } from "./routes/health.routes.js";
 import { inquiriesRoutes } from "./routes/inquiries.routes.js";
 import { mediaRoutes } from "./routes/media.routes.js";
@@ -36,5 +37,6 @@ app.use("/api", inquiriesRoutes);
 app.use("/api", settingsRoutes);
 app.use("/api", mediaRoutes);
 app.use("/api", usersRoutes);
+app.use("/api", auditRoutes);
 
 app.use(errorMiddleware);

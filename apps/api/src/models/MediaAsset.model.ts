@@ -7,6 +7,15 @@ const mediaAssetSchema = new mongoose.Schema(
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
     originalName: String,
+    altText: String,
+    caption: String,
+    credit: String,
+    usedIn: [
+      {
+        entityType: String,
+        entityId: String
+      }
+    ],
     uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
   },
   { timestamps: true }

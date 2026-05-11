@@ -2,7 +2,7 @@
   "name": "doctor-tebar",
   "version": "0.1.0",
   "private": true,
-  "description": "Plataforma full-stack de metodologia clinica aplicada de Eduardo Tebarbotic.",
+  "description": "Plataforma full-stack de metodologia clinica aplicada de Eduardo Tebar Boti.",
   "packageManager": "pnpm@9.15.4",
   "workspaces": [
     "apps/*",

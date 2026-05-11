@@ -1,6 +1,6 @@
 # Doctor Tebar
 
-Aplicacion web profesional de metodologia clinica aplicada para Eduardo Tebarbotic.
+Aplicacion web profesional de metodologia clinica aplicada para Eduardo Tebar Boti.
 
 ## Estructura
 

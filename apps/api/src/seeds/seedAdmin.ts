@@ -12,7 +12,7 @@ async function seedAdmin() {
     return;
   }
   await User.create({
-    name: "Eduardo Tebarbotic",
+    name: "Eduardo Tebar Boti",
     email,
     passwordHash: await bcrypt.hash("AdminPassword123!", 12),
     role: "admin",

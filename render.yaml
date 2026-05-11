@@ -21,7 +21,7 @@ services:
       - key: COOKIE_NAME
         value: etb_session
       - key: CLIENT_ORIGIN
-        value: https://eduardotebarbotic.com,https://www.eduardotebarbotic.com
+        value: https://eduardotebarboti.com,https://www.eduardotebarboti.com
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY

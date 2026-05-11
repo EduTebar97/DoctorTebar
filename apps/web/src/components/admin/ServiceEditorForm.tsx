@@ -31,12 +31,12 @@ export function ServiceEditorForm() {
 
   return (
     <form className="editor-form" onSubmit={handleSubmit(save)}>
-      <label>Titulo<input {...register("title")} /></label>
+      <label>Titulo<input data-tour="service-title" {...register("title")} /></label>
       <label>Orden<input type="number" {...register("order")} /></label>
-      <label className="span-2">Descripcion breve<textarea rows={3} {...register("shortDescription")} /></label>
-      <label className="span-2">Descripcion completa<textarea rows={6} {...register("fullDescription")} /></label>
-      <label className="span-2">Audiencia objetivo<input {...register("targetAudience")} /></label>
-      <label className="span-2">Entregables<textarea rows={5} {...register("deliverables")} placeholder="Un entregable por linea" /></label>
+      <label className="span-2">Descripcion breve<textarea data-tour="service-short-description" rows={3} {...register("shortDescription")} /></label>
+      <label className="span-2">Descripcion completa<textarea data-tour="service-full-description" rows={6} {...register("fullDescription")} /></label>
+      <label className="span-2">Audiencia objetivo<input data-tour="service-target-audience" {...register("targetAudience")} /></label>
+      <label className="span-2">Entregables<textarea data-tour="service-deliverables" rows={5} {...register("deliverables")} placeholder="Un entregable por linea" /></label>
       <label>Estado<select {...register("status")}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label>
       <Button type="submit" disabled={formState.isSubmitting}>Guardar servicio</Button>
     </form>
