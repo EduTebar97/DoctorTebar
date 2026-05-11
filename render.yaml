@@ -3,7 +3,7 @@ services:
     name: doctor-tebar-api
     env: node
     plan: free
-    buildCommand: npm install --include=dev && npm --workspace @doctor-tebar/api run build
+    buildCommand: npm install --include=dev && npm --workspace @doctor-tebar/shared run build && npm --workspace @doctor-tebar/api run build
     startCommand: npm --workspace @doctor-tebar/api run start
     healthCheckPath: /api/health
     autoDeploy: true
