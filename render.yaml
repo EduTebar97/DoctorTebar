@@ -21,7 +21,7 @@ services:
       - key: COOKIE_NAME
         value: etb_session
       - key: CLIENT_ORIGIN
-        value: https://eduardotebarboti.com,https://www.eduardotebarboti.com
+        value: https://eduardotebarboti.com,https://www.eduardotebarboti.com,https://doctor-tebar.vercel.app
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
