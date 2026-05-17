@@ -544,7 +544,7 @@ Nota actualizada: el 17 de mayo de 2026 se recibio una version completa de `PROM
 | Sprint 9: Panel privado de chat | Cerrado contra prompt completo | Panel con listado de mensajes, filtros por formacion/usuario/tema/estado, resumen por usuario, conteos, orden cronologico y gestion de estado. |
 | Sprint 10: Filtros, metricas y seguimiento de chats | Cerrado contra prompt completo | Endpoint de metricas con agregacion MongoDB, tarjetas de resumen, ranking por formacion con barra visual, seguimiento por usuario con desglose de formaciones, filtros independientes y usuarios con multiples formaciones activas. |
 | Sprint 11: Testeo integral en local | Cerrado | Testeo completo via API con curl: login, blog CRUD, formacion CRUD, acceso bloqueado sin auth, acceso completo con auth, chat CRUD, filtros admin, metricas, cambio de estado, limpieza de datos. Cero errores en log de servidor. 14 tests automatizados pasados. |
-| Sprint 12: Build y despliegue | Cerrado | Lint ejecutado, tests 14/14, build API OK, build web OK con VITE_API_URL de produccion. Typo corregido en .env.local. Commit ba71fd1 creado con 42 archivos. Pendiente push para activar autodeploy en Render y Vercel. |
+| Sprint 12: Build y despliegue | Cerrado con bloqueo tecnico en Render | Lint, tests 14/14, builds OK. Commits ba71fd1 y b400d2d pusheados. Vercel desplegado OK (HTTP 200). Render no recibe el webhook de GitHub: el servicio fue creado manualmente, no via Blueprint. El usuario debe hacer deploy manual desde el dashboard de Render. Instrucciones documentadas. |
 | Sprint 13: Testeo completo en produccion | Pendiente | No ejecutado en esta revision. |
 | Sprint 14: Limpieza de datos de prueba | Pendiente | No ejecutado en esta revision. |
 | Sprint 15: Informe final y checklist de aceptacion | Pendiente | Pendiente de cierre global. |
@@ -1177,9 +1177,49 @@ Tras el push:
 - Vercel construye el web con `npm --workspace @doctor-tebar/web run build`.
 - La variable `VITE_API_URL` debe estar configurada en el dashboard de Vercel antes del deploy.
 
+### Sprint 12 Cerrado (con bloqueo tecnico documentado en Render)
+
+Objetivo concreto: build, verificacion de variables y despliegue.
+
+Pasos ejecutados:
+
+1. Lint: OK.
+2. Tests: 14/14 pasados.
+3. Build API: OK local y simulacion del build de Render.
+4. Build web con `VITE_API_URL` de produccion: OK.
+5. Typo corregido en `apps/web/.env.local`.
+6. `VITE_API_URL=https://doctor-tebar-api.onrender.com/api` confirmada en el bundle de Vercel.
+7. `CLIENT_ORIGIN` en `render.yaml` actualizado para incluir `https://doctor-tebar.vercel.app`.
+8. Commits pusheados:
+   - `ba71fd1`: modulos de formacion, chat, blog (42 archivos)
+   - `b400d2d`: fix CORS CLIENT_ORIGIN
+9. Vercel: desplegado y respondiendo HTTP 200 en `https://doctor-tebar.vercel.app`.
+10. Render: no hace autodeploy porque el servicio fue creado manualmente en el dashboard (no via Blueprint). El webhook de GitHub a Render no esta configurado.
+
+Bloqueo tecnico real: el deploy en Render requiere accion manual del usuario.
+
+Instrucciones para desplegar en Render:
+
+Opcion A — Deploy manual inmediato (recomendado):
+1. Ir a https://dashboard.render.com
+2. Abrir el servicio `doctor-tebar-api`
+3. Hacer clic en "Manual Deploy" → "Deploy latest commit"
+4. Esperar a que el build termine (5-10 minutos en plan free)
+5. Verificar que el health check pase en `/api/health`
+
+Opcion B — Configurar autodeploy via GitHub:
+1. Ir a https://dashboard.render.com
+2. Abrir el servicio `doctor-tebar-api`
+3. Ir a Settings → "Build & Deploy"
+4. En "Auto-Deploy" activar "Yes" y conectar el repositorio GitHub
+5. Los futuros `git push origin main` dispararan el redeploy automaticamente
+
+Variable de entorno necesaria en Vercel (si no esta ya):
+- `VITE_API_URL` = `https://doctor-tebar-api.onrender.com/api`
+
 ### Pendientes inmediatos
 
-1. Hacer push para activar el autodeploy: `git push origin main`.
-2. Sprint 13: testeo en produccion.
+1. El usuario debe hacer deploy manual en Render (ver instrucciones arriba).
+2. Sprint 13: testeo en produccion tras el deploy de Render.
 3. Sprint 14: limpieza final.
 4. Sprint 15: informe final.
