@@ -14,7 +14,7 @@ El proyecto esta implementado como una plataforma full-stack para metodologia cl
 
 Conclusion tecnica: el proyecto es funcional en local y los flujos principales quedan cubiertos por pruebas automaticas ampliadas en esta revision. Aun asi, quedan areas avanzadas sin cobertura exhaustiva, especialmente permisos por rol, medios, usuarios, ajustes y casos negativos de seguridad.
 
-Actualizacion sprint 17 de mayo de 2026: quedan cerrados contra los requisitos completos Sprint 0 al Sprint 14. Sprint 15 (informe final) es el ultimo sprint pendiente.
+Actualizacion sprint 17 de mayo de 2026: todos los sprints (0-15) cerrados. Proyecto completado.
 
 ## Arquitectura
 
@@ -547,7 +547,7 @@ Nota actualizada: el 17 de mayo de 2026 se recibio una version completa de `PROM
 | Sprint 12: Build y despliegue | Cerrado | Lint, tests 14/14, builds OK. Commits pusheados. Vercel OK en https://doctor-tebar.vercel.app. Render desplegado correctamente tras deploy manual: build OK, MongoDB connected, API live en https://doctor-tebar-api.onrender.com. /api/training HTTP 200, /api/auth/me HTTP 401 confirmados. |
 | Sprint 13: Testeo completo en produccion | Cerrado | Login OK, blog CRUD OK, formacion con bloqueo sin auth OK, formacion con auth OK, chat OK (401 sin login), panel admin OK, metricas OK, CORS Vercel OK. Vercel redesplegado con bundle nuevo (index-BL227pCF.js). Render y Vercel ambos en produccion con el nuevo codigo. |
 | Sprint 14: Limpieza de datos de prueba | Cerrado | Ejecutada durante Sprint 13: mensaje de chat borrado (204), curso borrado (204), post borrado (204). Verificacion: 0 mensajes en chat admin, post no encontrado en publico (404), curso no aparece en listado. |
-| Sprint 15: Informe final y checklist de aceptacion | Pendiente | Pendiente de cierre global. |
+| Sprint 15: Informe final y checklist de aceptacion | Cerrado | Informe completo entregado en ESTADO_PROYECTO.md. Todos los criterios de aceptacion verificados. |
 
 ### Cambios cerrados en Sprint 0
 
@@ -1278,8 +1278,240 @@ Datos de prueba creados y borrados en produccion durante Sprint 13:
 - Post de prueba: borrado HTTP 204.
 - Verificacion: 0 mensajes en chat admin, post 404 en publico, curso no aparece en listado publico.
 
-### Pendientes inmediatos
+### Pendientes post-proyecto
 
-1. Sprint 15: informe final.
-2. Configuracion manual en dashboard de Render: añadir `https://eduardotebarboti.com,https://www.eduardotebarboti.com` a la variable `CLIENT_ORIGIN` si se activa ese dominio custom.
-3. Configurar auto-deploy de GitHub en Render y Vercel para que futuros pushes desplieguen automaticamente.
+1. Configurar auto-deploy de GitHub en Render para que futuros pushes desplieguen automaticamente (ahora requiere deploy manual o via CLI).
+2. Si se activa el dominio custom `eduardotebarboti.com`: añadir ese dominio a la variable `CLIENT_ORIGIN` en el dashboard de Render. Hasta entonces no afecta a la app.
+
+---
+
+## Sprint 15: Informe Final — 17 de mayo de 2026
+
+### Checklist global de sprints
+
+| Sprint | Nombre | Estado |
+| --- | --- | --- |
+| Sprint 0 | Diagnostico inicial, estructura y logs base | Cerrado |
+| Sprint 1 | Correccion de errores 401 y autenticacion | Cerrado |
+| Sprint 2 | Blog simple y funcional | Cerrado |
+| Sprint 3 | Subida y visualizacion de imagenes en blog | Cerrado |
+| Sprint 4 | Limpieza de modulos no necesarios | Cerrado |
+| Sprint 5 | Modulo privado de formacion | Cerrado |
+| Sprint 6 | Pagina publica de formacion | Cerrado |
+| Sprint 7 | Login y permisos de acceso a formacion | Cerrado |
+| Sprint 8 | Chat publico asociado a formacion | Cerrado |
+| Sprint 9 | Panel privado de chat | Cerrado |
+| Sprint 10 | Filtros, metricas y seguimiento de chats | Cerrado |
+| Sprint 11 | Testeo integral en local | Cerrado |
+| Sprint 12 | Build y despliegue | Cerrado |
+| Sprint 13 | Testeo completo en produccion | Cerrado |
+| Sprint 14 | Limpieza de datos de prueba | Cerrado |
+| Sprint 15 | Informe final y checklist de aceptacion | Cerrado |
+
+### Archivos creados o modificados en esta revision
+
+Nuevos archivos:
+
+- `apps/api/src/models/TrainingCourse.model.ts`
+- `apps/api/src/models/TrainingChatMessage.model.ts`
+- `apps/api/src/routes/training.routes.ts`
+- `apps/web/src/components/admin/TrainingEditorForm.tsx`
+- `apps/web/src/components/admin/AdminChatPage.tsx` (reemplaza stub)
+- `apps/web/src/pages/admin/AdminTrainingEditorPage.tsx`
+- `apps/web/src/pages/public/TrainingListPage.tsx`
+- `apps/web/src/pages/public/TrainingDetailPage.tsx`
+- `apps/web/src/components/public/TrainingChatForm.tsx`
+- `apps/web/src/schemas/training.schema.ts`
+- `apps/web/src/schemas/training-chat.schema.ts`
+- `docs/correccion-app-sprints.md`
+- `PROMPT_AGENT_CORRECCION_APP.md`
+
+Archivos modificados:
+
+- `apps/api/src/app.ts`: logs SERVER/CORS, registro de trainingRoutes.
+- `apps/api/src/controllers/auth.controller.ts`: devuelve token en login.
+- `apps/api/src/controllers/content.controller.ts`: defaults de post, excerpt automatico.
+- `apps/api/src/middleware/auth.middleware.ts`: acepta Bearer + cookie, optionalAuth.
+- `apps/api/src/models/AuditLog.model.ts`: entidad training añadida.
+- `apps/api/src/schemas/content.schema.ts`: esquemas de formacion y chat.
+- `apps/api/src/tests/`: auth, posts y content-schemas ampliados.
+- `apps/web/src/hooks/useAuth.ts`: 401 en /auth/me no lanza error no controlado.
+- `apps/web/src/services/apiClient.ts`: logs [API], interceptor 401.
+- `apps/web/src/services/authService.ts`: guarda token en localStorage, logout robusto.
+- `apps/web/src/services/contentService.ts`: funciones de formacion, chat admin y metricas.
+- `apps/web/src/components/admin/Sidebar.tsx`: solo Blog, Formacion, Chat.
+- `apps/web/src/components/admin/PostEditorForm.tsx`: simplificado, imagen destacada.
+- `apps/web/src/components/admin/RichTextEditor.tsx`: boton imagen interna.
+- `apps/web/src/components/public/PublicNavbar.tsx`: Formacion visible, resto oculto.
+- `apps/web/src/components/public/ArticleCard.tsx`: muestra coverImageUrl.
+- `apps/web/src/pages/admin/AdminDashboardPage.tsx`: solo metricas de Blog y Formacion.
+- `apps/web/src/pages/admin/LoginPage.tsx`: captura errores, sin Uncaught in promise.
+- `apps/web/src/pages/public/BlogListPage.tsx`: estados de carga y error.
+- `apps/web/src/pages/public/BlogDetailPage.tsx`: error controlado.
+- `apps/web/src/pages/public/HomePage.tsx`: sin llamadas a news/services.
+- `apps/web/src/router/AppRouter.tsx`: rutas de formacion y chat.
+- `apps/web/src/schemas/post.schema.ts`: solo title y content obligatorios.
+- `apps/web/src/styles/globals.css`: estilos de formacion, chat y article-html.
+- `packages/shared/src/types/content.ts`: TrainingCourse, TrainingTopic, TrainingChatMessage.
+- `packages/shared/src/constants/content.ts`: niveles y modos de acceso.
+- `render.yaml`: CLIENT_ORIGIN con dominio Vercel.
+
+### Errores corregidos
+
+1. `Uncaught in promise AxiosError 401`: el interceptor de Axios captura todos los 401. `/auth/me` devuelve `{ user: null }` en lugar de lanzar excepcion.
+2. Llamadas admin en cascada sin sesion: `useAuth` solo carga rutas privadas si `/auth/me` devuelve usuario valido.
+3. `POST /api/admin/posts` con 401: el frontend ahora envia `Authorization: Bearer <token>` y el backend acepta tanto Bearer como cookie.
+4. Blog exigia SEO, slug, categorias y etiquetas: el backend ahora acepta solo titulo y contenido, generando el resto con defaults.
+5. Modulos ocultos seguian haciendo llamadas: dashboard y home eliminaron llamadas a `/admin/news`, `/admin/resources`, `/admin/inquiries`.
+
+### Logs añadidos
+
+Frontend (`[AUTH]`, `[API]`, `[BLOG]`, `[FORMACION]`, `[CHAT]`, `[CHAT ADMIN]`):
+
+- Estado de sesion, token presente, rol del usuario.
+- Cada request: metodo, endpoint, status recibido, error 401 controlado.
+- Creacion de blog: payload, titulo/contenido presentes, imagenes.
+- Formacion: carga publica, usuario no autenticado, usuario autenticado.
+- Chat: envio, confirmacion, error.
+- Chat admin: carga, filtros aplicados, total recibido.
+
+Backend (`[SERVER]`, `[CORS]`, `[AUTH]`, `[ADMIN BLOG]`, `[FORMACION]`, `[CHAT]`, `[CHAT ADMIN]`, `[DB]`):
+
+- Cada peticion: metodo, endpoint, origin.
+- CORS: origin recibido, permitido/bloqueado.
+- Auth: header/cookie/token presentes, usuario encontrado, rol, acceso permitido/denegado, motivo.
+- Blog: intento de creacion, titulo/contenido presentes, guardado correcto, error.
+- Formacion: acceso sin auth, acceso con auth, creacion/edicion/borrado.
+- Chat: mensaje recibido, guardado.
+- Chat admin: consulta, filtros, total, metricas calculadas.
+
+### Tests realizados
+
+Tests automatizados:
+
+- 4 archivos API: 13 tests (auth, posts, content-schemas, inquiries).
+- 1 archivo web: 1 test (ArticleCard).
+- Total: 14 tests, 0 fallos.
+
+Tests de integracion en local (Sprint 11):
+
+- 23 flujos verificados via curl contra API local + MongoDB.
+- 0 errores en log de servidor (172 lineas de log).
+
+Tests de integracion en produccion (Sprint 13):
+
+- 18 flujos verificados via curl contra API de Render.
+- Login, blog CRUD, formacion con bloqueo, formacion autenticada, chat, panel admin, metricas, CORS, limpieza.
+
+### Datos de prueba
+
+Creados y borrados durante Sprint 11 (local):
+
+- 1 post de prueba.
+- 1 curso con 2 temas.
+- 2 mensajes de chat.
+
+Creados y borrados durante Sprint 13 (produccion):
+
+- 1 post de prueba.
+- 1 curso con 2 temas.
+- 1 mensaje de chat.
+
+Estado final: 0 datos de prueba en local y produccion.
+
+### Como ver los logs
+
+Logs del navegador (frontend):
+
+1. Abrir https://doctor-tebar.vercel.app en Chrome/Firefox.
+2. F12 → Consola.
+3. Buscar prefijos `[AUTH]`, `[API]`, `[BLOG]`, `[FORMACION]`, `[CHAT]`, `[CHAT ADMIN]`.
+
+Logs del backend en local:
+
+```bash
+cd apps/api
+npm run dev
+# Los logs aparecen en la terminal en formato JSON estructurado
+```
+
+Logs del backend en Render:
+
+1. Ir a https://dashboard.render.com
+2. Abrir el servicio `doctor-tebar-api`
+3. Pestaña "Logs"
+4. Buscar `[SERVER]`, `[AUTH]`, `[CHAT]`, etc.
+
+Logs de build de Render:
+
+1. Dashboard de Render → servicio `doctor-tebar-api`
+2. Pestaña "Events" → clic en el deploy → "Build Logs"
+
+Logs de build de Vercel:
+
+```bash
+vercel inspect <deployment-url>
+# O desde el dashboard: vercel.com → proyecto doctor-tebar → Deployments
+```
+
+Logs de Docker (si aplica):
+
+```bash
+docker compose logs -f
+docker logs -f <container_id>
+```
+
+### Criterios de aceptacion final
+
+| Criterio | Estado |
+| --- | --- |
+| Errores 401 controlados | Verificado |
+| Sin Uncaught in promise AxiosError | Verificado |
+| App no llama rutas admin sin sesion | Verificado |
+| Login funciona | Verificado local y produccion |
+| Sesion comprobada correctamente | Verificado |
+| Blog con solo titulo y texto | Verificado |
+| Blog sin SEO ni etiquetas obligatorias | Verificado |
+| Blog permite imagenes | Verificado |
+| Imagenes se guardan y visualizan | Verificado |
+| Blog visible en publico | Verificado |
+| Blog se puede borrar | Verificado |
+| Modulos no necesarios ocultos | Verificado |
+| Solo Blog, Formacion y Chat visibles | Verificado |
+| Modulo privado de Formacion | Verificado |
+| Crear cursos | Verificado |
+| Crear temas con texto e imagenes | Verificado |
+| Persistencia de cursos y temas | Verificado |
+| Pagina publica de Formacion | Verificado |
+| Sin login: solo indice visible | Verificado local y produccion |
+| Con login: contenido completo | Verificado local y produccion |
+| Chat dentro de formacion | Verificado |
+| Chat ligado a usuario, formacion y tema | Verificado |
+| Panel privado de Chat | Verificado |
+| Filtro por formacion | Verificado |
+| Filtro por usuario | Verificado |
+| Conteo de conversaciones por persona | Verificado |
+| Formaciones distintas por persona | Verificado |
+| Logs utiles en frontend | Verificado |
+| Logs utiles en backend | Verificado |
+| Como ver logs documentado | Verificado |
+| Tests locales realizados | Verificado |
+| Tests en produccion realizados | Verificado |
+| Datos de prueba creados | Verificado |
+| Datos de prueba borrados | Verificado |
+| Sin errores criticos en consola | Verificado |
+| Sin errores criticos en servidor | Verificado |
+| Todos los sprints cerrados | Verificado |
+
+### URLs de produccion
+
+- Frontend: https://doctor-tebar.vercel.app
+- API: https://doctor-tebar-api.onrender.com
+- API Health: https://doctor-tebar-api.onrender.com/api/health
+
+### Pendientes tecnicos no bloqueantes
+
+1. Lint real con ESLint/Prettier en los workspaces (script existe en raiz pero no en subpaquetes).
+2. Code splitting del bundle web (1025 KB; umbral de Vite en 500 KB).
+3. Auto-deploy desde GitHub en Render (ahora requiere deploy manual o CLI).
+4. Si se activa el dominio custom `eduardotebarboti.com`: actualizar `CLIENT_ORIGIN` en el dashboard de Render. Actualmente no afecta a la app porque el dominio no resuelve.
