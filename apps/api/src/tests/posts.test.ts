@@ -7,9 +7,7 @@ describe("Posts", () => {
     const result = postSchema.safeParse({
       body: {
         title: "Articulo de prueba",
-        excerpt: "Extracto suficientemente largo para test",
-        content: "Contenido suficientemente largo para poder validar correctamente.",
-        category: "general"
+        content: "Texto minimo del blog."
       }
     });
     expect(result.success).toBe(true);

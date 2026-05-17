@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inquiryCrmSchema, inquirySchema, newsSchema, resourceSchema, serviceSchema, settingsSchema } from "../schemas/content.schema.js";
+import { inquiryCrmSchema, inquirySchema, newsSchema, resourceSchema, serviceSchema, settingsSchema, trainingChatMessageSchema, trainingCourseSchema } from "../schemas/content.schema.js";
 
 describe("Content schemas", () => {
   it("validates news payloads", () => {
@@ -40,6 +40,35 @@ describe("Content schemas", () => {
         deliverables: ["Informe", "Plan de analisis"],
         status: "published",
         order: 1
+      }
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("validates training course payloads", () => {
+    const result = trainingCourseSchema.safeParse({
+      body: {
+        title: "Formacion en metodologia clinica",
+        summary: "Programa aplicado para mejorar el diseno y analisis de estudios clinicos.",
+        description: "Contenido detallado del programa formativo con sesiones, ejercicios y seguimiento.",
+        level: "intermedio",
+        access: "private",
+        status: "draft",
+        featured: false
+      }
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("validates training chat message payloads", () => {
+    const result = trainingChatMessageSchema.safeParse({
+      params: { slug: "formacion-metodologia" },
+      body: {
+        topicId: "topic-id",
+        message: "Quiero resolver una duda concreta sobre esta formacion.",
+        consent: true
       }
     });
 

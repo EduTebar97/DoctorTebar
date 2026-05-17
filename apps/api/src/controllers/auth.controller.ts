@@ -10,6 +10,15 @@ function publicUser(user: any) {
   return { id: String(user._id), name: user.name, email: user.email, role: user.role };
 }
 
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    secure: env.nodeEnv === "production",
+    sameSite: env.nodeEnv === "production" ? "none" as const : "lax" as const,
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  };
+}
+
 export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email.toLowerCase() });
@@ -17,21 +26,20 @@ export async function login(req: Request, res: Response) {
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) throw new ApiError(401, "Invalid credentials");
   const token = jwt.sign({ userId: user._id }, env.jwtSecret, { expiresIn: env.jwtExpiresIn as any });
-  res.cookie(env.cookieName, token, {
-    httpOnly: true,
-    secure: env.nodeEnv === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  });
+  res.cookie(env.cookieName, token, cookieOptions());
   user.lastLoginAt = new Date();
   await user.save();
   req.user = user as never;
   await audit(req, "login", "auth", String(user._id));
-  res.json({ user: publicUser(user) });
+  res.json({ user: publicUser(user), token });
 }
 
 export async function logout(req: Request, res: Response) {
-  res.clearCookie(env.cookieName);
+  res.clearCookie(env.cookieName, {
+    httpOnly: true,
+    secure: env.nodeEnv === "production",
+    sameSite: env.nodeEnv === "production" ? "none" : "lax"
+  });
   await audit(req, "logout", "auth", req.user ? String(req.user._id) : undefined);
   res.json({ ok: true });
 }

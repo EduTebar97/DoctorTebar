@@ -9,6 +9,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { pagination } from "../utils/pagination.js";
 import { sanitizeRichHtml } from "../utils/sanitizeHtml.js";
 import { slugify } from "../utils/slugify.js";
+import { logger } from "../config/logger.js";
 
 type Entity = "post" | "news" | "resource" | "service";
 
@@ -16,6 +17,18 @@ async function uniqueSlug(model: Model<any>, title: string, currentId?: string) 
   const base = slugify(title);
   const existing = await model.findOne({ slug: base, ...(currentId ? { _id: { $ne: currentId } } : {}) });
   return existing ? `${base}-${Date.now()}` : base;
+}
+
+function plainText(value: string) {
+  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function ensurePostDefaults(payload: Record<string, any>) {
+  if (!payload.excerpt) payload.excerpt = plainText(String(payload.content ?? "")).slice(0, 220) || payload.title;
+  if (!payload.category) payload.category = "general";
+  if (!payload.status) payload.status = "published";
+  if (!Array.isArray(payload.tags)) payload.tags = [];
+  return payload;
 }
 
 function publicFilter(req: Request) {
@@ -65,10 +78,20 @@ export function createContent(model: Model<any>, entity: Entity) {
   return async (req: Request, res: Response) => {
     const payload = { ...req.body };
     if ("content" in payload) payload.content = sanitizeRichHtml(payload.content);
+    if (entity === "post") {
+      logger.info("[ADMIN BLOG] Intento de crear blog", {
+        userAuthenticated: Boolean(req.user),
+        titlePresent: Boolean(payload.title),
+        contentPresent: Boolean(payload.content),
+        imagesReceived: payload.coverImageUrl ? 1 : 0
+      });
+      ensurePostDefaults(payload);
+    }
     if ("title" in payload && entity !== "resource") payload.slug = await uniqueSlug(model, payload.title);
     if (entity === "post") payload.authorId = req.user?._id;
     if (payload.status === "published" && !payload.publishedAt) payload.publishedAt = new Date();
     const item = await model.create(payload);
+    if (entity === "post") logger.info("[ADMIN BLOG] Blog guardado correctamente", { id: String(item._id), slug: item.slug });
     await audit(req, "create", entity, String(item._id));
     res.status(201).json(item);
   };
@@ -78,6 +101,7 @@ export function updateContent(model: Model<any>, entity: Entity) {
   return async (req: Request, res: Response) => {
     const payload = { ...req.body };
     if ("content" in payload) payload.content = sanitizeRichHtml(payload.content);
+    if (entity === "post") ensurePostDefaults(payload);
     if ("title" in payload && entity !== "resource") payload.slug = await uniqueSlug(model, payload.title, String(req.params.id));
     if (payload.status === "published" && !payload.publishedAt) payload.publishedAt = new Date();
     const item = await model.findByIdAndUpdate(String(req.params.id), payload, { new: true, runValidators: true });

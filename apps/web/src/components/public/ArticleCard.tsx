@@ -3,9 +3,10 @@ import { CalendarDays } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "../common/Badge";
 
-export function ArticleCard({ post }: { post: Pick<Post, "title" | "excerpt" | "slug" | "category" | "publishedAt" | "tags"> }) {
+export function ArticleCard({ post }: { post: Pick<Post, "title" | "excerpt" | "slug" | "category" | "publishedAt" | "tags" | "coverImageUrl"> }) {
   return (
     <article className="content-card">
+      {post.coverImageUrl ? <Link to={`/blog/${post.slug}`}><img className="content-card-cover" src={post.coverImageUrl} alt={post.title} /></Link> : null}
       <Badge>{post.category}</Badge>
       <h3>
         <Link to={`/blog/${post.slug}`}>{post.title}</Link>

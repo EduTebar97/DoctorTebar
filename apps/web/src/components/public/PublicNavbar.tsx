@@ -4,12 +4,8 @@ import { NavLink } from "react-router-dom";
 
 const links = [
   ["/", "Inicio"],
-  ["/sobre-mi", "Sobre mi"],
-  ["/servicios", "Servicios"],
   ["/blog", "Blog"],
-  ["/noticias", "Noticias"],
-  ["/recursos", "Recursos"],
-  ["/contacto", "Contacto"]
+  ["/formacion", "Formacion"]
 ];
 
 export function PublicNavbar() {
@@ -32,9 +28,6 @@ export function PublicNavbar() {
             {label}
           </NavLink>
         ))}
-        <NavLink className="nav-cta" to="/contacto" onClick={() => setOpen(false)}>
-          Consulta metodologica
-        </NavLink>
       </nav>
     </header>
   );

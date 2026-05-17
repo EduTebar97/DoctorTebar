@@ -4,6 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { auditRoutes } from "./routes/audit.routes.js";
@@ -15,6 +16,7 @@ import { postsRoutes } from "./routes/posts.routes.js";
 import { resourcesRoutes } from "./routes/resources.routes.js";
 import { servicesRoutes } from "./routes/services.routes.js";
 import { settingsRoutes } from "./routes/settings.routes.js";
+import { trainingRoutes } from "./routes/training.routes.js";
 import { usersRoutes } from "./routes/users.routes.js";
 
 const allowedOrigins = env.clientOrigin.split(",").map((origin) => origin.trim());
@@ -22,7 +24,23 @@ const allowedOrigins = env.clientOrigin.split(",").map((origin) => origin.trim()
 export const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use((req, _res, next) => {
+  logger.info("[SERVER] Petición recibida", {
+    method: req.method,
+    endpoint: req.originalUrl,
+    origin: req.get("origin")
+  });
+  next();
+});
+app.use(cors({
+  origin(origin, callback) {
+    logger.info("[CORS] Origin recibido", { origin, credentialsEnabled: true });
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    logger.warn("[CORS] Origin permitido: no", { origin, allowedOrigins, credentialsEnabled: true });
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan(env.nodeEnv === "test" ? "tiny" : "dev"));
@@ -35,6 +53,7 @@ app.use("/api", resourcesRoutes);
 app.use("/api", servicesRoutes);
 app.use("/api", inquiriesRoutes);
 app.use("/api", settingsRoutes);
+app.use("/api", trainingRoutes);
 app.use("/api", mediaRoutes);
 app.use("/api", usersRoutes);
 app.use("/api", auditRoutes);

@@ -5,6 +5,7 @@ import { LoginPage } from "../pages/admin/LoginPage";
 import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage";
 import { AdminAuditPage } from "../pages/admin/AdminAuditPage";
 import { AdminCalendarPage } from "../pages/admin/AdminCalendarPage";
+import { AdminChatPage } from "../pages/admin/AdminChatPage";
 import { AdminEditorialPage } from "../pages/admin/AdminEditorialPage";
 import { AdminGenericListPage } from "../pages/admin/AdminGenericListPage";
 import { AdminGuidesPage } from "../pages/admin/AdminGuidesPage";
@@ -14,6 +15,7 @@ import { AdminPostEditorPage } from "../pages/admin/AdminPostEditorPage";
 import { AdminResourceEditorPage } from "../pages/admin/AdminResourceEditorPage";
 import { AdminServiceEditorPage } from "../pages/admin/AdminServiceEditorPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
+import { AdminTrainingEditorPage } from "../pages/admin/AdminTrainingEditorPage";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
 import { AboutPage } from "../pages/public/AboutPage";
 import { BlogDetailPage } from "../pages/public/BlogDetailPage";
@@ -24,6 +26,8 @@ import { NewsDetailPage } from "../pages/public/NewsDetailPage";
 import { NewsListPage } from "../pages/public/NewsListPage";
 import { ResourcesPage } from "../pages/public/ResourcesPage";
 import { ServicesPage } from "../pages/public/ServicesPage";
+import { TrainingDetailPage } from "../pages/public/TrainingDetailPage";
+import { TrainingListPage } from "../pages/public/TrainingListPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -34,6 +38,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "sobre-mi", element: <AboutPage /> },
       { path: "servicios", element: <ServicesPage /> },
+      { path: "formacion", element: <TrainingListPage /> },
+      { path: "formacion/:slug", element: <TrainingDetailPage /> },
       { path: "blog", element: <BlogListPage /> },
       { path: "blog/:slug", element: <BlogDetailPage /> },
       { path: "noticias", element: <NewsListPage /> },
@@ -61,6 +67,10 @@ const router = createBrowserRouter([
       { path: "services", element: <AdminGenericListPage path="services" title="Servicios" editBase="/admin/services" /> },
       { path: "services/new", element: <AdminServiceEditorPage /> },
       { path: "services/:id/edit", element: <AdminServiceEditorPage /> },
+      { path: "training", element: <AdminGenericListPage path="training" title="Formacion" editBase="/admin/training" /> },
+      { path: "training/new", element: <AdminTrainingEditorPage /> },
+      { path: "training/:id/edit", element: <AdminTrainingEditorPage /> },
+      { path: "chat", element: <AdminChatPage /> },
       { path: "media", element: <AdminMediaPage /> },
       { path: "inquiries", element: <AdminInquiriesPage /> },
       { path: "guides", element: <AdminGuidesPage /> },

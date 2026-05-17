@@ -79,6 +79,53 @@ export interface ClinicalService {
   updatedAt: string;
 }
 
+export interface TrainingCourse {
+  _id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  description: string;
+  level: "introductorio" | "intermedio" | "avanzado";
+  access: "public" | "private";
+  coverImageUrl?: string;
+  price?: string;
+  duration?: string;
+  topics: TrainingTopic[];
+  status: ContentStatus;
+  featured: boolean;
+  locked?: boolean;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TrainingTopic {
+  _id?: string;
+  title: string;
+  summary?: string;
+  content?: string;
+  imageUrls: string[];
+  videoUrl?: string;
+  order: number;
+}
+
+export interface TrainingChatMessage {
+  _id: string;
+  courseId: string;
+  userId: string;
+  courseTitle: string;
+  courseSlug: string;
+  topicId?: string;
+  topicTitle?: string;
+  name: string;
+  email: string;
+  message: string;
+  status: "new" | "reviewed" | "replied" | "archived";
+  source: "training_public_chat";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Inquiry {
   _id: string;
   name: string;

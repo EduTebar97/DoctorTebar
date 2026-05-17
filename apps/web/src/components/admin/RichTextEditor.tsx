@@ -1,10 +1,11 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { Bold, Code, Heading2, Heading3, Italic, List, ListOrdered, Pilcrow, Minus } from "lucide-react";
+import { Bold, Code, Heading2, Heading3, Image, Italic, List, ListOrdered, Pilcrow, Minus } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-export function RichTextEditor({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export function RichTextEditor({ value, onChange, onUploadImage }: { value: string; onChange: (value: string) => void; onUploadImage?: (file: File) => Promise<string> }) {
   const updatingFromProp = useRef(false);
+  const imageInput = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -27,6 +28,19 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
   }, [value, editor]);
 
   if (!editor) return null;
+
+  async function insertImage(file: File) {
+    if (!onUploadImage) return;
+    console.info("[BLOG] Imagen seleccionada", { type: file.type, size: file.size });
+    console.info("[BLOG] Subiendo imagen");
+    try {
+      const url = await onUploadImage(file);
+      editor.chain().focus().insertContent(`<img src="${url}" alt="" />`).run();
+      console.info("[BLOG] Imagen subida correctamente", { urlPresent: Boolean(url) });
+    } catch (error: any) {
+      console.error("[BLOG] Error subiendo imagen", error?.response?.data ?? error?.message ?? error);
+    }
+  }
 
   function btn(label: string, icon: React.ReactNode, action: () => void, active: boolean) {
     return (
@@ -51,6 +65,18 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
         <span className="rte-sep" />
         {btn("Bloque de código", <Code size={15} />, () => editor.chain().focus().toggleCodeBlock().run(), editor.isActive("codeBlock"))}
         {btn("Separador horizontal", <Minus size={15} />, () => editor.chain().focus().setHorizontalRule().run(), false)}
+        {onUploadImage ? btn("Insertar imagen", <Image size={15} />, () => imageInput.current?.click(), false) : null}
+        <input
+          ref={imageInput}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          hidden
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void insertImage(file);
+            event.target.value = "";
+          }}
+        />
       </div>
       <EditorContent editor={editor} className="rte-content" />
     </div>

@@ -6,8 +6,8 @@ export const slugParamSchema = z.object({ params: z.object({ slug: z.string().mi
 export const postSchema = z.object({
   body: z.object({
     title: z.string().min(5).max(180),
-    excerpt: z.string().min(20).max(500),
-    content: z.string().min(20),
+    excerpt: z.string().max(500).optional().or(z.literal("")),
+    content: z.string().min(1),
     coverImageUrl: z.string().url().optional().or(z.literal("")),
     category: z.enum(["causalidad", "prediccion", "reporte", "stata", "errores", "general"]).default("general"),
     tags: z.array(z.string().max(40)).default([]),
@@ -39,6 +39,38 @@ export const resourceSchema = z.object({
     fileUrl: z.string().url().optional().or(z.literal("")),
     externalUrl: z.string().url().optional().or(z.literal("")),
     status: z.enum(["draft", "published", "archived"]).default("draft")
+  })
+});
+
+export const trainingCourseSchema = z.object({
+  body: z.object({
+    title: z.string().min(5).max(180),
+    summary: z.string().min(20).max(500),
+    description: z.string().min(20),
+    level: z.enum(["introductorio", "intermedio", "avanzado"]).default("intermedio"),
+    access: z.enum(["public", "private"]).default("private"),
+    coverImageUrl: z.string().url().optional().or(z.literal("")),
+    price: z.string().max(80).optional().or(z.literal("")),
+    duration: z.string().max(80).optional().or(z.literal("")),
+    topics: z.array(z.object({
+      title: z.string().min(3).max(180),
+      summary: z.string().max(500).optional().or(z.literal("")),
+      content: z.string().optional().or(z.literal("")),
+      imageUrls: z.array(z.string().url()).default([]),
+      videoUrl: z.string().url().optional().or(z.literal("")),
+      order: z.coerce.number().int().default(0)
+    })).default([]),
+    status: z.enum(["draft", "published", "archived"]).default("draft"),
+    featured: z.boolean().default(false)
+  })
+});
+
+export const trainingChatMessageSchema = z.object({
+  params: z.object({ slug: z.string().min(1) }),
+  body: z.object({
+    topicId: z.string().optional().or(z.literal("")),
+    message: z.string().min(10).max(2000),
+    consent: z.boolean().optional()
   })
 });
 

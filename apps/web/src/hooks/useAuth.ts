@@ -6,7 +6,8 @@ export function useAuth() {
   const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: authService.getMe,
-    retry: false
+    retry: false,
+    throwOnError: false
   });
 
   const loginMutation = useMutation({
@@ -22,6 +23,7 @@ export function useAuth() {
   return {
     user: meQuery.data?.user ?? null,
     isLoading: meQuery.isLoading,
+    isAuthenticated: Boolean(meQuery.data?.user),
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
     loginError: loginMutation.error

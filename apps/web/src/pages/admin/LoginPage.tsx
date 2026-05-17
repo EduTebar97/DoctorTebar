@@ -14,8 +14,12 @@ export function LoginPage() {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    await login({ email, password });
-    navigate("/admin");
+    try {
+      await login({ email, password });
+      navigate("/admin");
+    } catch {
+      console.warn("[AUTH] Sesión caducada o no válida");
+    }
   }
 
   return (
