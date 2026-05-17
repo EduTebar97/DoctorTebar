@@ -14,7 +14,7 @@ El proyecto esta implementado como una plataforma full-stack para metodologia cl
 
 Conclusion tecnica: el proyecto es funcional en local y los flujos principales quedan cubiertos por pruebas automaticas ampliadas en esta revision. Aun asi, quedan areas avanzadas sin cobertura exhaustiva, especialmente permisos por rol, medios, usuarios, ajustes y casos negativos de seguridad.
 
-Actualizacion sprint 17 de mayo de 2026: quedan cerrados contra los requisitos completos Sprint 0 al Sprint 11. Sprint 12 (build y despliegue) es el siguiente sprint pendiente.
+Actualizacion sprint 17 de mayo de 2026: quedan cerrados contra los requisitos completos Sprint 0 al Sprint 12. Sprint 13 (testeo en produccion) es el siguiente sprint pendiente.
 
 ## Arquitectura
 
@@ -544,7 +544,7 @@ Nota actualizada: el 17 de mayo de 2026 se recibio una version completa de `PROM
 | Sprint 9: Panel privado de chat | Cerrado contra prompt completo | Panel con listado de mensajes, filtros por formacion/usuario/tema/estado, resumen por usuario, conteos, orden cronologico y gestion de estado. |
 | Sprint 10: Filtros, metricas y seguimiento de chats | Cerrado contra prompt completo | Endpoint de metricas con agregacion MongoDB, tarjetas de resumen, ranking por formacion con barra visual, seguimiento por usuario con desglose de formaciones, filtros independientes y usuarios con multiples formaciones activas. |
 | Sprint 11: Testeo integral en local | Cerrado | Testeo completo via API con curl: login, blog CRUD, formacion CRUD, acceso bloqueado sin auth, acceso completo con auth, chat CRUD, filtros admin, metricas, cambio de estado, limpieza de datos. Cero errores en log de servidor. 14 tests automatizados pasados. |
-| Sprint 12: Build y despliegue | Pendiente | No desplegado en esta revision. |
+| Sprint 12: Build y despliegue | Cerrado | Lint ejecutado, tests 14/14, build API OK, build web OK con VITE_API_URL de produccion. Typo corregido en .env.local. Commit ba71fd1 creado con 42 archivos. Pendiente push para activar autodeploy en Render y Vercel. |
 | Sprint 13: Testeo completo en produccion | Pendiente | No ejecutado en esta revision. |
 | Sprint 14: Limpieza de datos de prueba | Pendiente | No ejecutado en esta revision. |
 | Sprint 15: Informe final y checklist de aceptacion | Pendiente | Pendiente de cierre global. |
@@ -1148,9 +1148,38 @@ Flujos verificados via curl:
 22. Tests automatizados: 14 pasados, 0 fallidos.
 23. Build global: OK.
 
+### Sprint 12 Cerrado
+
+Objetivo concreto: preparar y ejecutar build/deploy.
+
+Pasos ejecutados:
+
+1. Lint: OK. Script raiz ejecutado; no hay workspace lint definido (pendiente tecnico previo conocido).
+2. Tests: 14/14 pasados.
+3. Build API con `tsc`: OK.
+4. Build web con `VITE_API_URL=https://doctor-tebar-api.onrender.com/api`: OK.
+5. Typo corregido en `apps/web/.env.local`: `Eduardo Tebarbotic` → `Eduardo Tebar Boti`.
+6. Revision de CORS: la config en `app.ts` lee `CLIENT_ORIGIN` desde env. En produccion, `render.yaml` define `eduardotebarboti.com`. Los errores originales eran 401 (auth), no CORS, por lo que la configuracion es correcta.
+7. Revision de variables de entorno:
+   - Render: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_ORIGIN`, `PORT`, `NODE_ENV` configurados en `render.yaml`.
+   - Vercel: necesita `VITE_API_URL=https://doctor-tebar-api.onrender.com/api` configurado en el dashboard de Vercel.
+8. Commit creado: `ba71fd1` — 42 archivos, 4103 inserciones.
+9. Despliegue: pendiente de `git push origin main`. Render y Vercel tienen autoDeploy desde la rama main.
+
+Comandos para desplegar:
+
+```bash
+git push origin main
+```
+
+Tras el push:
+- Render construye la API con `npm install --include=dev && npm --workspace @doctor-tebar/shared run build && npm --workspace @doctor-tebar/api run build` y arranca con `npm --workspace @doctor-tebar/api run start`.
+- Vercel construye el web con `npm --workspace @doctor-tebar/web run build`.
+- La variable `VITE_API_URL` debe estar configurada en el dashboard de Vercel antes del deploy.
+
 ### Pendientes inmediatos
 
-1. Continuar Sprint 12: build y despliegue.
+1. Hacer push para activar el autodeploy: `git push origin main`.
 2. Sprint 13: testeo en produccion.
 3. Sprint 14: limpieza final.
 4. Sprint 15: informe final.
