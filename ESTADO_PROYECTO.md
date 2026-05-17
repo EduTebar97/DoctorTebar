@@ -14,7 +14,7 @@ El proyecto esta implementado como una plataforma full-stack para metodologia cl
 
 Conclusion tecnica: el proyecto es funcional en local y los flujos principales quedan cubiertos por pruebas automaticas ampliadas en esta revision. Aun asi, quedan areas avanzadas sin cobertura exhaustiva, especialmente permisos por rol, medios, usuarios, ajustes y casos negativos de seguridad.
 
-Actualizacion sprint 17 de mayo de 2026: quedan cerrados contra los requisitos completos Sprint 0 al Sprint 12. Sprint 13 (testeo en produccion) es el siguiente sprint pendiente.
+Actualizacion sprint 17 de mayo de 2026: quedan cerrados contra los requisitos completos Sprint 0 al Sprint 14. Sprint 15 (informe final) es el ultimo sprint pendiente.
 
 ## Arquitectura
 
@@ -544,9 +544,9 @@ Nota actualizada: el 17 de mayo de 2026 se recibio una version completa de `PROM
 | Sprint 9: Panel privado de chat | Cerrado contra prompt completo | Panel con listado de mensajes, filtros por formacion/usuario/tema/estado, resumen por usuario, conteos, orden cronologico y gestion de estado. |
 | Sprint 10: Filtros, metricas y seguimiento de chats | Cerrado contra prompt completo | Endpoint de metricas con agregacion MongoDB, tarjetas de resumen, ranking por formacion con barra visual, seguimiento por usuario con desglose de formaciones, filtros independientes y usuarios con multiples formaciones activas. |
 | Sprint 11: Testeo integral en local | Cerrado | Testeo completo via API con curl: login, blog CRUD, formacion CRUD, acceso bloqueado sin auth, acceso completo con auth, chat CRUD, filtros admin, metricas, cambio de estado, limpieza de datos. Cero errores en log de servidor. 14 tests automatizados pasados. |
-| Sprint 12: Build y despliegue | Cerrado con bloqueo tecnico en Render | Lint, tests 14/14, builds OK. Commits ba71fd1 y b400d2d pusheados. Vercel desplegado OK (HTTP 200). Render no recibe el webhook de GitHub: el servicio fue creado manualmente, no via Blueprint. El usuario debe hacer deploy manual desde el dashboard de Render. Instrucciones documentadas. |
-| Sprint 13: Testeo completo en produccion | Pendiente | No ejecutado en esta revision. |
-| Sprint 14: Limpieza de datos de prueba | Pendiente | No ejecutado en esta revision. |
+| Sprint 12: Build y despliegue | Cerrado | Lint, tests 14/14, builds OK. Commits pusheados. Vercel OK en https://doctor-tebar.vercel.app. Render desplegado correctamente tras deploy manual: build OK, MongoDB connected, API live en https://doctor-tebar-api.onrender.com. /api/training HTTP 200, /api/auth/me HTTP 401 confirmados. |
+| Sprint 13: Testeo completo en produccion | Cerrado | Login OK, blog CRUD OK, formacion con bloqueo sin auth OK, formacion con auth OK, chat OK (401 sin login), panel admin OK, metricas OK, CORS Vercel OK. Vercel redesplegado con bundle nuevo (index-BL227pCF.js). Render y Vercel ambos en produccion con el nuevo codigo. |
+| Sprint 14: Limpieza de datos de prueba | Cerrado | Ejecutada durante Sprint 13: mensaje de chat borrado (204), curso borrado (204), post borrado (204). Verificacion: 0 mensajes en chat admin, post no encontrado en publico (404), curso no aparece en listado. |
 | Sprint 15: Informe final y checklist de aceptacion | Pendiente | Pendiente de cierre global. |
 
 ### Cambios cerrados en Sprint 0
@@ -1217,9 +1217,69 @@ Opcion B — Configurar autodeploy via GitHub:
 Variable de entorno necesaria en Vercel (si no esta ya):
 - `VITE_API_URL` = `https://doctor-tebar-api.onrender.com/api`
 
+### Sprint 12 Cerrado
+
+Objetivo concreto: build, verificacion de variables y despliegue.
+
+Pasos ejecutados:
+
+1. Lint: OK.
+2. Tests: 14/14 pasados.
+3. Build API local: OK. Build simulado con el comando exacto de Render: OK.
+4. Build web con `VITE_API_URL` de produccion: OK.
+5. Typo corregido en `apps/web/.env.local`.
+6. `VITE_API_URL=https://doctor-tebar-api.onrender.com/api` confirmada en bundle de Vercel.
+7. `CLIENT_ORIGIN` en `render.yaml` actualizado para incluir `https://doctor-tebar.vercel.app`.
+8. Commits pusheados: `ba71fd1`, `b400d2d`, `a35eeb1`.
+9. Render: deploy manual por el usuario. Build exitoso segun logs: `Build successful`, `MongoDB connected`, `API live`.
+10. Vercel: deploy via Vercel CLI (`vercel --prod --yes`). Bundle `index-BL227pCF.js` activo.
+
+Bloqueo tecnico documentado (resuelto):
+
+- Render no tenia webhook de GitHub porque el servicio fue creado manualmente. Se resolvio con deploy manual.
+- Vercel no tenia auto-deploy activo. Se resolvio con deploy directo via CLI autenticada.
+
+### Sprint 13 Cerrado
+
+Objetivo concreto: testeo completo en produccion.
+
+Entorno verificado:
+
+- API: https://doctor-tebar-api.onrender.com (nuevo deploy activo, uptime ~130s al iniciar tests).
+- Frontend: https://doctor-tebar.vercel.app (bundle index-BL227pCF.js tras redeploy).
+
+Flujos verificados en produccion via curl:
+
+1. Login admin: OK. Token recibido, email y rol correctos.
+2. /auth/me con token: OK. Devuelve usuario y rol.
+3. /auth/me sin token: HTTP 401.
+4. Crear blog (solo titulo + texto): OK. Slug y excerpt autogenerados.
+5. Publicar blog: OK. Aparece en publico.
+6. Detalle publico por slug: OK.
+7. Crear curso con 2 temas: OK.
+8. Acceso sin login al curso: locked=true, content vacio.
+9. Acceso con login al curso: locked=false, content presente.
+10. Chat con tema desde formacion: OK. topicTitle guardado.
+11. Chat sin autenticacion: HTTP 401.
+12. Panel admin chat: 1 mensaje visible.
+13. Filtro por formacion: 1 mensaje.
+14. Metricas: total 1, open 1, 1 formacion, 1 usuario.
+15. CORS desde doctor-tebar.vercel.app: HTTP 200, cabecera access-control-allow-origin correcta.
+16. CORS desde eduardotebarboti.com: HTTP 500 (dominio no configurado en CLIENT_ORIGIN del dashboard de Render; pendiente de configuracion manual).
+17. Rutas frontend: /, /blog, /formacion, /login → todas HTTP 200.
+18. API embebida en bundle JS: doctor-tebar-api.onrender.com/api.
+
+### Sprint 14 Cerrado
+
+Datos de prueba creados y borrados en produccion durante Sprint 13:
+
+- Mensaje de chat: borrado HTTP 204.
+- Curso de prueba: borrado HTTP 204.
+- Post de prueba: borrado HTTP 204.
+- Verificacion: 0 mensajes en chat admin, post 404 en publico, curso no aparece en listado publico.
+
 ### Pendientes inmediatos
 
-1. El usuario debe hacer deploy manual en Render (ver instrucciones arriba).
-2. Sprint 13: testeo en produccion tras el deploy de Render.
-3. Sprint 14: limpieza final.
-4. Sprint 15: informe final.
+1. Sprint 15: informe final.
+2. Configuracion manual en dashboard de Render: añadir `https://eduardotebarboti.com,https://www.eduardotebarboti.com` a la variable `CLIENT_ORIGIN` si se activa ese dominio custom.
+3. Configurar auto-deploy de GitHub en Render y Vercel para que futuros pushes desplieguen automaticamente.
