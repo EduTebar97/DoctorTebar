@@ -16,6 +16,12 @@ Conclusion tecnica: el proyecto es funcional en local y los flujos principales q
 
 Actualizacion sprint 17 de mayo de 2026: todos los sprints (0-15) cerrados. Proyecto completado.
 
+Actualizacion 18 de mayo de 2026: flujo de acceso publico implementado y desplegado.
+- Backend: endpoint POST /auth/register (role=viewer) para registro de usuarios publicos.
+- Frontend: pagina /acceso con tabs login/registro, redireccion post-auth al recurso solicitado.
+- PublicNavbar: botones Acceder/Registrarse cuando no hay sesion; nombre y Salir cuando si hay.
+- TrainingDetailPage: access gate enlaza a /acceso con redirect al curso.
+
 ## Arquitectura
 
 Monorepo Node con workspaces:
