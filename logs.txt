@@ -1,50 +1,50 @@
-2026-05-17T18:07:54.39835338Z added 558 packages, and audited 563 packages in 9s
-2026-05-17T18:07:54.398360831Z 
-2026-05-17T18:07:54.398366461Z 114 packages are looking for funding
-2026-05-17T18:07:54.398371361Z   run `npm fund` for details
-2026-05-17T18:07:54.431968701Z 
-2026-05-17T18:07:54.431992871Z 6 vulnerabilities (5 moderate, 1 critical)
-2026-05-17T18:07:54.431998541Z 
-2026-05-17T18:07:54.432004202Z To address issues that do not require attention, run:
-2026-05-17T18:07:54.432008862Z   npm audit fix
-2026-05-17T18:07:54.432013222Z 
-2026-05-17T18:07:54.432017712Z To address all issues (including breaking changes), run:
-2026-05-17T18:07:54.432022672Z   npm audit fix --force
-2026-05-17T18:07:54.432026812Z 
-2026-05-17T18:07:54.432031362Z Run `npm audit` for details.
-2026-05-17T18:07:54.739692711Z 
-2026-05-17T18:07:54.739827324Z > @doctor-tebar/shared@0.1.0 build
-2026-05-17T18:07:54.739835964Z > tsc
-2026-05-17T18:07:54.739840134Z 
-2026-05-17T18:07:56.272832876Z 
-2026-05-17T18:07:56.272859637Z > @doctor-tebar/api@0.1.0 build
-2026-05-17T18:07:56.272866167Z > tsc
-2026-05-17T18:07:56.272870637Z 
-2026-05-17T18:08:09.725958344Z ==> Uploading build...
-2026-05-17T18:08:16.715514546Z ==> Uploaded in 3.5s. Compression took 3.5s
-2026-05-17T18:08:16.872226647Z ==> Build successful 🎉
-2026-05-17T18:08:37.815112107Z ==> Deploying...
-2026-05-17T18:08:37.899476655Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-05-17T18:08:52.411826827Z ==> Running 'npm --workspace @doctor-tebar/api run start'
-2026-05-17T18:08:53.829706459Z 
-2026-05-17T18:08:53.82974018Z > @doctor-tebar/api@0.1.0 start
-2026-05-17T18:08:53.82974441Z > node dist/server.js
-2026-05-17T18:08:53.82974709Z 
-2026-05-17T18:09:00.259198323Z {"level":"info","message":"MongoDB connected","timestamp":"2026-05-17T18:09:00.258Z"}
-2026-05-17T18:09:00.26165915Z {"level":"info","message":"API running on port 10000","timestamp":"2026-05-17T18:09:00.261Z"}
-2026-05-17T18:09:00.572746769Z {"endpoint":"/","level":"info","message":"[SERVER] Petición recibida","method":"HEAD","timestamp":"2026-05-17T18:09:00.572Z"}
-2026-05-17T18:09:00.573081976Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-17T18:09:00.572Z"}
-2026-05-17T18:09:00.61632286Z HEAD / 404 39.148 ms - 140
-2026-05-17T18:09:08.064509246Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-17T18:09:08.064Z"}
-2026-05-17T18:09:08.064552037Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-17T18:09:08.064Z"}
-2026-05-17T18:09:08.067980816Z GET /api/health 200 1.946 ms - 99
-2026-05-17T18:09:08.069025891Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-17T18:09:08.068Z"}
-2026-05-17T18:09:08.069160854Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-17T18:09:08.068Z"}
-2026-05-17T18:09:08.069750057Z GET /api/health 200 0.224 ms - 99
-2026-05-17T18:09:08.962558934Z ==> Your service is live 🎉
-2026-05-17T18:09:09.185230589Z ==> 
-2026-05-17T18:09:09.18768934Z ==> ///////////////////////////////////////////////////////////
-2026-05-17T18:09:09.1901303Z ==> 
-2026-05-17T18:09:09.195263346Z ==> Available at your primary URL https://doctor-tebar-api.onrender.com
-2026-05-17T18:09:09.199180963Z ==> 
-2026-05-17T18:09:09.201185744Z ==> ///////////////////////////////////////////////////////////
+2026-05-18T09:58:05.746582636Z   run `npm fund` for details
+2026-05-18T09:58:05.760374983Z 
+2026-05-18T09:58:05.760392923Z 6 vulnerabilities (5 moderate, 1 critical)
+2026-05-18T09:58:05.760397943Z 
+2026-05-18T09:58:05.760403133Z To address issues that do not require attention, run:
+2026-05-18T09:58:05.760407133Z   npm audit fix
+2026-05-18T09:58:05.760410913Z 
+2026-05-18T09:58:05.760417644Z To address all issues (including breaking changes), run:
+2026-05-18T09:58:05.760421993Z   npm audit fix --force
+2026-05-18T09:58:05.760425674Z 
+2026-05-18T09:58:05.760430114Z Run `npm audit` for details.
+2026-05-18T09:58:05.991344644Z 
+2026-05-18T09:58:05.991361784Z > @doctor-tebar/shared@0.1.0 build
+2026-05-18T09:58:05.991366294Z > tsc
+2026-05-18T09:58:05.991370064Z 
+2026-05-18T09:58:07.238025407Z 
+2026-05-18T09:58:07.238052737Z > @doctor-tebar/api@0.1.0 build
+2026-05-18T09:58:07.238058457Z > tsc
+2026-05-18T09:58:07.238063187Z 
+2026-05-18T09:58:13.103376036Z ==> Uploading build...
+2026-05-18T09:58:18.941597663Z ==> Uploaded in 3.0s. Compression took 2.8s
+2026-05-18T09:58:18.970709896Z ==> Build successful 🎉
+2026-05-18T09:58:21.710049702Z ==> Deploying...
+2026-05-18T09:58:21.768171352Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-05-18T09:58:35.654059235Z ==> Running 'npm --workspace @doctor-tebar/api run start'
+2026-05-18T09:58:36.967022837Z 
+2026-05-18T09:58:36.967053608Z > @doctor-tebar/api@0.1.0 start
+2026-05-18T09:58:36.967059018Z > node dist/server.js
+2026-05-18T09:58:36.967061718Z 
+2026-05-18T09:58:43.543012267Z {"level":"info","message":"MongoDB connected","timestamp":"2026-05-18T09:58:43.540Z"}
+2026-05-18T09:58:43.547157335Z {"level":"info","message":"API running on port 10000","timestamp":"2026-05-18T09:58:43.545Z"}
+2026-05-18T09:58:44.05718873Z {"endpoint":"/","level":"info","message":"[SERVER] Petición recibida","method":"HEAD","timestamp":"2026-05-18T09:58:44.056Z"}
+2026-05-18T09:58:44.057454577Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:44.057Z"}
+2026-05-18T09:58:44.063423612Z HEAD / 404 2.470 ms - 140
+2026-05-18T09:58:52.005912385Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.005Z"}
+2026-05-18T09:58:52.005951217Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.005Z"}
+2026-05-18T09:58:52.008924314Z GET /api/health 200 1.649 ms - 99
+2026-05-18T09:58:52.009996551Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.009Z"}
+2026-05-18T09:58:52.010141825Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.009Z"}
+2026-05-18T09:58:52.01071296Z GET /api/health 200 0.213 ms - 99
+2026-05-18T09:58:52.64618901Z ==> Your service is live 🎉
+2026-05-18T09:58:52.737685166Z {"endpoint":"/","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.737Z"}
+2026-05-18T09:58:52.73786618Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.737Z"}
+2026-05-18T09:58:52.738735333Z GET / 404 0.341 ms - 139
+2026-05-18T09:58:52.745169917Z ==> 
+2026-05-18T09:58:52.750117026Z ==> ///////////////////////////////////////////////////////////
+2026-05-18T09:58:52.755394003Z ==> 
+2026-05-18T09:58:52.762154652Z ==> Available at your primary URL https://doctor-tebar-api.onrender.com
+2026-05-18T09:58:52.770048372Z ==> 
+2026-05-18T09:58:52.776318427Z ==> ///////////////////////////////////////////////////////////

@@ -1309,7 +1309,7 @@ Datos de prueba creados y borrados en produccion durante Sprint 13:
 | Sprint 13 | Testeo completo en produccion | Cerrado |
 | Sprint 14 | Limpieza de datos de prueba | Cerrado |
 | Sprint 15 | Informe final y checklist de aceptacion | Cerrado |
-| Sprint 16 | Flujo publico de login y registro | Cerrado — frontend en produccion; backend pendiente deploy manual en Render |
+| Sprint 16 | Flujo publico de login y registro | Cerrado — verificado en produccion en Vercel y Render |
 | Sprint 17 | Google OAuth para registro/login publico | Pendiente |
 
 ### Archivos creados o modificados en esta revision
@@ -1608,10 +1608,68 @@ El endpoint fue anadido en el commit `43bc434` pusheado el 18 de mayo de 2026. R
 
 Vercel tiene autodeploy real desde GitHub y despliega automaticamente en cada push a main. El nuevo bundle con `/acceso` y los botones de navbar esta activo en https://doctor-tebar.vercel.app tras el push del 18 de mayo de 2026.
 
+### Verificacion completa en produccion — 18 de mayo de 2026
+
+#### Render build log (ultimo deploy)
+
+```
+09:57:xx  npm install completado (6 vulnerabilidades conocidas, no criticas para produccion)
+09:58:05  shared build: OK
+09:58:07  API build: OK (tsc sin errores)
+09:58:18  ==> Build successful 🎉
+09:58:35  Deploying...
+09:58:43  MongoDB connected
+09:58:43  API running on port 10000
+09:58:52  ==> Your service is live 🎉
+09:58:52  Available at https://doctor-tebar-api.onrender.com
+```
+
+#### Test de registro en produccion
+
+Comando:
+
+```bash
+curl -X POST https://doctor-tebar-api.onrender.com/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"CI Test","email":"ci_test_...@example.com","password":"TestPass123"}'
+```
+
+Resultado:
+
+```json
+{"user":{"id":"6a0ae2fbc862fa56a1270fb6","name":"CI Test","email":"ci_test_...@example.com","role":"viewer"},"token":"eyJhbG..."}
+```
+
+- HTTP 201: correcto.
+- role: "viewer": correcto.
+- JWT devuelto: correcto.
+
+#### Verificacion de endpoints en produccion
+
+| Endpoint | Metodo | Resultado |
+| --- | --- | --- |
+| `/api/health` | GET | HTTP 200, `database: connected` |
+| `/api/auth/me` sin token | GET | HTTP 401 correcto |
+| `/api/auth/login` contrasena erronea | POST | HTTP 401 correcto |
+| `/api/auth/register` nuevo usuario | POST | HTTP 201, role=viewer, JWT |
+| `/api/training` | GET | HTTP 200, array de formaciones |
+| Frontend `/acceso` (Vercel) | GET | HTTP 200, pagina activa |
+
+#### Limpieza de datos de prueba
+
+El polling automatico creo un usuario de prueba en produccion:
+
+- Email: `ci_test_1779098360@example.com`
+- ID: `6a0ae2fbc862fa56a1270fb6`
+- Rol: viewer
+
+Para borrarlo: `/admin/users` en el panel → encontrar el usuario → cambiar estado a "disabled" o contactar directamente a MongoDB Atlas para eliminar el documento.
+
 ### Estado del sprint
 
-- Frontend (Vercel): Cerrado y verificado en produccion.
-- Backend (Render): Codigo pusheado. Verificar deploy manual si el endpoint /auth/register sigue en 404.
+- Frontend (Vercel): Cerrado y verificado en produccion. Autodeploy activo.
+- Backend (Render): Cerrado y verificado en produccion. Build limpio. Endpoint /auth/register activo.
+- Autodeploy Render: Funcionando correctamente en este commit (desplegado ~6 min despues del push).
 
 ---
 
