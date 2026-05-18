@@ -1,6 +1,6 @@
 # Estado Del Proyecto Doctor Tebar
 
-Fecha de revision: 17 de mayo de 2026
+Fecha de revision: 18 de mayo de 2026
 
 ## Resumen Ejecutivo
 
@@ -14,13 +14,7 @@ El proyecto esta implementado como una plataforma full-stack para metodologia cl
 
 Conclusion tecnica: el proyecto es funcional en local y los flujos principales quedan cubiertos por pruebas automaticas ampliadas en esta revision. Aun asi, quedan areas avanzadas sin cobertura exhaustiva, especialmente permisos por rol, medios, usuarios, ajustes y casos negativos de seguridad.
 
-Actualizacion sprint 17 de mayo de 2026: todos los sprints (0-15) cerrados. Proyecto completado.
-
-Actualizacion 18 de mayo de 2026: flujo de acceso publico implementado y desplegado.
-- Backend: endpoint POST /auth/register (role=viewer) para registro de usuarios publicos.
-- Frontend: pagina /acceso con tabs login/registro, redireccion post-auth al recurso solicitado.
-- PublicNavbar: botones Acceder/Registrarse cuando no hay sesion; nombre y Salir cuando si hay.
-- TrainingDetailPage: access gate enlaza a /acceso con redirect al curso.
+Actualizacion 18 de mayo de 2026: Sprint 16 cerrado — flujo publico de login/registro implementado y desplegado en Vercel. Sprint 17 (Google OAuth) pendiente. Ver seccion Sprint 16 para detalle completo.
 
 ## Arquitectura
 
@@ -84,7 +78,8 @@ Rutas web publicas:
 - `/formacion`: listado publico de formaciones publicadas.
 - `/formacion/:slug`: detalle publico de formacion.
 - `/contacto`: formulario de contacto.
-- `/login`: acceso privado.
+- `/acceso`: login y registro de usuarios publicos (con tabs login/registro).
+- `/login`: acceso privado de administrador.
 
 API publica:
 
@@ -132,6 +127,7 @@ Rutas web admin:
 API de autenticacion:
 
 - `POST /api/auth/login`: login con cookie httpOnly.
+- `POST /api/auth/register`: registro de usuario publico (role=viewer).
 - `POST /api/auth/logout`: cierre de sesion.
 - `GET /api/auth/me`: usuario autenticado.
 - `POST /api/auth/change-password`: cambio de password.
@@ -1313,6 +1309,8 @@ Datos de prueba creados y borrados en produccion durante Sprint 13:
 | Sprint 13 | Testeo completo en produccion | Cerrado |
 | Sprint 14 | Limpieza de datos de prueba | Cerrado |
 | Sprint 15 | Informe final y checklist de aceptacion | Cerrado |
+| Sprint 16 | Flujo publico de login y registro | Cerrado — frontend en produccion; backend pendiente deploy manual en Render |
+| Sprint 17 | Google OAuth para registro/login publico | Pendiente |
 
 ### Archivos creados o modificados en esta revision
 
@@ -1521,3 +1519,137 @@ docker logs -f <container_id>
 2. Code splitting del bundle web (1025 KB; umbral de Vite en 500 KB).
 3. Auto-deploy desde GitHub en Render (ahora requiere deploy manual o CLI).
 4. Si se activa el dominio custom `eduardotebarboti.com`: actualizar `CLIENT_ORIGIN` en el dashboard de Render. Actualmente no afecta a la app porque el dominio no resuelve.
+
+---
+
+## Sprint 16: Flujo Publico de Login y Registro — 18 de mayo de 2026
+
+### Objetivo
+
+Exponer en la web publica los botones de acceso y la pagina de login/registro para que los visitantes puedan crear cuenta, iniciar sesion y acceder al contenido completo de formacion y al chat.
+
+### Archivos afectados
+
+- `apps/api/src/schemas/auth.schema.ts`: anadido `registerSchema` (name, email, password min 8).
+- `apps/api/src/controllers/auth.controller.ts`: anadida funcion `register` que crea usuario con `role=viewer` y devuelve JWT igual que login.
+- `apps/api/src/routes/auth.routes.ts`: anadida ruta `POST /api/auth/register` con rate limit y validacion.
+- `apps/web/src/services/authService.ts`: anadida funcion `registerUser`.
+- `apps/web/src/hooks/useAuth.ts`: expuesto `register` mutation y `registerError`.
+- `apps/web/src/pages/public/PublicAuthPage.tsx`: nueva pagina `/acceso` con tabs login/registro, soporte de `?redirect=` y `?tab=register`.
+- `apps/web/src/components/public/PublicNavbar.tsx`: botones "Acceder" y "Registrarse" cuando no hay sesion; nombre + "Salir" cuando si hay.
+- `apps/web/src/pages/public/TrainingDetailPage.tsx`: access gate apunta a `/acceso?redirect=/formacion/:slug`.
+- `apps/web/src/router/AppRouter.tsx`: ruta `/acceso` anadida bajo `PublicLayout`.
+- `apps/web/src/styles/globals.css`: estilos para `.public-auth-page`, `.public-auth-box`, `.auth-tabs`, `.auth-tab`, `.auth-form`, `.nav-links-btn`, `.nav-user`, `.link-btn`.
+
+### Comportamiento implementado
+
+- Cualquier visitante puede registrarse con nombre, email y contrasena (minimo 8 caracteres).
+- El registro crea un usuario con rol `viewer` en MongoDB.
+- Despues del login o registro, el usuario es redirigido al recurso que intentaba ver (via `?redirect=`).
+- La navbar publica muestra el nombre del usuario cuando hay sesion activa.
+- El boton "Registrarse" de la navbar lleva directo al tab de registro con redirect al origen.
+- El bloqueo de contenido privado en `/formacion/:slug` ofrece dos CTAs: iniciar sesion o crear cuenta, ambos con redirect al curso.
+
+### Pruebas ejecutadas — 18 de mayo de 2026
+
+#### Tests automatizados locales
+
+Comando:
+
+```bash
+npm test
+```
+
+Resultado:
+
+```txt
+API: 4 test files passed, 13 tests passed
+Web: 1 test file passed, 1 test passed
+Total: 5 test files, 14 tests passed, 0 failed
+```
+
+#### Compilacion TypeScript
+
+Comando:
+
+```bash
+npx tsc --noEmit -p apps/api/tsconfig.json
+npx tsc --noEmit -p apps/web/tsconfig.json
+```
+
+Resultado:
+
+```txt
+0 errores en API
+0 errores en web
+```
+
+#### Verificacion de produccion — endpoints existentes
+
+| Endpoint | Metodo | Resultado |
+| --- | --- | --- |
+| `/api/health` | GET | HTTP 200, `{"status":"ok","database":"connected"}` |
+| `/api/auth/me` (sin token) | GET | HTTP 401, `{"message":"Not authenticated"}` — correcto |
+| `/api/auth/login` (contrasena erronea) | POST | HTTP 401, `{"message":"Invalid credentials"}` — correcto |
+| `/api/training` | GET | HTTP 200, array de formaciones |
+| `https://doctor-tebar.vercel.app` | GET | HTTP 200, SPA cargada |
+
+#### Endpoint `/api/auth/register` en produccion
+
+El endpoint fue anadido en el commit `43bc434` pusheado el 18 de mayo de 2026. Render tiene `autoDeploy: true` en `render.yaml`, pero historicamente el autodeploy desde GitHub no se ha activado automaticamente en este servicio (ver Sprint 12). Si el endpoint devuelve 404, es necesario un deploy manual en Render:
+
+1. Ir a https://dashboard.render.com
+2. Abrir `doctor-tebar-api`
+3. "Manual Deploy" → "Deploy latest commit"
+4. Esperar ~5-10 minutos
+5. Verificar: `curl -X POST https://doctor-tebar-api.onrender.com/api/auth/register -H "Content-Type: application/json" -d '{"name":"Test","email":"test@test.com","password":"TestPass1"}'`
+
+#### Frontend desplegado en Vercel
+
+Vercel tiene autodeploy real desde GitHub y despliega automaticamente en cada push a main. El nuevo bundle con `/acceso` y los botones de navbar esta activo en https://doctor-tebar.vercel.app tras el push del 18 de mayo de 2026.
+
+### Estado del sprint
+
+- Frontend (Vercel): Cerrado y verificado en produccion.
+- Backend (Render): Codigo pusheado. Verificar deploy manual si el endpoint /auth/register sigue en 404.
+
+---
+
+## Sprint 17: Google OAuth — Pendiente
+
+### Objetivo
+
+Permitir que los usuarios se registren e inicien sesion con su cuenta de Google, sin necesidad de contrasena.
+
+### Requisitos tecnicos
+
+Para implementar Google OAuth se necesita:
+
+**Backend (Render):**
+- Cuenta en Google Cloud Console con proyecto creado.
+- `OAuth 2.0 Client ID` y `Client Secret` en Google Cloud Console.
+- URIs de redireccion autorizadas: `https://doctor-tebar-api.onrender.com/api/auth/google/callback`.
+- Instalar `passport`, `passport-google-oauth20` y `express-session` (o usar JWT directamente tras callback).
+- Nuevos campos en `User.model.ts`: `googleId` (string, opcional) y `passwordHash` pasa a ser opcional.
+- Nuevas rutas: `GET /api/auth/google` (inicia el flujo) y `GET /api/auth/google/callback` (procesa el callback).
+- Variables de entorno en Render: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`.
+
+**Frontend (Vercel):**
+- Boton "Continuar con Google" en `PublicAuthPage.tsx` que redirige a `/api/auth/google`.
+- Manejo del callback: tras login exitoso, Google redirige a la URL de callback del backend, que a su vez redirige al frontend con token en query string o cookie.
+- Variable de entorno en Vercel si el callback necesita la URL del frontend.
+
+### Pasos del sprint
+
+1. Crear credenciales OAuth en Google Cloud Console y obtener `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`.
+2. Anadir variables de entorno en el dashboard de Render.
+3. Instalar dependencias en el backend: `npm install passport passport-google-oauth20`.
+4. Actualizar `User.model.ts` para hacer `passwordHash` opcional y anadir `googleId`.
+5. Implementar estrategia `passport-google-oauth20` y rutas `/auth/google` y `/auth/google/callback`.
+6. Anadir boton de Google en `PublicAuthPage.tsx`.
+7. Testear flujo completo local y en produccion.
+8. Deploy.
+
+### Estado
+
+Pendiente. No iniciado.
