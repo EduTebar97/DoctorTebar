@@ -26,6 +26,7 @@ import { NewsDetailPage } from "../pages/public/NewsDetailPage";
 import { NewsListPage } from "../pages/public/NewsListPage";
 import { ResourcesPage } from "../pages/public/ResourcesPage";
 import { ServicesPage } from "../pages/public/ServicesPage";
+import { PublicAuthPage } from "../pages/public/PublicAuthPage";
 import { TrainingDetailPage } from "../pages/public/TrainingDetailPage";
 import { TrainingListPage } from "../pages/public/TrainingListPage";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -45,7 +46,8 @@ const router = createBrowserRouter([
       { path: "noticias", element: <NewsListPage /> },
       { path: "noticias/:slug", element: <NewsDetailPage /> },
       { path: "recursos", element: <ResourcesPage /> },
-      { path: "contacto", element: <ContactPage /> }
+      { path: "contacto", element: <ContactPage /> },
+      { path: "acceso", element: <PublicAuthPage /> }
     ]
   },
   { path: "/login", element: <LoginPage /> },

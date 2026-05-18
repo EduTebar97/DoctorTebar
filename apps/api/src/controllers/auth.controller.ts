@@ -48,6 +48,21 @@ export async function me(req: Request, res: Response) {
   res.json({ user: req.user ? publicUser(req.user) : null });
 }
 
+export async function register(req: Request, res: Response) {
+  const { name, email, password } = req.body;
+  const existing = await User.findOne({ email: email.toLowerCase() });
+  if (existing) throw new ApiError(409, "Email ya registrado");
+  const passwordHash = await bcrypt.hash(password, 12);
+  const user = await User.create({ name, email: email.toLowerCase(), passwordHash, role: "viewer" });
+  const token = jwt.sign({ userId: user._id }, env.jwtSecret, { expiresIn: env.jwtExpiresIn as any });
+  res.cookie(env.cookieName, token, cookieOptions());
+  user.lastLoginAt = new Date();
+  await user.save();
+  req.user = user as never;
+  await audit(req, "register", "auth", String(user._id));
+  res.status(201).json({ user: publicUser(user), token });
+}
+
 export async function changePassword(req: Request, res: Response) {
   if (!req.user) throw new ApiError(401, "Not authenticated");
   const { currentPassword, newPassword } = req.body;

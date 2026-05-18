@@ -53,10 +53,10 @@ export function TrainingDetailPage() {
         <section className="access-gate admin-panel">
           <Badge>Acceso privado</Badge>
           <h2>Contenido completo protegido</h2>
-          <p>Para acceder al contenido completo de esta formación debes iniciar sesión.</p>
+          <p>Para acceder al material, los vídeos y el chat de esta formación necesitas una cuenta. Es gratuita.</p>
           <div className="form-actions">
-            <Link className="btn" to="/login">Iniciar sesion</Link>
-            <Link className="btn secondary" to="/contacto">Solicitar acceso</Link>
+            <Link className="btn" to={`/acceso?redirect=/formacion/${course.data.slug}`}>Iniciar sesion</Link>
+            <Link className="btn secondary" to={`/acceso?tab=register&redirect=/formacion/${course.data.slug}`}>Crear cuenta gratis</Link>
           </div>
         </section>
       ) : null}

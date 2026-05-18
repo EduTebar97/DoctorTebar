@@ -15,6 +15,12 @@ export function useAuth() {
     onSuccess: (data) => queryClient.setQueryData(["me"], data)
   });
 
+  const registerMutation = useMutation({
+    mutationFn: ({ name, email, password }: { name: string; email: string; password: string }) =>
+      authService.registerUser(name, email, password),
+    onSuccess: (data) => queryClient.setQueryData(["me"], data)
+  });
+
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
     onSuccess: () => queryClient.setQueryData(["me"], { user: null })
@@ -25,7 +31,9 @@ export function useAuth() {
     isLoading: meQuery.isLoading,
     isAuthenticated: Boolean(meQuery.data?.user),
     login: loginMutation.mutateAsync,
+    register: registerMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
-    loginError: loginMutation.error
+    loginError: loginMutation.error,
+    registerError: registerMutation.error
   };
 }

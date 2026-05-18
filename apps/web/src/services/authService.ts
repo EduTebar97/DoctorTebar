@@ -29,6 +29,14 @@ export async function logout() {
   }
 }
 
+export async function registerUser(name: string, email: string, password: string) {
+  console.info("[AUTH] Registrando nuevo usuario", { emailPresent: Boolean(email) });
+  const { data } = await apiClient.post<LoginResponse>("/auth/register", { name, email, password });
+  if (data.token) setAuthToken(data.token);
+  console.info("[AUTH] Usuario registrado", { role: data.user.role });
+  return data;
+}
+
 export async function getMe() {
   console.info("[AUTH] Comprobando sesión con /api/auth/me");
   try {

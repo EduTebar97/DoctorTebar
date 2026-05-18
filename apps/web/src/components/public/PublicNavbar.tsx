@@ -1,6 +1,7 @@
-import { Menu, Stethoscope, X } from "lucide-react";
+import { LogIn, LogOut, Menu, Stethoscope, UserPlus, X } from "lucide-react";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const links = [
   ["/", "Inicio"],
@@ -10,6 +11,10 @@ const links = [
 
 export function PublicNavbar() {
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const authRedirect = `/acceso?redirect=${encodeURIComponent(location.pathname + location.search)}`;
+
   return (
     <header className="public-nav">
       <NavLink to="/" className="brand">
@@ -28,6 +33,27 @@ export function PublicNavbar() {
             {label}
           </NavLink>
         ))}
+        {user ? (
+          <>
+            <span className="nav-user">{user.name.split(" ")[0]}</span>
+            <button
+              className="nav-links-btn secondary"
+              onClick={() => { logout(); setOpen(false); }}
+              type="button"
+            >
+              <LogOut size={15} /> Salir
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink className="nav-links-btn secondary" to={authRedirect} onClick={() => setOpen(false)}>
+              <LogIn size={15} /> Acceder
+            </NavLink>
+            <NavLink className="nav-links-btn nav-cta" to={`/acceso?tab=register&redirect=${encodeURIComponent(location.pathname + location.search)}`} onClick={() => setOpen(false)}>
+              <UserPlus size={15} /> Registrarse
+            </NavLink>
+          </>
+        )}
       </nav>
     </header>
   );
