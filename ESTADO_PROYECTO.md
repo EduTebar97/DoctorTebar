@@ -1667,9 +1667,9 @@ Para borrarlo: `/admin/users` en el panel → encontrar el usuario → cambiar e
 
 ### Estado del sprint
 
-- Frontend (Vercel): Cerrado y verificado en produccion. Autodeploy activo.
-- Backend (Render): Cerrado y verificado en produccion. Build limpio. Endpoint /auth/register activo.
-- Autodeploy Render: Funcionando correctamente en este commit (desplegado ~6 min despues del push).
+- Frontend (Vercel): Cerrado y verificado en produccion. Bundle activo: `index-CjnxEMFA.js`. Rutas `/`, `/formacion`, `/acceso` responden HTTP 200. Botones Acceder/Registrarse presentes en el bundle. Deploy via CLI (`vercel --prod`).
+- Backend (Render): Cerrado y verificado en produccion. Build limpio. Endpoint /auth/register activo y verificado.
+- Nota Vercel autodeploy: los deploys automaticos desde GitHub estaban fallando (Error en ~10s) por una incidencia en la integracion GitHub-Vercel. El deploy manual via CLI (`vercel --prod --yes`) resuelve el problema. Para futuros cambios de frontend usar `vercel --prod --yes` desde el directorio raiz del monorepo.
 
 ---
 
