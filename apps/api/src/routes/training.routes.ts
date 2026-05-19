@@ -148,9 +148,11 @@ trainingRoutes.put("/admin/training/:id", requireAuth, validate(trainingCourseSc
     estado: req.body.status,
     usuario: String(req.user!._id)
   });
-  const payload = { ...req.body, slug: await uniqueTrainingSlug(req.body.title, id) };
+  const { blocks: _blocks, ...bodyWithoutBlocks } = req.body;
+  const payload: Record<string, unknown> = { ...bodyWithoutBlocks, slug: await uniqueTrainingSlug(req.body.title, id) };
   if (payload.status === "published" && !payload.publishedAt) payload.publishedAt = new Date();
-  const item = await TrainingCourse.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+  if (_blocks !== undefined) payload.blocks = _blocks;
+  const item = await TrainingCourse.findByIdAndUpdate(id, { $set: payload }, { new: true, runValidators: true });
   if (!item) throw new ApiError(404, "Training course not found");
   await audit(req, "update", "training", String(item._id));
   logger.info("[FORMACION API] Formación actualizada en base de datos", { id: String(item._id) });

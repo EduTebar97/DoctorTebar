@@ -65,7 +65,7 @@ export const trainingCourseSchema = z.object({
     title: z.string().min(1).max(180),
     description: z.string().optional().or(z.literal("")),
     coverImageUrl: z.string().url().optional().or(z.literal("")),
-    blocks: z.array(trainingBlockBodySchema).default([]),
+    blocks: z.array(trainingBlockBodySchema).optional(),
     status: z.enum(["draft", "published", "archived"]).default("draft"),
     featured: z.boolean().default(false),
     order: z.coerce.number().int().default(0)
