@@ -14,7 +14,7 @@ El proyecto esta implementado como una plataforma full-stack para metodologia cl
 
 Conclusion tecnica: el proyecto es funcional en local y los flujos principales quedan cubiertos por pruebas automaticas ampliadas en esta revision. Aun asi, quedan areas avanzadas sin cobertura exhaustiva, especialmente permisos por rol, medios, usuarios, ajustes y casos negativos de seguridad.
 
-Actualizacion 18 de mayo de 2026: Sprint 16 cerrado — flujo publico de login/registro implementado y desplegado en Vercel. Sprint 17 (Google OAuth) pendiente. Ver seccion Sprint 16 para detalle completo.
+Actualizacion 19 de mayo de 2026: Sprint 18 cerrado — modulo de formacion reestructurado con bloques y temas, bug de PUT corregido, verificado en produccion (Render + Vercel). Sprint 17 (Google OAuth) pendiente.
 
 ## Arquitectura
 
@@ -1311,7 +1311,7 @@ Datos de prueba creados y borrados en produccion durante Sprint 13:
 | Sprint 15 | Informe final y checklist de aceptacion | Cerrado |
 | Sprint 16 | Flujo publico de login y registro | Cerrado — verificado en produccion en Vercel y Render |
 | Sprint 17 | Google OAuth para registro/login publico | Pendiente |
-| Sprint 18 | Reestructuracion modulo formacion: bloques + temas | Cerrado — 19 de mayo de 2026 |
+| Sprint 18 | Reestructuracion modulo formacion: bloques + temas | Cerrado — verificado en produccion el 19 de mayo de 2026 |
 
 ### Archivos creados o modificados en esta revision
 
@@ -1936,9 +1936,35 @@ La nueva estructura de subdocumentos de Mongoose compila sin errores con TypeScr
 | Multimedia por tema (imagenes + video) | Funcional |
 | Tests automatizados | 15 tests pasados, 0 fallidos |
 
-### Pendiente para siguiente sesion
+### Verificacion en produccion — 19 de mayo de 2026
 
-- Sprint 10 (testeo en produccion): desplegar a Render (deploy manual) y Vercel (`vercel --prod --yes`), luego verificar todos los flujos de formacion con bloques en produccion.
-- Sprint 11 (limpieza): verificar que no quedan datos de prueba de formacion en produccion.
-- Sprint 17 (Google OAuth): pendiente de credenciales Google Cloud.
-- Code splitting del bundle web (1030 KB; umbral Vite 500 KB).
+Deploy Render commit `b672906` (fix bloques en PUT). Vercel en `c16eb2c` (Sprint 18 completo).
+
+Tests ejecutados en produccion (con un unico token de admin):
+
+| Test | Resultado |
+| --- | --- |
+| Crear curso con solo titulo | OK |
+| Anadir bloque al curso | OK |
+| Anadir tema al bloque | OK |
+| Estructura correcta antes de publicar (1 bloque, 1 tema) | OK |
+| Publicar via PUT sin bloque en payload — bloques preservados | OK (bug corregido) |
+| Acceso publico bloqueado para anonimos | OK |
+| Acceso autenticado con contenido completo | OK |
+| Chat con blockId y blockTitle guardados | OK |
+| Filtro admin por titulo de bloque | OK |
+| Limpieza: chat y curso de prueba eliminados | OK |
+
+Bug corregido durante testeo de produccion:
+
+- `blocks: z.array(...).default([])` en Zod schema del backend causaba que PUT sin blocks en el payload forzara `blocks: []` en MongoDB, borrando subdocumentos.
+- Corregido a `.optional()` y en el route se usa `$set` explicito y solo incluye `blocks` si llega en el request.
+- Commit `b672906` — desplegado en Render el 19 de mayo de 2026.
+
+Tests automatizados: 14 tests pasados, 0 fallidos.
+
+### Pendiente
+
+- Sprint 17 (Google OAuth): pendiente de credenciales Google Cloud (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET).
+- Code splitting del bundle web (~1030 KB; umbral Vite 500 KB).
+- Test user `6a0c88aed2e505ffcb2f3b29` (email: test_sprint18_prod@example.com) pendiente de eliminar directamente en MongoDB (no hay ruta DELETE /admin/users/:id).
