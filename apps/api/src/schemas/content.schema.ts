@@ -42,33 +42,51 @@ export const resourceSchema = z.object({
   })
 });
 
+const trainingTopicBodySchema = z.object({
+  title: z.string().min(1).max(180),
+  description: z.string().max(2000).optional().or(z.literal("")),
+  content: z.string().optional().or(z.literal("")),
+  imageUrls: z.array(z.string().url()).default([]),
+  videoUrl: z.string().url().optional().or(z.literal("")),
+  order: z.coerce.number().int().default(0),
+  status: z.enum(["draft", "published"]).default("draft")
+});
+
+const trainingBlockBodySchema = z.object({
+  title: z.string().min(1).max(180),
+  description: z.string().max(1000).optional().or(z.literal("")),
+  order: z.coerce.number().int().default(0),
+  status: z.enum(["draft", "published"]).default("draft"),
+  topics: z.array(trainingTopicBodySchema).default([])
+});
+
 export const trainingCourseSchema = z.object({
   body: z.object({
-    title: z.string().min(5).max(180),
-    summary: z.string().min(20).max(500),
-    description: z.string().min(20),
-    level: z.enum(["introductorio", "intermedio", "avanzado"]).default("intermedio"),
-    access: z.enum(["public", "private"]).default("private"),
+    title: z.string().min(1).max(180),
+    description: z.string().optional().or(z.literal("")),
     coverImageUrl: z.string().url().optional().or(z.literal("")),
-    price: z.string().max(80).optional().or(z.literal("")),
-    duration: z.string().max(80).optional().or(z.literal("")),
-    topics: z.array(z.object({
-      title: z.string().min(3).max(180),
-      summary: z.string().max(500).optional().or(z.literal("")),
-      content: z.string().optional().or(z.literal("")),
-      imageUrls: z.array(z.string().url()).default([]),
-      videoUrl: z.string().url().optional().or(z.literal("")),
-      order: z.coerce.number().int().default(0)
-    })).default([]),
+    blocks: z.array(trainingBlockBodySchema).default([]),
     status: z.enum(["draft", "published", "archived"]).default("draft"),
-    featured: z.boolean().default(false)
+    featured: z.boolean().default(false),
+    order: z.coerce.number().int().default(0)
   })
+});
+
+export const trainingBlockSchema = z.object({
+  params: z.object({ courseId: z.string().min(1) }),
+  body: trainingBlockBodySchema
+});
+
+export const trainingTopicSchema = z.object({
+  params: z.object({ blockId: z.string().min(1) }),
+  body: trainingTopicBodySchema
 });
 
 export const trainingChatMessageSchema = z.object({
   params: z.object({ slug: z.string().min(1) }),
   body: z.object({
     topicId: z.string().optional().or(z.literal("")),
+    blockId: z.string().optional().or(z.literal("")),
     message: z.string().min(10).max(2000),
     consent: z.boolean().optional()
   })

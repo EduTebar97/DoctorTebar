@@ -71,8 +71,9 @@ function MessagesTab() {
   const [filterCourse, setFilterCourse] = useState("");
   const [filterUser, setFilterUser] = useState("");
   const [filterTopic, setFilterTopic] = useState("");
+  const [filterBlock, setFilterBlock] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [active, setActive] = useState<{ course?: string; user?: string; topic?: string; status?: string }>({});
+  const [active, setActive] = useState<{ course?: string; user?: string; topic?: string; block?: string; status?: string }>({});
 
   const { data: messages = [], isLoading, isError } = useQuery({
     queryKey: ["admin-chat", active],
@@ -98,12 +99,13 @@ function MessagesTab() {
     if (filterCourse.trim()) f.course = filterCourse.trim();
     if (filterUser.trim()) f.user = filterUser.trim();
     if (filterTopic.trim()) f.topic = filterTopic.trim();
+    if (filterBlock.trim()) f.block = filterBlock.trim();
     if (filterStatus) f.status = filterStatus;
     setActive(f);
   }
 
   function clear() {
-    setFilterCourse(""); setFilterUser(""); setFilterTopic(""); setFilterStatus("");
+    setFilterCourse(""); setFilterUser(""); setFilterTopic(""); setFilterBlock(""); setFilterStatus("");
     setActive({});
   }
 
@@ -123,6 +125,11 @@ function MessagesTab() {
             <label style={{ fontSize: 12, color: "#6b7280", display: "block", marginBottom: 4 }}>Usuario (nombre o email)</label>
             <input className="form-input" placeholder="ej: Ana García" value={filterUser}
               onChange={e => setFilterUser(e.target.value)} onKeyDown={e => e.key === "Enter" && apply()} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, color: "#6b7280", display: "block", marginBottom: 4 }}>Bloque</label>
+            <input className="form-input" placeholder="ej: fundamentos" value={filterBlock}
+              onChange={e => setFilterBlock(e.target.value)} onKeyDown={e => e.key === "Enter" && apply()} />
           </div>
           <div>
             <label style={{ fontSize: 12, color: "#6b7280", display: "block", marginBottom: 4 }}>Tema</label>
@@ -328,6 +335,9 @@ function ChatMessageCard({ msg, onStatus, onDelete }: {
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
             <BookOpen size={12} color="#6b7280" />
             <span style={{ fontSize: 12, color: "#374151" }}>{msg.courseTitle}</span>
+            {msg.blockTitle && (
+              <><Tag size={11} color="#9ca3af" /><span style={{ fontSize: 12, color: "#6b7280" }}>Bloque: {msg.blockTitle}</span></>
+            )}
             {msg.topicTitle && (
               <><Tag size={11} color="#9ca3af" /><span style={{ fontSize: 12, color: "#6b7280" }}>{msg.topicTitle}</span></>
             )}

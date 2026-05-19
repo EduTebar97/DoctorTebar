@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 export const trainingChatSchema = z.object({
-  topicId: z.string().optional(),
-  message: z.string().min(10, "Escribe una pregunta un poco mas detallada").max(2000),
+  blockId: z.string().optional().or(z.literal("")),
+  topicId: z.string().optional().or(z.literal("")),
+  message: z.string().min(10, "Escribe una pregunta un poco más detallada").max(2000),
   consent: z.boolean().refine(Boolean, "Acepta el contacto para poder responderte")
 });
 

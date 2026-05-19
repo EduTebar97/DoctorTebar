@@ -46,19 +46,36 @@ describe("Content schemas", () => {
     expect(result.success).toBe(true);
   });
 
-  it("validates training course payloads", () => {
+  it("validates training course payloads — minimal (title only)", () => {
     const result = trainingCourseSchema.safeParse({
       body: {
         title: "Formacion en metodologia clinica",
-        summary: "Programa aplicado para mejorar el diseno y analisis de estudios clinicos.",
-        description: "Contenido detallado del programa formativo con sesiones, ejercicios y seguimiento.",
-        level: "intermedio",
-        access: "private",
-        status: "draft",
-        featured: false
+        status: "draft"
       }
     });
+    expect(result.success).toBe(true);
+  });
 
+  it("validates training course payloads — with blocks and topics", () => {
+    const result = trainingCourseSchema.safeParse({
+      body: {
+        title: "Modelos predictivos en investigacion clinica",
+        description: "Curso introductorio sobre modelos predictivos.",
+        status: "draft",
+        featured: false,
+        blocks: [
+          {
+            title: "Bloque 1: Fundamentos",
+            order: 0,
+            status: "draft",
+            topics: [
+              { title: "Que es un modelo predictivo", order: 0, status: "draft" },
+              { title: "Diferencia entre causalidad y prediccion", order: 1, status: "draft" }
+            ]
+          }
+        ]
+      }
+    });
     expect(result.success).toBe(true);
   });
 

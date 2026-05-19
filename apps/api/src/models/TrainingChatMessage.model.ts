@@ -6,6 +6,8 @@ const trainingChatMessageSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     courseTitle: { type: String, required: true },
     courseSlug: { type: String, required: true, index: true },
+    blockId: String,
+    blockTitle: String,
     topicId: String,
     topicTitle: String,
     name: { type: String, required: true, trim: true },

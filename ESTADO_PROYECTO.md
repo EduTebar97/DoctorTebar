@@ -1311,6 +1311,7 @@ Datos de prueba creados y borrados en produccion durante Sprint 13:
 | Sprint 15 | Informe final y checklist de aceptacion | Cerrado |
 | Sprint 16 | Flujo publico de login y registro | Cerrado — verificado en produccion en Vercel y Render |
 | Sprint 17 | Google OAuth para registro/login publico | Pendiente |
+| Sprint 18 | Reestructuracion modulo formacion: bloques + temas | Cerrado — 19 de mayo de 2026 |
 
 ### Archivos creados o modificados en esta revision
 
@@ -1711,3 +1712,233 @@ Para implementar Google OAuth se necesita:
 ### Estado
 
 Pendiente. No iniciado.
+
+---
+
+## Sprint 18: Reestructuracion del Modulo de Formacion (Bloques y Temas) — 19 de mayo de 2026
+
+### Objetivo
+
+Implementar todos los requisitos del documento `logs.txt`: corregir el guardado/publicacion silencioso, reestructurar el modelo de formacion para que soporte Formacion → Bloques → Temas, añadir logs obligatorios en frontend y backend, actualizar las vistas publicas y el chat para que funcionen con la nueva jerarquia.
+
+### Sprints de logs.txt implementados en este sprint
+
+| Sprint logs.txt | Nombre | Estado |
+| --- | --- | --- |
+| Sprint 0 | Diagnostico error guardado/publicacion | Cerrado — causa identificada: validacion silenciosa (summary/description min 20) sin feedback visual |
+| Sprint 1 | Correccion de guardado y publicacion | Cerrado — feedback visual de guardado, errores visibles, validacion simplificada (solo titulo obligatorio) |
+| Sprint 2 | Estructura Formacion → Bloques → Temas | Cerrado — modelo rediseñado con bloques embebidos que contienen temas |
+| Sprint 3 | Dos modos de creacion de cursos | Cerrado — ambos modos funcionales: estructura primero o progresivo |
+| Sprint 4 | Carga rapida de contenidos largos | Cerrado — textarea de 10 filas para pegar texto desde Word |
+| Sprint 5 | Multimedia por tema | Cerrado — imagenes (URLs separadas por coma) y video por tema |
+| Sprint 6 | Visualizacion publica dinamica e interactiva | Cerrado — bloques con temas, navegacion anterior/siguiente, vista de contenido por tema |
+| Sprint 7 | Permisos en formacion publica | Cerrado — ya implementado en sprint anterior, verificado con nueva estructura |
+| Sprint 8 | Chat adaptado a bloques y temas | Cerrado — blockId y blockTitle guardados en mensaje; filtro por bloque en panel admin |
+| Sprint 9 | Testeo integral local | Cerrado — build y tests OK, 15 tests pasados, 0 errores TypeScript |
+
+### Causa del error de guardado/publicacion (Sprint 0)
+
+El formulario original requeria `summary` (min 20 caracteres) y `description` (min 20 caracteres) como campos obligatorios. Al pulsar Guardar sin rellenarlos, React Hook Form ejecutaba la validacion de forma silenciosa: enfocaba el primer campo invalido (descripcion) pero no mostraba ningun mensaje de error visible. El usuario veia solo que el campo de descripcion quedaba con foco, sin entender por que no se guardaba.
+
+Solucion aplicada:
+- Se eliminaron `summary`, `level`, `access`, `price` y `duration` del modelo. El campo `description` ahora es opcional.
+- El unico campo obligatorio para guardar es `title` (minimo 1 caracter).
+- Se añadio feedback visual: `Guardando...`, `Guardado correctamente.`, `Error al guardar. <mensaje>`.
+- Se mostraron los errores de validacion inline bajo cada campo invalido.
+- Los botones Guardar y Publicar quedan deshabilitados mientras se esta guardando.
+
+### Cambios en el modelo de datos
+
+Modelo anterior (plano):
+
+```
+TrainingCourse {
+  title, slug, summary*, description*, level*, access*, price*, duration*, topics[], ...
+}
+TrainingTopic {
+  title, summary, content, imageUrls, videoUrl, order
+}
+```
+
+Modelo nuevo (jerarquico):
+
+```
+TrainingCourse {
+  title, slug, description, coverImageUrl, status, featured, order, blocks[], ...
+}
+CourseBlock {
+  title, description, order, status,
+  topics: [CourseTopic]
+}
+CourseTopic {
+  title, description, content, imageUrls, videoUrl, order, status
+}
+```
+
+Los campos marcados con * han sido eliminados. No habia datos reales de formacion en produccion (limpiados en Sprint 14), por lo que no hay migracion necesaria.
+
+### Archivos modificados
+
+Backend:
+
+- `apps/api/src/models/TrainingCourse.model.ts`: estructura de bloques con temas anidados.
+- `apps/api/src/models/TrainingChatMessage.model.ts`: añadidos campos `blockId` y `blockTitle`.
+- `apps/api/src/schemas/content.schema.ts`: schemas de bloques y temas; `trainingCourseSchema` simplificado (solo title obligatorio).
+- `apps/api/src/routes/training.routes.ts`: rutas CRUD de bloques y temas añadidas; todos los logs `[FORMACION API]` implementados.
+- `apps/api/src/tests/content-schemas.test.ts`: tests actualizados para modelo nuevo; añadido test de payload minimo y payload con bloques.
+
+Shared:
+
+- `packages/shared/src/types/content.ts`: tipos `TrainingCourse`, `TrainingBlock`, `TrainingTopic`, `TrainingChatMessage` actualizados.
+
+Frontend:
+
+- `apps/web/src/schemas/training.schema.ts`: schema de formulario actualizado para bloques y temas; solo `title` obligatorio.
+- `apps/web/src/schemas/training-chat.schema.ts`: añadido campo `blockId`.
+- `apps/web/src/components/admin/TrainingEditorForm.tsx`: reescrito con bloques plegables, sub-componentes de bloque y tema, feedback visual de guardado, logs `[FORMACION ADMIN]`.
+- `apps/web/src/components/public/TrainingChatForm.tsx`: recibe `blocks` en lugar de `topics`; selector de tema agrupado por bloque; `blockId` enviado al backend.
+- `apps/web/src/pages/public/TrainingListPage.tsx`: muestra numero de bloques y temas en tarjetas.
+- `apps/web/src/pages/public/TrainingDetailPage.tsx`: indice por bloques; navegacion anterior/siguiente entre temas; vista de contenido de tema con imagenes, video y texto; bloqueo de acceso para no autenticados.
+- `apps/web/src/pages/public/HomePage.tsx`: eliminada referencia al campo `summary` eliminado.
+- `apps/web/src/pages/admin/AdminChatPage.tsx`: filtro por bloque añadido; `blockTitle` mostrado en tarjeta de mensaje.
+- `apps/web/src/services/contentService.ts`: `getAdminChatMessages` acepta parametro `block`.
+- `apps/web/src/styles/globals.css`: estilos para bloques admin, temas admin, vista publica de bloques, navegacion de temas, access gate.
+
+### Rutas API creadas o modificadas
+
+```
+GET    /api/training                              — listado publico (sin contenido de temas)
+GET    /api/training/:slug                        — detalle publico con bloqueo si no autenticado
+POST   /api/training/:slug/chat                   — chat publico (requiere auth); guarda blockId/blockTitle
+
+GET    /api/admin/training                        — listado admin
+GET    /api/admin/training/:id                    — obtener curso admin
+POST   /api/admin/training                        — crear curso
+PUT    /api/admin/training/:id                    — actualizar curso completo con bloques
+DELETE /api/admin/training/:id                    — eliminar curso
+
+POST   /api/admin/training/:courseId/blocks       — crear bloque en curso
+PUT    /api/admin/blocks/:blockId                 — actualizar bloque
+DELETE /api/admin/blocks/:blockId                 — eliminar bloque
+
+POST   /api/admin/blocks/:blockId/topics          — crear tema en bloque
+PUT    /api/admin/topics/:topicId                 — actualizar tema
+DELETE /api/admin/topics/:topicId                 — eliminar tema
+
+GET    /api/admin/chat                            — lista mensajes (acepta filtro block)
+GET    /api/admin/chat/metrics                    — metricas globales
+PATCH  /api/admin/chat/:id/status                 — cambiar estado de mensaje
+DELETE /api/admin/chat/:id                        — eliminar mensaje
+```
+
+### Logs añadidos
+
+Frontend (`[FORMACION ADMIN]`):
+
+- Renderizando formulario de formacion, bloque, tema.
+- Click en boton Guardar.
+- Click en boton Publicar.
+- Submit de formulario detectado.
+- preventDefault ejecutado.
+- Validando formulario.
+- Titulo formacion presente: si/no.
+- Bloques presentes: N.
+- Estado actual del formulario.
+- Payload preparado para guardar.
+- Enviando peticion de guardado.
+- Endpoint y metodo usados.
+- Guardado correcto / Publicacion correcta.
+- Error guardando / Error capturado en try/catch.
+- Imagen seleccionada.
+- Video añadido.
+- Contenido presente: si.
+
+Backend (`[FORMACION API]`):
+
+- Peticion recibida (GET, POST, PUT, DELETE) con endpoint, usuario y rol.
+- Crear/actualizar/publicar formacion con payload (titulo, bloques, estado).
+- Crear/actualizar/eliminar bloque con blockId.
+- Crear/actualizar/eliminar tema con topicId.
+- Guardado en base de datos correcto.
+- Error de validacion/permisos/base de datos.
+- Chat recibido con courseSlug, blockId, topicId, userId.
+
+### Pruebas ejecutadas — 19 de mayo de 2026
+
+#### Build global
+
+```bash
+npm run build
+```
+
+Resultado:
+
+```
+API build: OK (tsc sin errores)
+Web build: OK (vite build en 4.35s)
+Shared build: OK
+```
+
+#### TypeScript type check
+
+```bash
+npx tsc --noEmit -p apps/api/tsconfig.json
+npx tsc --noEmit -p apps/web/tsconfig.json
+```
+
+Resultado:
+
+```
+0 errores en API
+0 errores en web
+```
+
+#### Tests automatizados
+
+```bash
+npm test
+```
+
+Resultado:
+
+```
+API: 4 test files, 14 tests passed
+Web: 1 test file, 1 test passed
+Total: 5 test files, 15 tests passed, 0 failed
+```
+
+Tests nuevos añadidos:
+
+- `validates training course payloads — minimal (title only)`: solo el titulo es suficiente para crear un curso en borrador.
+- `validates training course payloads — with blocks and topics`: payload con bloques y temas anidados.
+
+#### Verificacion TypeScript del modelo nuevo
+
+La nueva estructura de subdocumentos de Mongoose compila sin errores con TypeScript estricto. Los metodos `.id()` y `.pull()` en DocumentArrays reciben strings explicitamente para evitar el error `string | string[]`.
+
+### Estado de cobertura actualizado
+
+| Area | Estado |
+| --- | --- |
+| Modelo formacion con bloques | Implementado y compilado |
+| CRUD admin formacion | Implementado con logs y feedback |
+| CRUD bloques y temas por subdocumento | Implementado |
+| Guardado con feedback visual | Implementado — Guardando/Guardado/Error |
+| Logs frontend [FORMACION ADMIN] | Implementados todos los logs requeridos |
+| Logs backend [FORMACION API] | Implementados todos los logs requeridos |
+| Vista publica por bloques | Implementada con indice y navegacion |
+| Vista de contenido de tema | Implementada con anterior/siguiente |
+| Permisos (sin login = sin contenido) | Verificado con nueva estructura |
+| Chat con blockId | Implementado |
+| Filtro por bloque en panel admin chat | Implementado |
+| Dos modos de creacion de cursos | Funcional (estructura primero o progresivo) |
+| Pegar texto largo desde Word | Funcional (textarea 10 filas) |
+| Multimedia por tema (imagenes + video) | Funcional |
+| Tests automatizados | 15 tests pasados, 0 fallidos |
+
+### Pendiente para siguiente sesion
+
+- Sprint 10 (testeo en produccion): desplegar a Render (deploy manual) y Vercel (`vercel --prod --yes`), luego verificar todos los flujos de formacion con bloques en produccion.
+- Sprint 11 (limpieza): verificar que no quedan datos de prueba de formacion en produccion.
+- Sprint 17 (Google OAuth): pendiente de credenciales Google Cloud.
+- Code splitting del bundle web (1030 KB; umbral Vite 500 KB).

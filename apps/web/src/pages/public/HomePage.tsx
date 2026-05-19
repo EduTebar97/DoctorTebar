@@ -20,7 +20,7 @@ export function HomePage() {
       </section>
       <section className="section">
         <div className="section-heading"><h2>Formacion</h2><Link to="/formacion">Ver formacion</Link></div>
-        <div className="card-grid">{training.data?.slice(0, 3).map((item) => <article className="content-card" key={item._id}><h3><Link to={`/formacion/${item.slug}`}>{item.title}</Link></h3><p>{item.summary}</p></article>)}</div>
+        <div className="card-grid">{training.data?.slice(0, 3).map((item) => <article className="content-card" key={item._id}><h3><Link to={`/formacion/${item.slug}`}>{item.title}</Link></h3>{item.description ? <p>{item.description.slice(0, 120)}</p> : null}</article>)}</div>
       </section>
     </>
   );

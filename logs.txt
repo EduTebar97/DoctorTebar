@@ -1,50 +1,1155 @@
-2026-05-18T09:58:05.746582636Z   run `npm fund` for details
-2026-05-18T09:58:05.760374983Z 
-2026-05-18T09:58:05.760392923Z 6 vulnerabilities (5 moderate, 1 critical)
-2026-05-18T09:58:05.760397943Z 
-2026-05-18T09:58:05.760403133Z To address issues that do not require attention, run:
-2026-05-18T09:58:05.760407133Z   npm audit fix
-2026-05-18T09:58:05.760410913Z 
-2026-05-18T09:58:05.760417644Z To address all issues (including breaking changes), run:
-2026-05-18T09:58:05.760421993Z   npm audit fix --force
-2026-05-18T09:58:05.760425674Z 
-2026-05-18T09:58:05.760430114Z Run `npm audit` for details.
-2026-05-18T09:58:05.991344644Z 
-2026-05-18T09:58:05.991361784Z > @doctor-tebar/shared@0.1.0 build
-2026-05-18T09:58:05.991366294Z > tsc
-2026-05-18T09:58:05.991370064Z 
-2026-05-18T09:58:07.238025407Z 
-2026-05-18T09:58:07.238052737Z > @doctor-tebar/api@0.1.0 build
-2026-05-18T09:58:07.238058457Z > tsc
-2026-05-18T09:58:07.238063187Z 
-2026-05-18T09:58:13.103376036Z ==> Uploading build...
-2026-05-18T09:58:18.941597663Z ==> Uploaded in 3.0s. Compression took 2.8s
-2026-05-18T09:58:18.970709896Z ==> Build successful 🎉
-2026-05-18T09:58:21.710049702Z ==> Deploying...
-2026-05-18T09:58:21.768171352Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
-2026-05-18T09:58:35.654059235Z ==> Running 'npm --workspace @doctor-tebar/api run start'
-2026-05-18T09:58:36.967022837Z 
-2026-05-18T09:58:36.967053608Z > @doctor-tebar/api@0.1.0 start
-2026-05-18T09:58:36.967059018Z > node dist/server.js
-2026-05-18T09:58:36.967061718Z 
-2026-05-18T09:58:43.543012267Z {"level":"info","message":"MongoDB connected","timestamp":"2026-05-18T09:58:43.540Z"}
-2026-05-18T09:58:43.547157335Z {"level":"info","message":"API running on port 10000","timestamp":"2026-05-18T09:58:43.545Z"}
-2026-05-18T09:58:44.05718873Z {"endpoint":"/","level":"info","message":"[SERVER] Petición recibida","method":"HEAD","timestamp":"2026-05-18T09:58:44.056Z"}
-2026-05-18T09:58:44.057454577Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:44.057Z"}
-2026-05-18T09:58:44.063423612Z HEAD / 404 2.470 ms - 140
-2026-05-18T09:58:52.005912385Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.005Z"}
-2026-05-18T09:58:52.005951217Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.005Z"}
-2026-05-18T09:58:52.008924314Z GET /api/health 200 1.649 ms - 99
-2026-05-18T09:58:52.009996551Z {"endpoint":"/api/health","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.009Z"}
-2026-05-18T09:58:52.010141825Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.009Z"}
-2026-05-18T09:58:52.01071296Z GET /api/health 200 0.213 ms - 99
-2026-05-18T09:58:52.64618901Z ==> Your service is live 🎉
-2026-05-18T09:58:52.737685166Z {"endpoint":"/","level":"info","message":"[SERVER] Petición recibida","method":"GET","timestamp":"2026-05-18T09:58:52.737Z"}
-2026-05-18T09:58:52.73786618Z {"credentialsEnabled":true,"level":"info","message":"[CORS] Origin recibido","timestamp":"2026-05-18T09:58:52.737Z"}
-2026-05-18T09:58:52.738735333Z GET / 404 0.341 ms - 139
-2026-05-18T09:58:52.745169917Z ==> 
-2026-05-18T09:58:52.750117026Z ==> ///////////////////////////////////////////////////////////
-2026-05-18T09:58:52.755394003Z ==> 
-2026-05-18T09:58:52.762154652Z ==> Available at your primary URL https://doctor-tebar-api.onrender.com
-2026-05-18T09:58:52.770048372Z ==> 
-2026-05-18T09:58:52.776318427Z ==> ///////////////////////////////////////////////////////////
+# PROMPT PARA AGENTE DE DESARROLLO: CORRECCIÓN Y REESTRUCTURACIÓN DEL MÓDULO DE FORMACIÓN
+
+## CONTEXTO GENERAL
+
+Estoy trabajando sobre una aplicación web que tiene una parte pública y una parte privada.
+
+La aplicación debe quedar simplificada y centrada solo en tres bloques principales:
+
+1. Blog.
+2. Formación.
+3. Chat asociado a formación.
+
+Este documento se centra especialmente en corregir y rediseñar el módulo de Formación, porque actualmente hay un problema grave en la parte privada al intentar guardar o publicar temas/contenidos.
+
+---
+
+# OBJETIVO PRINCIPAL DE ESTA FASE
+
+Quiero que corrijas, rediseñes y pruebes completamente el módulo de Formación.
+
+Hay dos grandes objetivos:
+
+1. Corregir el error actual de guardado/publicación de temas de formación.
+2. Reestructurar el modelo de formación para que funcione por bloques, temas/puntos y contenidos.
+
+La estructura deseada es:
+
+```text
+Formación
+└── Bloque 1
+    ├── Tema/Punto 1
+    │   └── Contenido: texto, imágenes, vídeos, adjuntos
+    ├── Tema/Punto 2
+    │   └── Contenido
+    └── Tema/Punto 3
+        └── Contenido
+
+└── Bloque 2
+    ├── Tema/Punto 1
+    ├── Tema/Punto 2
+    └── Tema/Punto 3
+```
+
+No quiero que los temas estén todos juntos en una lista plana. Tienen que organizarse por bloques.
+
+---
+
+# ERROR ACTUAL QUE HAY QUE CORREGIR
+
+Actualmente, en la parte privada de Formación ocurre lo siguiente:
+
+1. Entro en Formación.
+2. Subo o creo un tema.
+3. Relleno información.
+4. Pulso en “Guardar” o “Publicar”.
+5. No ocurre nada.
+6. No se guarda nada.
+7. No aparece nada en consola del navegador.
+8. No aparece ningún error visible.
+9. No parece ejecutarse ninguna función.
+10. El único cambio visual es que se ilumina o queda enfocado el apartado de descripción.
+11. No se lanza ninguna petición visible.
+12. No se crea contenido.
+13. No se persiste nada.
+14. La funcionalidad está bloqueada.
+
+Este error debe tratarse como prioridad absoluta.
+
+---
+
+# DESCRIPCIÓN DEL ERROR PARA CONTEXTO
+
+El problema parece estar en el evento del botón o en el formulario.
+
+Posibles causas a investigar:
+
+- El botón “Guardar” o “Publicar” no tiene `onClick`.
+- El botón está dentro de un formulario pero no dispara `onSubmit`.
+- El botón tiene `type="button"` cuando debería disparar una acción.
+- El botón tiene `type="submit"` pero el formulario no tiene manejador.
+- Hay validación silenciosa que bloquea el guardado.
+- El foco se mueve al campo descripción porque hay un campo requerido o validación HTML nativa.
+- Hay un `preventDefault()` mal colocado.
+- La función de guardado no está conectada.
+- La función existe pero no se llama.
+- La función se llama pero no hace petición.
+- La petición no aparece porque hay una condición previa que la bloquea.
+- Hay campos requeridos ocultos o no cumplidos.
+- Hay un estado React que no cambia.
+- Hay un error capturado silenciosamente sin `console.error`.
+- El componente no está recibiendo correctamente props o contexto.
+- La ruta/API de guardado de formación no existe o no está conectada.
+- El botón “Publicar” y “Guardar” no están diferenciados correctamente.
+- El estado de publicación no se está enviando.
+- El backend no recibe nada.
+- El frontend no está mostrando feedback de carga, éxito o error.
+
+No asumas una causa sin revisar el código.
+
+---
+
+# PRIMERA PRIORIDAD: HACER VISIBLE LO INVISIBLE
+
+Antes de modificar el diseño de Formación, debes conseguir que el problema sea observable.
+
+Actualmente no aparece nada en consola ni se ve ningún error. Eso es inaceptable.
+
+Añade logs para que cualquier clic, validación, intento de guardado, error o bloqueo quede visible.
+
+---
+
+# LOGS OBLIGATORIOS EN FRONTEND PARA FORMACIÓN
+
+Añadir logs claros y seguros para:
+
+```text
+[FORMACION ADMIN] Renderizando formulario de formación
+[FORMACION ADMIN] Renderizando formulario de bloque
+[FORMACION ADMIN] Renderizando formulario de tema
+[FORMACION ADMIN] Click en botón Guardar
+[FORMACION ADMIN] Click en botón Publicar
+[FORMACION ADMIN] Submit de formulario detectado
+[FORMACION ADMIN] preventDefault ejecutado
+[FORMACION ADMIN] Validando formulario
+[FORMACION ADMIN] Resultado validación
+[FORMACION ADMIN] Campo bloqueante detectado
+[FORMACION ADMIN] Campos obligatorios presentes
+[FORMACION ADMIN] Título formación presente: sí/no
+[FORMACION ADMIN] Título bloque presente: sí/no
+[FORMACION ADMIN] Título tema presente: sí/no
+[FORMACION ADMIN] Contenido presente: sí/no
+[FORMACION ADMIN] Estado actual del formulario
+[FORMACION ADMIN] Payload preparado para guardar
+[FORMACION ADMIN] Enviando petición de guardado
+[FORMACION ADMIN] Endpoint usado
+[FORMACION ADMIN] Método usado
+[FORMACION ADMIN] Respuesta recibida
+[FORMACION ADMIN] Guardado correcto
+[FORMACION ADMIN] Publicación correcta
+[FORMACION ADMIN] Error guardando
+[FORMACION ADMIN] Error publicando
+[FORMACION ADMIN] Error capturado en try/catch
+[FORMACION ADMIN] No se envía petición porque:
+[FORMACION ADMIN] Imagen seleccionada
+[FORMACION ADMIN] Vídeo añadido
+[FORMACION ADMIN] Documento/Word añadido
+[FORMACION ADMIN] Contenido importado correctamente
+```
+
+No debe quedar ningún fallo silencioso.
+
+---
+
+# LOGS OBLIGATORIOS EN BACKEND PARA FORMACIÓN
+
+Añadir logs claros en servidor para:
+
+```text
+[FORMACION API] Petición recibida
+[FORMACION API] Método
+[FORMACION API] Endpoint
+[FORMACION API] Usuario autenticado
+[FORMACION API] Rol usuario
+[FORMACION API] Crear formación
+[FORMACION API] Actualizar formación
+[FORMACION API] Publicar formación
+[FORMACION API] Crear bloque
+[FORMACION API] Actualizar bloque
+[FORMACION API] Crear tema
+[FORMACION API] Actualizar tema
+[FORMACION API] Guardar contenido
+[FORMACION API] Payload recibido
+[FORMACION API] Formación ID
+[FORMACION API] Bloque ID
+[FORMACION API] Tema ID
+[FORMACION API] Contenido recibido
+[FORMACION API] Imágenes recibidas
+[FORMACION API] Vídeos recibidos
+[FORMACION API] Adjuntos recibidos
+[FORMACION API] Guardado en base de datos correcto
+[FORMACION API] Error de validación
+[FORMACION API] Error de base de datos
+[FORMACION API] Error de permisos
+[FORMACION API] Error inesperado
+```
+
+No imprimir contraseñas, tokens completos ni datos sensibles.
+
+---
+
+# FEEDBACK VISUAL OBLIGATORIO
+
+Cuando el usuario pulse Guardar o Publicar, la interfaz debe mostrar algo.
+
+Debe haber feedback visible para:
+
+- Guardando...
+- Publicando...
+- Guardado correctamente.
+- Publicado correctamente.
+- Error al guardar.
+- Error al publicar.
+- Faltan datos mínimos.
+- No tienes permisos.
+- Sesión caducada.
+
+No puede ocurrir que el usuario pulse y no pase nada.
+
+---
+
+# NUEVA ESTRUCTURA FUNCIONAL DE FORMACIÓN
+
+Quiero que el módulo de Formación se reestructure para trabajar de forma cómoda con esta jerarquía:
+
+```text
+Formación
+└── Bloques
+    └── Temas/Puntos
+        └── Contenido
+```
+
+## Formación
+
+Cada formación debe tener:
+
+- Título.
+- Descripción.
+- Imagen principal opcional.
+- Estado: borrador/publicada.
+- Orden si hay varias formaciones.
+- Fecha de creación.
+- Fecha de actualización.
+- Bloques asociados.
+
+Ejemplo:
+
+```text
+Formación: Modelos predictivos en investigación clínica
+Descripción: Curso introductorio sobre modelos predictivos, validación y aplicación clínica.
+Imagen principal: opcional
+```
+
+## Bloques
+
+Cada formación puede tener varios bloques.
+
+Ejemplo:
+
+```text
+Bloque 1: Fundamentos de los modelos predictivos
+Bloque 2: Desarrollo del modelo
+Bloque 3: Validación interna y externa
+Bloque 4: Aplicación clínica e interpretación
+```
+
+Cada bloque debe tener:
+
+- Título.
+- Descripción breve opcional.
+- Orden.
+- Estado.
+- Temas/puntos asociados.
+
+## Temas o puntos dentro de cada bloque
+
+Cada bloque puede tener varios temas o puntos.
+
+Ejemplo:
+
+```text
+Bloque 1: Fundamentos de los modelos predictivos
+
+1. Qué es un modelo predictivo
+2. Diferencia entre causalidad y predicción
+3. Variables candidatas
+4. Riesgo de sobreajuste
+5. Medidas de rendimiento
+```
+
+Cada tema/punto debe tener:
+
+- Título.
+- Descripción breve opcional.
+- Orden.
+- Contenido principal.
+- Imágenes opcionales.
+- Vídeos opcionales.
+- Adjuntos opcionales.
+- Estado: borrador/publicado.
+
+---
+
+# DOS FORMAS DE TRABAJO QUE DEBEN SER POSIBLES
+
+El sistema debe permitir dos formas de creación de cursos.
+
+## Forma 1: Crear primero la estructura y después rellenar contenidos
+
+El administrador puede:
+
+1. Crear una formación.
+2. Añadir título, descripción e imagen.
+3. Crear todos los bloques.
+4. Dentro de cada bloque, crear todos los temas/puntos.
+5. Guardar la estructura vacía o semivacía.
+6. Volver después.
+7. Rellenar los contenidos de cada tema.
+
+Esta forma es útil cuando primero se diseña el índice completo.
+
+## Forma 2: Crear estructura y contenido progresivamente
+
+El administrador puede:
+
+1. Crear una formación.
+2. Crear bloque 1.
+3. Crear tema 1 dentro del bloque 1.
+4. Añadir contenido completo al tema 1.
+5. Crear tema 2.
+6. Añadir contenido al tema 2.
+7. Crear bloque 2.
+8. Continuar progresivamente.
+
+Esta forma es útil cuando se va construyendo el curso poco a poco.
+
+Ambas formas deben funcionar.
+
+---
+
+# FACILIDAD DE USO EN LA CARGA DE CONTENIDOS
+
+Quiero que subir contenidos sea muy rápido y sencillo.
+
+El administrador debe poder pegar o subir contenidos largos, por ejemplo textos de 3 o 4 páginas de Word.
+
+Debe poder:
+
+- Pegar texto largo directamente.
+- Mantener saltos de línea y estructura básica.
+- Mantener títulos y subtítulos si es posible.
+- Añadir imágenes.
+- Añadir vídeos.
+- Añadir adjuntos si procede.
+- Guardar rápidamente.
+- Publicar rápidamente.
+
+No quiero un sistema complejo que obligue a rellenar muchos campos para cada tema.
+
+Para cada tema/punto, lo mínimo obligatorio debe ser:
+
+- Título del tema.
+- Contenido si se quiere publicar.
+
+Para guardar como borrador, debería poder guardarse incluso sin contenido completo.
+
+---
+
+# IMPORTACIÓN O PEGADO DESDE WORD
+
+Quiero que el sistema esté preparado para contenidos que vienen de Word.
+
+Debe permitir, si es viable:
+
+1. Pegar texto desde Word en un editor.
+2. Limpiar estilos innecesarios.
+3. Mantener estructura básica:
+   - Párrafos.
+   - Negritas si es posible.
+   - Listas.
+   - Títulos.
+   - Subtítulos.
+4. Evitar que se rompa el diseño.
+5. Evitar código HTML basura.
+6. Guardar el contenido limpio.
+
+Si se implementa subida de archivo Word directamente, debe documentarse bien.
+
+Pero como mínimo, debe funcionar bien el pegado de textos largos desde Word.
+
+---
+
+# CONTENIDO MULTIMEDIA EN TEMAS
+
+Cada tema/punto debe permitir añadir:
+
+- Texto largo.
+- Imágenes.
+- Varias imágenes.
+- Vídeos embebidos o enlaces de vídeo.
+- Adjuntos si procede.
+- Recursos complementarios.
+
+Debe visualizarse correctamente en la parte pública.
+
+Las imágenes y vídeos pueden ser opcionales.
+
+No deben bloquear el guardado si no existen.
+
+---
+
+# VISUALIZACIÓN PÚBLICA DE FORMACIÓN
+
+La parte pública debe visualizar la formación de forma atractiva, dinámica e interactiva.
+
+## Página de listado de formaciones
+
+Debe mostrar:
+
+- Tarjetas de formaciones.
+- Imagen principal.
+- Título.
+- Descripción.
+- Número de bloques.
+- Número de temas.
+- Estado o disponibilidad si procede.
+
+## Página interna de una formación
+
+Debe mostrar:
+
+- Cabecera visual.
+- Imagen principal.
+- Título de la formación.
+- Descripción.
+- Bloques organizados.
+- Dentro de cada bloque, los temas/puntos.
+- Progreso visual si se implementa.
+- Diseño tipo curso.
+
+## Página de contenido de un tema
+
+Cuando el usuario haga clic en un tema/punto, debe abrirse una página o vista atractiva con:
+
+- Título del tema.
+- Bloque al que pertenece.
+- Contenido principal.
+- Imágenes.
+- Vídeos.
+- Adjuntos.
+- Botón anterior.
+- Botón siguiente.
+- Volver al índice.
+- Chat asociado a esa formación/tema si ya existe el módulo de chat.
+
+Debe ser una experiencia de curso, no una lista plana de textos.
+
+---
+
+# PERMISOS EN LA PARTE PÚBLICA
+
+Mantener la lógica:
+
+## Usuario no autenticado
+
+Puede ver:
+
+- Listado de formaciones.
+- Título de cada formación.
+- Descripción.
+- Bloques.
+- Índice de temas/puntos.
+
+No puede ver:
+
+- Contenido completo del tema.
+- Imágenes internas del contenido.
+- Vídeos.
+- Adjuntos.
+- Chat.
+
+Si intenta acceder al contenido completo, mostrar:
+
+```text
+Para acceder al contenido completo de esta formación debes iniciar sesión.
+```
+
+## Usuario autenticado
+
+Puede ver:
+
+- Todo el contenido completo.
+- Textos.
+- Imágenes.
+- Vídeos.
+- Adjuntos.
+- Chat asociado.
+
+La protección debe existir en frontend y backend.
+
+No basta con ocultar botones.
+
+---
+
+# CHAT ASOCIADO A FORMACIÓN Y TEMA
+
+Si el módulo de chat está implementado o se está implementando, debe quedar asociado a la nueva estructura:
+
+- Usuario.
+- Formación.
+- Bloque si procede.
+- Tema/punto si procede.
+- Mensaje.
+- Fecha.
+- Estado.
+
+Ejemplo:
+
+```text
+Usuario: Ana García
+Formación: Modelos predictivos en investigación clínica
+Bloque: Validación del modelo
+Tema: Validación externa
+Mensaje: No entiendo cuándo una validación externa es realmente independiente.
+```
+
+En el panel privado de chat debe poder filtrarse por:
+
+- Formación.
+- Bloque.
+- Tema.
+- Usuario.
+
+---
+
+# MODELO DE DATOS ESPERADO
+
+Revisar el modelo de datos actual y adaptarlo si hace falta.
+
+Modelo conceptual recomendado:
+
+```text
+Course / Formation
+- id
+- title
+- description
+- coverImage
+- status
+- order
+- createdAt
+- updatedAt
+
+CourseBlock
+- id
+- courseId
+- title
+- description
+- order
+- status
+- createdAt
+- updatedAt
+
+CourseTopic
+- id
+- blockId
+- courseId
+- title
+- description
+- content
+- status
+- order
+- createdAt
+- updatedAt
+
+CourseTopicMedia
+- id
+- topicId
+- type
+- url
+- caption
+- order
+- createdAt
+
+ChatConversation
+- id
+- userId
+- courseId
+- blockId optional
+- topicId optional
+- status
+- createdAt
+- updatedAt
+
+ChatMessage
+- id
+- conversationId
+- senderId
+- message
+- createdAt
+```
+
+No hay que usar exactamente estos nombres si el proyecto ya tiene otros, pero la lógica relacional debe quedar clara.
+
+---
+
+# API ESPERADA
+
+Revisar las rutas existentes y crear/adaptar las necesarias.
+
+Rutas orientativas:
+
+```text
+GET    /api/admin/courses
+POST   /api/admin/courses
+GET    /api/admin/courses/:id
+PUT    /api/admin/courses/:id
+DELETE /api/admin/courses/:id
+
+POST   /api/admin/courses/:courseId/blocks
+PUT    /api/admin/blocks/:blockId
+DELETE /api/admin/blocks/:blockId
+
+POST   /api/admin/blocks/:blockId/topics
+PUT    /api/admin/topics/:topicId
+DELETE /api/admin/topics/:topicId
+
+POST   /api/admin/topics/:topicId/media
+
+GET    /api/public/courses
+GET    /api/public/courses/:id
+GET    /api/public/courses/:id/outline
+
+GET    /api/courses/:courseId/topics/:topicId/content
+```
+
+La ruta de contenido completo debe estar protegida si el contenido es solo para usuarios autenticados.
+
+---
+
+# METODOLOGÍA OBLIGATORIA POR SPRINTS
+
+El trabajo debe organizarse por sprints independientes, testeables y bloqueantes.
+
+No pases al siguiente sprint si el sprint actual no está:
+
+- Implementado.
+- Compilado.
+- Probado.
+- Sin errores críticos.
+- Documentado.
+
+Cada sprint debe incluir:
+
+1. Objetivo.
+2. Cambios realizados.
+3. Archivos modificados.
+4. Logs añadidos.
+5. Tests ejecutados.
+6. Resultado de tests.
+7. Errores encontrados.
+8. Correcciones aplicadas.
+9. Confirmación de cierre.
+
+---
+
+# SPRINT 0: DIAGNÓSTICO DEL ERROR ACTUAL DE GUARDADO
+
+## Objetivo
+
+Hacer visible y diagnosticar por qué al pulsar Guardar/Publicar en Formación no ocurre nada.
+
+## Tareas
+
+1. Localizar componente del formulario de formación.
+2. Localizar componente de bloques.
+3. Localizar componente de temas.
+4. Localizar botones Guardar/Publicar.
+5. Comprobar si tienen `onClick`.
+6. Comprobar si están dentro de un formulario.
+7. Comprobar si hay `onSubmit`.
+8. Comprobar tipo de botón.
+9. Comprobar validaciones.
+10. Comprobar si algún campo required bloquea el submit.
+11. Comprobar si se está enfocando descripción por validación nativa.
+12. Añadir logs de clic.
+13. Añadir logs de submit.
+14. Añadir logs de validación.
+15. Añadir logs antes de enviar API.
+16. Añadir logs de error.
+
+## Tests obligatorios
+
+1. Abrir formulario de formación.
+2. Pulsar Guardar.
+3. Confirmar que aparece log de clic.
+4. Pulsar Publicar.
+5. Confirmar que aparece log de clic.
+6. Confirmar si hay submit o no.
+7. Confirmar si hay validación bloqueante.
+8. Confirmar si se lanza petición o no.
+9. Documentar causa exacta.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta saber exactamente por qué no se ejecuta el guardado/publicación.
+
+---
+
+# SPRINT 1: CORRECCIÓN DEL GUARDADO Y PUBLICACIÓN
+
+## Objetivo
+
+Conseguir que Guardar y Publicar funcionen.
+
+## Requisitos
+
+1. El botón Guardar debe ejecutar función.
+2. El botón Publicar debe ejecutar función.
+3. Debe haber feedback visual.
+4. Debe capturar errores.
+5. Debe llamar al backend o persistir correctamente.
+6. Debe diferenciar borrador/publicado.
+7. Debe mostrar éxito o error.
+8. No debe haber fallos silenciosos.
+
+## Tests obligatorios
+
+1. Crear formación mínima.
+2. Pulsar Guardar.
+3. Confirmar log.
+4. Confirmar petición.
+5. Confirmar persistencia.
+6. Recargar.
+7. Confirmar que sigue guardada.
+8. Pulsar Publicar.
+9. Confirmar estado publicado.
+10. Confirmar visualización pública si procede.
+11. Forzar error.
+12. Confirmar mensaje de error.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que Guardar y Publicar funcionen y no haya fallos silenciosos.
+
+---
+
+# SPRINT 2: REDISEÑO DE ESTRUCTURA FORMACIÓN → BLOQUES → TEMAS
+
+## Objetivo
+
+Reestructurar la formación para que no sea una lista plana de temas.
+
+## Requisitos
+
+1. Crear formación.
+2. Crear bloques dentro de formación.
+3. Crear temas dentro de cada bloque.
+4. Ordenar bloques.
+5. Ordenar temas dentro de cada bloque.
+6. Guardar estructura.
+7. Editar estructura.
+8. Borrar bloques.
+9. Borrar temas.
+10. Persistir todo.
+
+## Tests obligatorios
+
+1. Crear formación “Modelos predictivos”.
+2. Crear Bloque 1.
+3. Crear Bloque 2.
+4. Crear varios temas dentro del Bloque 1.
+5. Crear varios temas dentro del Bloque 2.
+6. Guardar.
+7. Recargar.
+8. Confirmar estructura jerárquica.
+9. Editar título de bloque.
+10. Editar título de tema.
+11. Borrar un tema.
+12. Borrar un bloque.
+13. Confirmar persistencia.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que la estructura jerárquica funcione completa.
+
+---
+
+# SPRINT 3: DOS MODOS DE CREACIÓN DE CURSOS
+
+## Objetivo
+
+Permitir las dos formas de trabajo del administrador.
+
+## Modo A: primero estructura, luego contenidos
+
+Debe permitir:
+
+1. Crear formación.
+2. Crear bloques.
+3. Crear temas vacíos o semivacíos.
+4. Guardar estructura.
+5. Volver después.
+6. Añadir contenidos.
+
+## Modo B: estructura y contenido progresivo
+
+Debe permitir:
+
+1. Crear formación.
+2. Crear bloque.
+3. Crear tema.
+4. Añadir contenido.
+5. Guardar.
+6. Continuar con siguiente tema.
+
+## Tests obligatorios
+
+1. Crear curso con estructura completa sin contenidos.
+2. Confirmar que se guarda.
+3. Volver y añadir contenido.
+4. Crear otro curso progresivamente con contenidos.
+5. Confirmar que ambos flujos funcionan.
+6. Confirmar que no obliga a rellenar todo desde el principio.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que ambos modos sean cómodos y funcionales.
+
+---
+
+# SPRINT 4: CARGA RÁPIDA DE CONTENIDOS LARGOS
+
+## Objetivo
+
+Permitir pegar o subir contenidos largos de forma sencilla.
+
+## Requisitos
+
+1. Editor cómodo para texto largo.
+2. Pegar texto de 3 o 4 páginas de Word.
+3. Mantener saltos de línea.
+4. Mantener estructura básica.
+5. Limpiar estilos basura si procede.
+6. No romper diseño.
+7. Guardar contenido largo.
+8. Recuperar contenido largo.
+9. Visualizarlo bien en público.
+
+## Tests obligatorios
+
+1. Pegar texto largo.
+2. Guardar.
+3. Recargar.
+4. Confirmar que sigue.
+5. Ver en parte pública.
+6. Confirmar que se lee bien.
+7. Confirmar que no rompe maquetación.
+8. Confirmar que no se pierde formato básico.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que el contenido largo se pueda guardar y visualizar correctamente.
+
+---
+
+# SPRINT 5: MULTIMEDIA EN CADA TEMA
+
+## Objetivo
+
+Permitir imágenes, vídeos y adjuntos dentro de cada tema.
+
+## Requisitos
+
+Cada tema debe permitir:
+
+- Texto.
+- Imágenes.
+- Varias imágenes.
+- Vídeos embebidos o enlaces.
+- Adjuntos si procede.
+
+Todo debe ser opcional.
+
+No debe bloquear el guardado si no hay multimedia.
+
+## Tests obligatorios
+
+1. Crear tema solo con texto.
+2. Crear tema con texto e imagen.
+3. Crear tema con varias imágenes.
+4. Crear tema con vídeo.
+5. Crear tema con adjunto si procede.
+6. Guardar.
+7. Recargar.
+8. Confirmar persistencia.
+9. Ver en público.
+10. Confirmar visualización correcta.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que el multimedia funcione por tema.
+
+---
+
+# SPRINT 6: VISUALIZACIÓN PÚBLICA DINÁMICA E INTERACTIVA
+
+## Objetivo
+
+Mostrar la formación en público como una plataforma de curso, no como una lista plana.
+
+## Requisitos
+
+1. Página de listado de formaciones.
+2. Tarjetas visuales.
+3. Página interna de formación.
+4. Bloques visibles.
+5. Temas dentro de bloques.
+6. Al hacer clic en un tema, abrir contenido.
+7. Página/vista de tema atractiva.
+8. Botón anterior.
+9. Botón siguiente.
+10. Volver al índice.
+11. Mostrar imágenes/vídeos/adjuntos.
+12. Integrar chat si procede.
+
+## Tests obligatorios
+
+1. Ver listado de formaciones.
+2. Entrar en formación.
+3. Ver bloques.
+4. Ver temas dentro de bloques.
+5. Clicar tema.
+6. Ver contenido.
+7. Navegar al siguiente.
+8. Volver al índice.
+9. Confirmar diseño limpio.
+10. Confirmar responsive básico.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que la experiencia pública sea clara, atractiva y funcional.
+
+---
+
+# SPRINT 7: PERMISOS EN FORMACIÓN PÚBLICA
+
+## Objetivo
+
+Mantener acceso restringido al contenido completo.
+
+## Tests obligatorios
+
+1. Entrar sin login.
+2. Ver formaciones.
+3. Ver bloques.
+4. Ver índice de temas.
+5. Intentar abrir contenido.
+6. Confirmar bloqueo.
+7. Confirmar que backend no entrega contenido protegido.
+8. Iniciar sesión.
+9. Abrir contenido.
+10. Confirmar acceso completo.
+11. Cerrar sesión.
+12. Confirmar bloqueo de nuevo.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que los permisos funcionen en frontend y backend.
+
+---
+
+# SPRINT 8: CHAT ADAPTADO A BLOQUES Y TEMAS
+
+## Objetivo
+
+Adaptar el chat a la nueva estructura.
+
+## Requisitos
+
+El chat debe poder asociarse a:
+
+- Usuario.
+- Formación.
+- Bloque.
+- Tema.
+- Mensajes.
+
+## Tests obligatorios
+
+1. Entrar como usuario.
+2. Abrir formación.
+3. Abrir bloque.
+4. Abrir tema.
+5. Enviar consulta desde ese tema.
+6. Confirmar que el chat guarda formación, bloque y tema.
+7. Entrar como admin.
+8. Ver chat.
+9. Filtrar por formación.
+10. Filtrar por bloque.
+11. Filtrar por tema.
+12. Filtrar por usuario.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que el chat respete la nueva jerarquía.
+
+---
+
+# SPRINT 9: TESTEO INTEGRAL LOCAL
+
+## Objetivo
+
+Probar todo el módulo de formación completo en local.
+
+## Tests obligatorios
+
+1. Crear formación.
+2. Crear bloques.
+3. Crear temas.
+4. Guardar borrador.
+5. Publicar.
+6. Pegar contenido largo.
+7. Añadir imágenes.
+8. Añadir vídeos.
+9. Ver público sin login.
+10. Confirmar restricción.
+11. Ver público con login.
+12. Abrir tema.
+13. Navegar por temas.
+14. Enviar chat.
+15. Ver chat en admin.
+16. Filtrar chat.
+17. Borrar datos de prueba.
+18. Confirmar limpieza.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que todo funcione en local sin errores críticos.
+
+---
+
+# SPRINT 10: TESTEO EN PRODUCCIÓN
+
+## Objetivo
+
+Probar todo el módulo de formación desplegado.
+
+## Tests obligatorios
+
+1. Hacer build.
+2. Desplegar si procede.
+3. Abrir producción.
+4. Confirmar sin errores críticos de consola.
+5. Crear formación de prueba.
+6. Crear bloques.
+7. Crear temas.
+8. Guardar.
+9. Publicar.
+10. Ver pública sin login.
+11. Confirmar restricción.
+12. Login usuario.
+13. Ver contenido completo.
+14. Añadir chat.
+15. Ver chat en admin.
+16. Borrar datos de prueba.
+17. Confirmar limpieza.
+18. Revisar logs de servidor/despliegue.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que producción funcione correctamente.
+
+---
+
+# SPRINT 11: LIMPIEZA DE DATOS DE PRUEBA
+
+## Objetivo
+
+Borrar todo lo creado para pruebas.
+
+## Borrar
+
+- Formaciones de prueba.
+- Bloques de prueba.
+- Temas de prueba.
+- Imágenes de prueba.
+- Vídeos de prueba.
+- Adjuntos de prueba.
+- Chats de prueba.
+- Mensajes de prueba.
+
+## Tests obligatorios
+
+1. Confirmar que no aparecen formaciones de prueba.
+2. Confirmar que no aparecen bloques de prueba.
+3. Confirmar que no aparecen temas de prueba.
+4. Confirmar que no aparecen chats de prueba.
+5. Confirmar que no se borró contenido real.
+6. Confirmar que la app sigue funcionando.
+
+## Criterio de cierre
+
+No cerrar este sprint hasta que la limpieza esté comprobada.
+
+---
+
+# SPRINT 12: INFORME FINAL
+
+## Objetivo
+
+Entregar un informe final claro.
+
+Debe incluir:
+
+1. Causa exacta del error de Guardar/Publicar.
+2. Cómo se corrigió.
+3. Archivos modificados.
+4. Logs añadidos.
+5. Nueva estructura de datos.
+6. Nueva estructura visual.
+7. Rutas API creadas o modificadas.
+8. Tests realizados.
+9. Tests superados.
+10. Datos de prueba creados.
+11. Datos de prueba eliminados.
+12. Confirmación local.
+13. Confirmación en producción.
+14. Problemas pendientes si existen.
+15. Cómo repetir las pruebas.
+16. Cómo ver logs.
+
+---
+
+# CRITERIOS DE ACEPTACIÓN FINAL
+
+La tarea solo está terminada si:
+
+1. Al pulsar Guardar en Formación ocurre algo visible.
+2. Al pulsar Publicar en Formación ocurre algo visible.
+3. No hay fallos silenciosos.
+4. Hay logs de clic, submit, validación, payload, API, éxito y error.
+5. Se puede crear una formación.
+6. Se pueden crear bloques.
+7. Se pueden crear temas dentro de bloques.
+8. Se puede guardar estructura sin contenido.
+9. Se puede añadir contenido después.
+10. Se puede crear estructura y contenido progresivamente.
+11. Se puede pegar texto largo desde Word.
+12. El texto largo se guarda.
+13. El texto largo se visualiza bien.
+14. Se pueden añadir imágenes por tema.
+15. Se pueden añadir vídeos por tema.
+16. Se visualiza todo en la parte pública.
+17. La parte pública muestra formación por bloques y temas.
+18. Al clicar un tema se abre una vista atractiva de contenido.
+19. Usuario no autenticado solo ve índice.
+20. Usuario autenticado ve contenido completo.
+21. Backend protege contenido restringido.
+22. Chat se asocia a formación/bloque/tema.
+23. Panel privado puede filtrar chats por formación/bloque/tema/usuario.
+24. Todo persiste tras recargar.
+25. Todo funciona en local.
+26. Todo funciona en producción si hay despliegue.
+27. Se han borrado datos de prueba.
+28. No quedan errores críticos.
+29. Se entrega informe final.

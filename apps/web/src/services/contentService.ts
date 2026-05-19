@@ -104,7 +104,7 @@ export async function getAdminChatMetrics() {
   return data;
 }
 
-export async function getAdminChatMessages(params?: { course?: string; user?: string; topic?: string; status?: string }) {
+export async function getAdminChatMessages(params?: { course?: string; user?: string; topic?: string; block?: string; status?: string }) {
   console.log("[CHAT ADMIN] Cargando conversaciones", params);
   const { data } = await apiClient.get<TrainingChatMessage[]>("/admin/chat", { params });
   console.log("[CHAT ADMIN] Conversaciones recibidas:", data.length);

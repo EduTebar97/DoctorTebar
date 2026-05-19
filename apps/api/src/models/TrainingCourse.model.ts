@@ -1,26 +1,33 @@
 import mongoose from "mongoose";
 
+const topicSchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true },
+  description: { type: String, default: "" },
+  content: { type: String, default: "" },
+  imageUrls: [{ type: String }],
+  videoUrl: { type: String, default: "" },
+  order: { type: Number, default: 0 },
+  status: { type: String, enum: ["draft", "published"], default: "draft" }
+});
+
+const blockSchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true },
+  description: { type: String, default: "" },
+  order: { type: Number, default: 0 },
+  status: { type: String, enum: ["draft", "published"], default: "draft" },
+  topics: [topicSchema]
+});
+
 const trainingCourseSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
-    summary: { type: String, required: true },
-    description: { type: String, required: true },
-    level: { type: String, enum: ["introductorio", "intermedio", "avanzado"], default: "intermedio" },
-    access: { type: String, enum: ["public", "private"], default: "private" },
-    coverImageUrl: String,
-    price: String,
-    duration: String,
-    topics: [{
-      title: { type: String, required: true, trim: true },
-      summary: String,
-      content: String,
-      imageUrls: [{ type: String }],
-      videoUrl: String,
-      order: { type: Number, default: 0 }
-    }],
+    description: { type: String, default: "" },
+    coverImageUrl: { type: String, default: "" },
     status: { type: String, enum: ["draft", "published", "archived"], default: "draft" },
     featured: { type: Boolean, default: false },
+    order: { type: Number, default: 0 },
+    blocks: [blockSchema],
     publishedAt: Date
   },
   { timestamps: true }

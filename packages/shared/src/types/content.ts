@@ -83,30 +83,36 @@ export interface TrainingCourse {
   _id: string;
   title: string;
   slug: string;
-  summary: string;
-  description: string;
-  level: "introductorio" | "intermedio" | "avanzado";
-  access: "public" | "private";
+  description?: string;
   coverImageUrl?: string;
-  price?: string;
-  duration?: string;
-  topics: TrainingTopic[];
+  blocks: TrainingBlock[];
   status: ContentStatus;
   featured: boolean;
+  order: number;
   locked?: boolean;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface TrainingBlock {
+  _id?: string;
+  title: string;
+  description?: string;
+  order: number;
+  status: "draft" | "published";
+  topics: TrainingTopic[];
+}
+
 export interface TrainingTopic {
   _id?: string;
   title: string;
-  summary?: string;
+  description?: string;
   content?: string;
   imageUrls: string[];
   videoUrl?: string;
   order: number;
+  status: "draft" | "published";
 }
 
 export interface TrainingChatMessage {
@@ -115,6 +121,8 @@ export interface TrainingChatMessage {
   userId: string;
   courseTitle: string;
   courseSlug: string;
+  blockId?: string;
+  blockTitle?: string;
   topicId?: string;
   topicTitle?: string;
   name: string;
