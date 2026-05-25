@@ -70,7 +70,7 @@ export function TrainingEditorForm() {
       order: data.order ?? 0
     });
     const expanded: Record<number, boolean> = {};
-    data.blocks?.forEach((_, i) => { expanded[i] = true; });
+    data.blocks?.forEach((_: unknown, i: number) => { expanded[i] = true; });
     setExpandedBlocks(expanded);
   }, [data, reset]);
 

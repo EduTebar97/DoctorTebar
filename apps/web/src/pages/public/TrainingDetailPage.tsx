@@ -65,7 +65,7 @@ export function TrainingDetailPage() {
 
         {topic.imageUrls?.length ? (
           <div className="topic-images">
-            {topic.imageUrls.map((url) => (
+            {topic.imageUrls.map((url: string) => (
               <img key={url} src={url} alt={topic.title} className="article-cover" />
             ))}
           </div>
@@ -79,7 +79,7 @@ export function TrainingDetailPage() {
 
         {topic.content ? (
           <div className="article-html">
-            {topic.content.split("\n").map((paragraph, i) =>
+            {topic.content.split("\n").map((paragraph: string, i: number) =>
               paragraph.trim() ? <p key={i}>{paragraph}</p> : null
             )}
           </div>
@@ -116,7 +116,7 @@ export function TrainingDetailPage() {
       ) : null}
       {course.data.description ? (
         <div className="article-html">
-          {course.data.description.split("\n").map((paragraph, i) =>
+          {course.data.description.split("\n").map((paragraph: string, i: number) =>
             paragraph.trim() ? <p key={i}>{paragraph}</p> : null
           )}
         </div>

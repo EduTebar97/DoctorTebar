@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm --workspace @doctor-tebar/web run build",
+  "buildCommand": "npm --workspace @doctor-tebar/shared run build && npm --workspace @doctor-tebar/web run build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "npm install",
   "framework": "vite",

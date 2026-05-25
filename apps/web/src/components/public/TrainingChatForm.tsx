@@ -37,7 +37,7 @@ export function TrainingChatForm({ slug, blocks = [], currentBlockId, currentTop
   // Build flat topic list grouped by block
   const topicOptions: Array<{ value: string; label: string; blockId: string }> = [];
   blocks.forEach((block) => {
-    (block.topics ?? []).forEach((topic) => {
+    (block.topics ?? []).forEach((topic: any) => {
       if (topic._id) topicOptions.push({ value: topic._id, label: `${block.title} / ${topic.title}`, blockId: block._id ?? "" });
     });
   });

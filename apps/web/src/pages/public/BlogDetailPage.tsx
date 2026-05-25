@@ -19,7 +19,7 @@ export function BlogDetailPage() {
       <p className="lead">{post.data.excerpt}</p>
       {post.data.coverImageUrl ? <img className="article-cover" src={post.data.coverImageUrl} alt={post.data.title} /> : null}
       <div className="article-html" dangerouslySetInnerHTML={{ __html: post.data.content }} />
-      <div className="tag-row">{post.data.tags?.map((tag) => <Badge key={tag}>{tag}</Badge>)}</div>
+      <div className="tag-row">{post.data.tags?.map((tag: string) => <Badge key={tag}>{tag}</Badge>)}</div>
       <div className="cta-band"><strong>Necesitas revisar un analisis o protocolo?</strong><Link className="btn" to="/contacto">Solicitar asesoria</Link></div>
       <h2>Articulos relacionados</h2>
       <div className="related-list">{related.data?.filter((item) => item.slug !== slug).slice(0, 3).map((item) => <Link key={item._id} to={`/blog/${item.slug}`}>{item.title}</Link>)}</div>

@@ -31,7 +31,7 @@ export function TrainingListPage() {
           {data.map((course) => {
             const numBlocks = course.blocks?.length ?? 0;
             const numTopics = (course.blocks ?? []).reduce(
-              (sum, block) => sum + (block.topics?.length ?? 0), 0
+              (sum: number, block: any) => sum + (block.topics?.length ?? 0), 0
             );
             return (
               <article className="content-card training-card" key={course._id}>
