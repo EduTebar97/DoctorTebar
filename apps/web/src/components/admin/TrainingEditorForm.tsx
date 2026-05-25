@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { TrainingCourse } from "@doctor-tebar/shared";
-import { ChevronDown, ChevronUp, ImageUp, Plus, Save, Send, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { ChevronDown, ChevronUp, FileText, ImageUp, Plus, Save, Send, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { trainingFormSchema, type TrainingFormData } from "../../schemas/training.schema";
+import { parseFormationMarkdown, validateFormationImport, type ParsedBlock } from "../../utils/formation-parser";
 import { adminCreate, adminGet, adminUpdate, uploadMedia } from "../../services/contentService";
 import { Button } from "../common/Button";
 import { ErrorMessage } from "../common/ErrorMessage";
@@ -39,7 +40,8 @@ export function TrainingEditorForm() {
     onSuccess: (asset) => {
       console.log("[FORMACION ADMIN] Imagen seleccionada", { url: asset.url });
       setValue("coverImageUrl", asset.url, { shouldDirty: true, shouldValidate: true });
-    }
+    },
+    onError: (error: any) => console.error("[FORMACION ADMIN] Error subiendo imagen", error?.response?.data ?? error?.message ?? error)
   });
 
   useEffect(() => {
@@ -107,7 +109,9 @@ export function TrainingEditorForm() {
       console.error("[FORMACION ADMIN] Error guardando", error);
       console.error("[FORMACION ADMIN] Error capturado en try/catch", error?.message);
       setSaveStatus("error");
-      setSaveError(error?.response?.data?.message ?? error?.message ?? "Error desconocido al guardar");
+      const details = error?.response?.data?.details;
+      const fieldErrors = details?.fieldErrors ? JSON.stringify(details.fieldErrors, null, 2) : null;
+      setSaveError((error?.response?.data?.message ?? error?.message ?? "Error desconocido al guardar") + (fieldErrors ? `: ${fieldErrors}` : ""));
     }
   }
 
@@ -181,7 +185,7 @@ export function TrainingEditorForm() {
 
       <label>
         Orden
-        <input type="number" {...register("order")} />
+        <input type="number" {...register("order", { valueAsNumber: true })} />
       </label>
 
       <label className="checkbox">
@@ -207,7 +211,9 @@ export function TrainingEditorForm() {
           />
         </label>
         {imageUpload.isPending ? <p className="field-note">Subiendo imagen...</p> : null}
-        {imageUpload.isError ? <ErrorMessage message="No se ha podido subir la imagen." /> : null}
+        {imageUpload.isError ? (
+          <ErrorMessage message={(imageUpload.error as any)?.response?.data?.message ?? "No se ha podido subir la imagen."} />
+        ) : null}
         {values.coverImageUrl ? <img className="post-image-preview" src={values.coverImageUrl} alt="Vista previa" /> : null}
       </div>
 
@@ -232,6 +238,7 @@ export function TrainingEditorForm() {
             blockIndex={blockIndex}
             register={register}
             control={control}
+            setValue={setValue}
             watch={watch}
             formState={formState}
             expanded={expandedBlocks[blockIndex] !== false}
@@ -239,6 +246,16 @@ export function TrainingEditorForm() {
             onRemove={() => blocks.remove(blockIndex)}
           />
         ))}
+
+        <ImportBlocksPanel
+          onImport={(importedBlocks) => {
+            const startIndex = blocks.fields.length;
+            importedBlocks.forEach((b, i) => {
+              blocks.append({ ...b, order: startIndex + i });
+              setExpandedBlocks((prev) => ({ ...prev, [startIndex + i]: true }));
+            });
+          }}
+        />
       </div>
 
       {/* Acciones */}
@@ -264,6 +281,7 @@ interface BlockEditorProps {
   blockIndex: number;
   register: any;
   control: any;
+  setValue: any;
   watch: any;
   formState: any;
   expanded: boolean;
@@ -271,7 +289,7 @@ interface BlockEditorProps {
   onRemove: () => void;
 }
 
-function BlockEditor({ blockIndex, register, control, watch, formState, expanded, onToggle, onRemove }: BlockEditorProps) {
+function BlockEditor({ blockIndex, register, control, setValue, watch, formState, expanded, onToggle, onRemove }: BlockEditorProps) {
   console.log(`[FORMACION ADMIN] Renderizando formulario de bloque ${blockIndex + 1}`);
   const blockTitle = watch(`blocks.${blockIndex}.title`);
 
@@ -300,7 +318,7 @@ function BlockEditor({ blockIndex, register, control, watch, formState, expanded
 
           <label>
             Orden
-            <input type="number" {...register(`blocks.${blockIndex}.order`)} />
+            <input type="number" {...register(`blocks.${blockIndex}.order`, { valueAsNumber: true })} />
           </label>
 
           <label className="span-2">
@@ -317,7 +335,7 @@ function BlockEditor({ blockIndex, register, control, watch, formState, expanded
           </label>
 
           <div className="span-2">
-            <TopicsEditor blockIndex={blockIndex} register={register} control={control} watch={watch} formState={formState} />
+            <TopicsEditor blockIndex={blockIndex} register={register} control={control} setValue={setValue} />
           </div>
         </div>
       ) : null}
@@ -331,11 +349,10 @@ interface TopicsEditorProps {
   blockIndex: number;
   register: any;
   control: any;
-  watch: any;
-  formState: any;
+  setValue: any;
 }
 
-function TopicsEditor({ blockIndex, register, control, watch, formState }: TopicsEditorProps) {
+function TopicsEditor({ blockIndex, register, control, setValue }: TopicsEditorProps) {
   const topics = useFieldArray({ control, name: `blocks.${blockIndex}.topics` });
 
   function addTopic() {
@@ -384,7 +401,7 @@ function TopicsEditor({ blockIndex, register, control, watch, formState }: Topic
 
             <label>
               Orden
-              <input type="number" {...register(`blocks.${blockIndex}.topics.${topicIndex}.order`)} />
+              <input type="number" {...register(`blocks.${blockIndex}.topics.${topicIndex}.order`, { valueAsNumber: true })} />
             </label>
 
             <label>
@@ -417,16 +434,236 @@ function TopicsEditor({ blockIndex, register, control, watch, formState }: Topic
               />
             </label>
 
-            <label>
-              Imágenes (URLs separadas por coma)
-              <input
-                {...register(`blocks.${blockIndex}.topics.${topicIndex}.imageUrls`)}
-                placeholder="https://img1.jpg, https://img2.jpg"
-              />
-            </label>
+            <TopicImageField
+              blockIndex={blockIndex}
+              topicIndex={topicIndex}
+              control={control}
+              setValue={setValue}
+            />
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Imágenes de tema ──────────────────────────────────────────────────────────
+
+function TopicImageField({
+  blockIndex,
+  topicIndex,
+  control,
+  setValue
+}: {
+  blockIndex: number;
+  topicIndex: number;
+  control: any;
+  setValue: any;
+}) {
+  const fieldName = `blocks.${blockIndex}.topics.${topicIndex}.imageUrls`;
+  const rawValue = useWatch({ control, name: fieldName as any });
+  const urls: string[] = Array.isArray(rawValue)
+    ? (rawValue as string[]).filter(Boolean)
+    : typeof rawValue === "string"
+    ? (rawValue as string).split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+
+  const imageUpload = useMutation({
+    mutationFn: uploadMedia,
+    onSuccess: (asset) => {
+      setValue(fieldName, [...urls, asset.url], { shouldDirty: true });
+    },
+    onError: (error: any) => console.error("[FORMACION ADMIN] Error subiendo imagen de tema", error?.response?.data ?? error?.message)
+  });
+
+  function removeUrl(idx: number) {
+    setValue(fieldName, urls.filter((_, i) => i !== idx), { shouldDirty: true });
+  }
+
+  function handleUrlInput(e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>) {
+    const input = e.currentTarget;
+    const url = input.value.trim();
+    if (url && !urls.includes(url)) {
+      setValue(fieldName, [...urls, url], { shouldDirty: true });
+      input.value = "";
+    }
+  }
+
+  return (
+    <div className="topic-images-field span-2">
+      <span className="field-label-text">Imágenes del tema</span>
+
+      {urls.length > 0 && (
+        <div className="topic-image-previews">
+          {urls.map((url, i) => (
+            <div key={`${i}-${url.slice(-20)}`} className="topic-image-thumb">
+              <img src={url} alt={`Imagen ${i + 1}`} />
+              <button type="button" className="remove-img-btn" onClick={() => removeUrl(i)}>
+                <Trash2 size={11} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="topic-image-actions">
+        <label className="upload-inline">
+          <ImageUp size={14} style={{ marginRight: 4 }} />
+          <span>Subir imagen</span>
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) imageUpload.mutate(file);
+              e.target.value = "";
+            }}
+          />
+        </label>
+        <input
+          type="url"
+          className="url-paste-input"
+          placeholder="O pega una URL y pulsa Enter"
+          onBlur={handleUrlInput}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleUrlInput(e); } }}
+        />
+      </div>
+
+      {imageUpload.isPending && <p className="field-note">Subiendo imagen...</p>}
+      {imageUpload.isError && (
+        <p className="field-error">
+          {(imageUpload.error as any)?.response?.data?.message ?? "Error al subir la imagen"}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ── Importar bloques desde documento ─────────────────────────────────────────
+
+interface ImportBlocksPanelProps {
+  onImport: (blocks: ParsedBlock[]) => void;
+}
+
+function ImportBlocksPanel({ onImport }: ImportBlocksPanelProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [parsedBlocks, setParsedBlocks] = useState<ParsedBlock[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [imported, setImported] = useState(false);
+
+  function reset() {
+    setParsedBlocks([]);
+    setErrors([]);
+    setFileName("");
+    setImported(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function handleFile(file: File) {
+    if (!file.name.endsWith(".md")) {
+      setErrors(["El archivo debe tener extensión .md"]);
+      setParsedBlocks([]);
+      setFileName(file.name);
+      return;
+    }
+    setFileName(file.name);
+    setImported(false);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const result = parseFormationMarkdown(text);
+      const errs = validateFormationImport(result, { requireMetadata: false });
+      setParsedBlocks(result.blocks);
+      setErrors(errs);
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
+  function handleConfirm() {
+    onImport(parsedBlocks);
+    setImported(true);
+    setTimeout(() => {
+      setOpen(false);
+      reset();
+    }, 1500);
+  }
+
+  const canImport = errors.length === 0 && parsedBlocks.length > 0 && !imported;
+
+  return (
+    <div className="import-blocks-panel">
+      <button
+        type="button"
+        className="import-blocks-toggle"
+        onClick={() => { setOpen((v) => !v); if (open) reset(); }}
+      >
+        <FileText size={15} />
+        <span>Añadir bloques desde documento</span>
+        {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+      </button>
+
+      {open && (
+        <div className="import-blocks-body">
+          <label
+            className="import-blocks-dropzone"
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+            tabIndex={0}
+            role="button"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".md"
+              style={{ display: "none" }}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+            />
+            {fileName
+              ? <span className="import-blocks-filename"><FileText size={13} /> {fileName}</span>
+              : <span className="field-note">Selecciona un archivo <strong>.md</strong> con bloques y temas</span>
+            }
+          </label>
+
+          {errors.length > 0 && (
+            <ul className="import-error-list" style={{ marginTop: 8 }}>
+              {errors.map((err, i) => <li key={i} className="import-error-item">{err}</li>)}
+            </ul>
+          )}
+
+          {parsedBlocks.length > 0 && errors.length === 0 && !imported && (
+            <div className="import-blocks-preview">
+              <p className="field-note">
+                Se añadirán <strong>{parsedBlocks.length} bloque{parsedBlocks.length !== 1 ? "s" : ""}</strong> con{" "}
+                <strong>{parsedBlocks.reduce((a, b) => a + b.topics.length, 0)} temas</strong> en total.
+              </p>
+              <ul className="import-blocks-list-preview">
+                {parsedBlocks.map((b, i) => (
+                  <li key={i}>
+                    <strong>{b.title}</strong>
+                    <span className="import-topic-count"> ({b.topics.length} tema{b.topics.length !== 1 ? "s" : ""})</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="form-actions" style={{ marginTop: 12 }}>
+                <Button type="button" disabled={!canImport} onClick={handleConfirm}>
+                  Añadir bloques al curso
+                </Button>
+                <Button type="button" className="secondary" onClick={reset}>
+                  Limpiar
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {imported && (
+            <p className="save-feedback success" style={{ marginTop: 8 }}>
+              Bloques añadidos correctamente. Guarda el curso para conservarlos.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

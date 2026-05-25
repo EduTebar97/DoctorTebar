@@ -46,8 +46,12 @@ const trainingTopicBodySchema = z.object({
   title: z.string().min(1).max(180),
   description: z.string().max(2000).optional().or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
-  imageUrls: z.array(z.string().url()).default([]),
-  videoUrl: z.string().url().optional().or(z.literal("")),
+  imageUrls: z.preprocess((v) => {
+    if (Array.isArray(v)) return v;
+    if (typeof v === "string") return v.split(",").map((s) => s.trim()).filter(Boolean);
+    return [];
+  }, z.array(z.string()).default([])),
+  videoUrl: z.string().optional().or(z.literal("")),
   order: z.coerce.number().int().default(0),
   status: z.enum(["draft", "published"]).default("draft")
 });
@@ -64,7 +68,7 @@ export const trainingCourseSchema = z.object({
   body: z.object({
     title: z.string().min(1).max(180),
     description: z.string().optional().or(z.literal("")),
-    coverImageUrl: z.string().url().optional().or(z.literal("")),
+    coverImageUrl: z.string().optional().or(z.literal("")),
     blocks: z.array(trainingBlockBodySchema).optional(),
     status: z.enum(["draft", "published", "archived"]).default("draft"),
     featured: z.boolean().default(false),

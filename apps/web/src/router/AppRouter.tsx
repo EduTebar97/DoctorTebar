@@ -16,6 +16,8 @@ import { AdminResourceEditorPage } from "../pages/admin/AdminResourceEditorPage"
 import { AdminServiceEditorPage } from "../pages/admin/AdminServiceEditorPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
 import { AdminTrainingEditorPage } from "../pages/admin/AdminTrainingEditorPage";
+import { AdminTrainingImportPage } from "../pages/admin/AdminTrainingImportPage";
+import { AdminTrainingListPage } from "../pages/admin/AdminTrainingListPage";
 import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
 import { AboutPage } from "../pages/public/AboutPage";
 import { BlogDetailPage } from "../pages/public/BlogDetailPage";
@@ -69,7 +71,8 @@ const router = createBrowserRouter([
       { path: "services", element: <AdminGenericListPage path="services" title="Servicios" editBase="/admin/services" /> },
       { path: "services/new", element: <AdminServiceEditorPage /> },
       { path: "services/:id/edit", element: <AdminServiceEditorPage /> },
-      { path: "training", element: <AdminGenericListPage path="training" title="Formacion" editBase="/admin/training" /> },
+      { path: "training", element: <AdminTrainingListPage /> },
+      { path: "training/import", element: <AdminTrainingImportPage /> },
       { path: "training/new", element: <AdminTrainingEditorPage /> },
       { path: "training/:id/edit", element: <AdminTrainingEditorPage /> },
       { path: "chat", element: <AdminChatPage /> },

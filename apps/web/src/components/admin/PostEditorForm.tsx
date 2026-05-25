@@ -46,7 +46,7 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
       console.info("[BLOG] Imagen subida correctamente", { urlPresent: Boolean(asset.url) });
       setValue("coverImageUrl", asset.url, { shouldDirty: true, shouldValidate: true });
     },
-    onError: (error: any) => console.error("[BLOG] Error subiendo imagen", error?.response?.data ?? error?.message ?? error)
+    onError: (error: any) => console.error("[BLOG] Error subiendo imagen", error?.response?.data ?? error?.message ?? error),
   });
 
   useEffect(() => {
@@ -117,7 +117,9 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
           />
         </label>
         {imageUpload.isPending ? <p className="field-note">Subiendo imagen...</p> : null}
-        {imageUpload.isError ? <ErrorMessage message="No se ha podido subir la imagen. Revisa Cloudinary y la sesion admin." /> : null}
+        {imageUpload.isError ? (
+          <ErrorMessage message={(imageUpload.error as any)?.response?.data?.message ?? "No se ha podido subir la imagen."} />
+        ) : null}
         {values.coverImageUrl ? <img className="post-image-preview" src={values.coverImageUrl} alt="Vista previa de imagen destacada" /> : null}
       </div>
       <label>Tags<input data-tour="post-tags" {...register("tags")} placeholder="causalidad, DAG, IPTW" /></label>

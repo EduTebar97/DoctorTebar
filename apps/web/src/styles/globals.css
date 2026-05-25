@@ -1083,5 +1083,61 @@ td:last-child { border-right: 1px solid var(--line); border-radius: 0 14px 14px 
 .topic-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); flex-wrap: wrap; }
 .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 .breadcrumb a { color: var(--brand); text-decoration: none; }
-.topic-images { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+.topic-images { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+.topic-images img { width: 100%; border-radius: 16px; object-fit: cover; }
 .access-gate { text-align: center; padding: 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+/* ── Topic image field (admin editor) ─────────────────────────────────────── */
+.topic-images-field { display: flex; flex-direction: column; gap: 8px; }
+.field-label-text { font-size: 13px; color: var(--muted); font-weight: 500; }
+.topic-image-previews { display: flex; flex-wrap: wrap; gap: 8px; }
+.topic-image-thumb { position: relative; width: 100px; height: 70px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); flex-shrink: 0; }
+.topic-image-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.remove-img-btn { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,0.75); border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; padding: 0; line-height: 1; }
+.remove-img-btn:hover { background: rgba(239,68,68,0.9); }
+.topic-image-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.url-paste-input { flex: 1; min-width: 180px; }
+
+/* ── Import page (/admin/training/import) ─────────────────────────────────── */
+.import-page { display: flex; flex-direction: column; gap: 24px; max-width: 720px; }
+.import-dropzone { display: flex; flex-direction: column; align-items: center; gap: 10px; border: 2px dashed var(--line); border-radius: 16px; padding: 36px 24px; cursor: pointer; text-align: center; transition: border-color 0.15s, background 0.15s; color: var(--muted); }
+.import-dropzone:hover, .import-dropzone.dragover { border-color: var(--brand); background: rgba(var(--brand-rgb, 59,130,246),0.06); color: var(--text); }
+.import-dropzone-name { font-weight: 600; color: var(--text); font-size: 15px; }
+.import-preview { display: flex; flex-direction: column; gap: 16px; }
+.import-error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 14px 16px; }
+.import-error-header { display: flex; align-items: center; gap: 8px; color: #fca5a5; margin-bottom: 8px; }
+.import-error-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.import-error-item { font-size: 13px; color: #fca5a5; padding-left: 4px; }
+.import-success-state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px 24px; text-align: center; }
+.import-summary-box { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+.import-summary-meta { flex: 1; min-width: 200px; }
+.import-formation-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+.import-formation-desc { font-size: 13px; color: var(--muted); }
+.import-summary-stats { display: flex; gap: 24px; }
+.import-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.import-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--brand); }
+.import-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.import-blocks-list { display: flex; flex-direction: column; gap: 10px; }
+.import-block-card { background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.import-block-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.import-block-num { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.05em; }
+.import-topic-count { font-size: 12px; color: var(--muted); margin-left: auto; }
+.import-block-desc { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.import-topic-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.import-topic-item { display: flex; align-items: baseline; gap: 8px; font-size: 13px; }
+.import-topic-num { font-size: 11px; font-weight: 700; color: var(--brand); min-width: 16px; }
+.import-topic-title { font-weight: 500; }
+.import-topic-desc { color: var(--muted); }
+
+/* ── ImportBlocksPanel (in TrainingEditorForm) ────────────────────────────── */
+.import-blocks-panel { border: 1px dashed var(--line); border-radius: 10px; overflow: hidden; }
+.import-blocks-toggle { width: 100%; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.02); border: none; padding: 12px 16px; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 500; transition: color 0.15s, background 0.15s; }
+.import-blocks-toggle:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.import-blocks-toggle span { flex: 1; text-align: left; }
+.import-blocks-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--line); }
+.import-blocks-dropzone { display: flex; align-items: center; gap: 8px; border: 1px dashed var(--line); border-radius: 8px; padding: 10px 14px; cursor: pointer; font-size: 13px; color: var(--muted); transition: border-color 0.15s; }
+.import-blocks-dropzone:hover { border-color: var(--brand); color: var(--text); }
+.import-blocks-filename { display: flex; align-items: center; gap: 6px; color: var(--text); font-weight: 500; }
+.import-blocks-preview { display: flex; flex-direction: column; gap: 8px; }
+.import-blocks-list-preview { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.import-blocks-list-preview li { font-size: 13px; display: flex; align-items: baseline; gap: 6px; }
