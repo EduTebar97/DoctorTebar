@@ -7,6 +7,7 @@ export const postSchema = z.object({
   body: z.object({
     title: z.string().min(5).max(180),
     excerpt: z.string().max(500).optional().or(z.literal("")),
+    thesis: z.string().max(800).optional().or(z.literal("")),
     content: z.string().min(1),
     coverImageUrl: z.string().url().optional().or(z.literal("")),
     category: z.enum(["causalidad", "prediccion", "reporte", "stata", "errores", "general"]).default("general"),
