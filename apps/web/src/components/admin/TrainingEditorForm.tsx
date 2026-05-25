@@ -3,13 +3,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { TrainingCourse } from "@doctor-tebar/shared";
 import { ChevronDown, ChevronUp, FileText, ImageUp, Plus, Save, Send, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { trainingFormSchema, type TrainingFormData } from "../../schemas/training.schema";
 import { parseFormationMarkdown, validateFormationImport, type ParsedBlock } from "../../utils/formation-parser";
 import { adminCreate, adminGet, adminUpdate, uploadMedia } from "../../services/contentService";
 import { Button } from "../common/Button";
 import { ErrorMessage } from "../common/ErrorMessage";
+import { RichTextEditor } from "./RichTextEditor";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -417,14 +418,21 @@ function TopicsEditor({ blockIndex, register, control, setValue }: TopicsEditorP
               <textarea rows={2} {...register(`blocks.${blockIndex}.topics.${topicIndex}.description`)} placeholder="Descripción breve del tema (opcional)" />
             </label>
 
-            <label className="span-2">
-              Contenido
-              <textarea
-                rows={10}
-                {...register(`blocks.${blockIndex}.topics.${topicIndex}.content`)}
-                placeholder="Pega aquí el texto desde Word o escribe directamente. Se mantienen los párrafos."
+            <div className="span-2 rte-field-wrap">
+              <span className="field-label-text">Contenido</span>
+              <Controller
+                control={control}
+                name={`blocks.${blockIndex}.topics.${topicIndex}.content` as any}
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onUploadImage={async (file) => { const asset = await uploadMedia(file); return asset.url; }}
+                    placeholder="Escribe el contenido del tema aquí..."
+                  />
+                )}
               />
-            </label>
+            </div>
 
             <label>
               Vídeo (URL)

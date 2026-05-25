@@ -24,6 +24,7 @@ export interface Post {
   title: string;
   slug: string;
   excerpt: string;
+  thesis?: string;
   content: string;
   coverImageUrl?: string;
   category: PostCategory;

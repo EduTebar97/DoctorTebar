@@ -5,6 +5,7 @@ const postSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
     excerpt: { type: String, required: true },
+    thesis: String,
     content: { type: String, required: true },
     coverImageUrl: String,
     category: { type: String, enum: ["causalidad", "prediccion", "reporte", "stata", "errores", "general"], default: "general" },

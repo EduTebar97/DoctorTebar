@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, BookOpen, Lock } from "lucide-react";
+import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { ErrorMessage } from "../../components/common/ErrorMessage";
+import { Lightbox } from "../../components/common/Lightbox";
 import { Loader } from "../../components/common/Loader";
 import { TrainingChatForm } from "../../components/public/TrainingChatForm";
 import { useAuth } from "../../hooks/useAuth";
@@ -13,6 +15,7 @@ export function TrainingDetailPage() {
   const { slug = "" } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   const course = useQuery({
     queryKey: ["training", slug],
@@ -55,6 +58,7 @@ export function TrainingDetailPage() {
 
     return (
       <article className="section article-page" id="topic-content">
+        {lightbox ? <Lightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} /> : null}
         <nav className="breadcrumb">
           <Link to={`/formacion/${course.data.slug}`}>← {course.data.title}</Link>
           <span> / {activeTopicData.blockTitle}</span>
@@ -66,7 +70,13 @@ export function TrainingDetailPage() {
         {topic.imageUrls?.length ? (
           <div className="topic-images">
             {topic.imageUrls.map((url: string) => (
-              <img key={url} src={url} alt={topic.title} className="article-cover" />
+              <img
+                key={url}
+                src={url}
+                alt={topic.title}
+                className="article-cover"
+                onClick={() => setLightbox({ src: url, alt: topic.title })}
+              />
             ))}
           </div>
         ) : null}
@@ -78,11 +88,17 @@ export function TrainingDetailPage() {
         ) : null}
 
         {topic.content ? (
-          <div className="article-html">
-            {topic.content.split("\n").map((paragraph: string, i: number) =>
-              paragraph.trim() ? <p key={i}>{paragraph}</p> : null
-            )}
-          </div>
+          <div
+            className="article-html"
+            dangerouslySetInnerHTML={{ __html: topic.content }}
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              if (target.tagName === "IMG") {
+                const img = target as HTMLImageElement;
+                setLightbox({ src: img.src, alt: img.alt || topic.title });
+              }
+            }}
+          />
         ) : null}
 
         {/* Navigation */}
@@ -110,9 +126,15 @@ export function TrainingDetailPage() {
   // ── Course index view ──────────────────────────────────────────────────────
   return (
     <article className="section article-page">
+      {lightbox ? <Lightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} /> : null}
       <h1>{course.data.title}</h1>
       {course.data.coverImageUrl ? (
-        <img className="article-cover" src={course.data.coverImageUrl} alt={course.data.title} />
+        <img
+          className="article-cover"
+          src={course.data.coverImageUrl}
+          alt={course.data.title}
+          onClick={() => setLightbox({ src: course.data!.coverImageUrl!, alt: course.data!.title })}
+        />
       ) : null}
       {course.data.description ? (
         <div className="article-html">

@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { ErrorMessage } from "../../components/common/ErrorMessage";
+import { Lightbox } from "../../components/common/Lightbox";
 import { Loader } from "../../components/common/Loader";
 import { getPost, getPosts } from "../../services/contentService";
 
 export function BlogDetailPage() {
   const { slug = "" } = useParams();
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
   const post = useQuery({ queryKey: ["post", slug], queryFn: () => getPost(slug) });
   const related = useQuery({ queryKey: ["related", slug], queryFn: () => getPosts() });
   if (post.isLoading) return <Loader />;
@@ -14,11 +17,28 @@ export function BlogDetailPage() {
   if (!post.data) return <section className="section"><h1>Articulo no encontrado</h1></section>;
   return (
     <article className="section article-page">
+      {lightbox ? <Lightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} /> : null}
       <Badge>{post.data.category}</Badge>
       <h1>{post.data.title}</h1>
-      <p className="lead">{post.data.excerpt}</p>
-      {post.data.coverImageUrl ? <img className="article-cover" src={post.data.coverImageUrl} alt={post.data.title} /> : null}
-      <div className="article-html" dangerouslySetInnerHTML={{ __html: post.data.content }} />
+      {post.data.coverImageUrl ? (
+        <img
+          className="article-cover"
+          src={post.data.coverImageUrl}
+          alt={post.data.title}
+          onClick={() => setLightbox({ src: post.data!.coverImageUrl!, alt: post.data!.title })}
+        />
+      ) : null}
+      <div
+        className="article-html"
+        dangerouslySetInnerHTML={{ __html: post.data.content }}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.tagName === "IMG") {
+            const img = target as HTMLImageElement;
+            setLightbox({ src: img.src, alt: img.alt || post.data!.title });
+          }
+        }}
+      />
       <div className="tag-row">{post.data.tags?.map((tag: string) => <Badge key={tag}>{tag}</Badge>)}</div>
       <div className="cta-band"><strong>Necesitas revisar un analisis o protocolo?</strong><Link className="btn" to="/contacto">Solicitar asesoria</Link></div>
       <h2>Articulos relacionados</h2>

@@ -36,7 +36,7 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
   });
   const { register, handleSubmit, control, setValue, reset, watch, formState } = useForm<PostFormData>({
     resolver: zodResolver(postFormSchema),
-    defaultValues: { category: "general", status: "published", content: "", excerpt: "", featured: false }
+    defaultValues: { category: "general", status: "published", content: "", excerpt: "", thesis: "", featured: false }
   });
   const values = watch();
   const quality = score(values);
@@ -54,6 +54,7 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
     reset({
       title: data.title,
       excerpt: data.excerpt,
+      thesis: "thesis" in data ? (data as any).thesis ?? "" : "",
       content: data.content,
       coverImageUrl: data.coverImageUrl ?? "",
       category: "category" in data ? data.category : "general",
@@ -96,7 +97,10 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
         <label>Estado<select {...register("status")}><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label>
       </div>
       <label>Titulo<input data-tour="post-title" {...register("title")} /></label>
-      <label>Extracto opcional<textarea data-tour="post-excerpt" rows={3} {...register("excerpt")} placeholder="Se genera automaticamente si lo dejas vacio" /></label>
+      <label>Tesis del artículo (se muestra en el listado de blog, 3-4 líneas)
+        <textarea data-tour="post-thesis" rows={4} {...register("thesis")} placeholder="Escribe una tesis o argumento principal del artículo que se mostrará en la lista de blogs..." />
+      </label>
+      <label>Extracto para SEO (opcional)<textarea data-tour="post-excerpt" rows={2} {...register("excerpt")} placeholder="Se genera automaticamente si lo dejas vacio" /></label>
       <label>Categoria<select data-tour="post-category" {...register("category")}><option value="causalidad">Causalidad</option><option value="prediccion">Prediccion</option><option value="reporte">Reporte</option><option value="stata">STATA</option><option value="errores">Errores</option><option value="general">General</option></select></label>
       <div className="post-image-field">
         <label>Imagen destacada<input data-tour="post-cover-image" {...register("coverImageUrl")} placeholder="https://..." /></label>
