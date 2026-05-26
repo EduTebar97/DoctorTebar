@@ -27,11 +27,17 @@ import {
 import { useEffect, useRef } from "react";
 
 function cleanWordHtml(html: string): string {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+  // Strip Word XML namespace elements via regex BEFORE DOM parsing —
+  // querySelectorAll cannot handle namespace selectors like o:p, w:*, v:*
+  const pre = html
+    .replace(/<!--\[if[^\]]*\]>[\s\S]*?<!\[endif\]-->/gi, "")   // conditional comments
+    .replace(/<\/?(?:o|w|m|v):[a-zA-Z][^>]*>/gi, "")            // <o:p>, <w:*>, <m:*>, <v:*>
+    .replace(/\s+xmlns(?::[^=]+)?="[^"]*"/gi, "");               // xmlns attributes
 
-  // Remove Word-specific tags and comments
-  doc.querySelectorAll("style, meta, link, o\\:p, w\\:*, m\\:*, v\\:*").forEach((el) => el.remove());
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(pre, "text/html");
+
+  doc.querySelectorAll("style, meta, link").forEach((el) => el.remove());
   doc.querySelectorAll("[class]").forEach((el) => el.removeAttribute("class"));
   doc.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
   doc.querySelectorAll("[lang]").forEach((el) => el.removeAttribute("lang"));
@@ -44,8 +50,6 @@ function cleanWordHtml(html: string): string {
       el.remove();
     }
   });
-
-  // Normalize empty paragraphs from Word line breaks
   doc.querySelectorAll("p").forEach((p) => {
     if (!p.textContent?.trim() && !p.querySelector("img")) p.remove();
   });
@@ -78,7 +82,7 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ strike: {} }),
+      StarterKit.configure({ strike: {}, link: false, underline: false }),
       Underline,
       TextStyle,
       Color,
