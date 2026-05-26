@@ -25,6 +25,7 @@ export const trainingBlockSchema = z.object({
 export const trainingFormSchema = z.object({
   title: z.string().min(1, "El título es obligatorio"),
   description: z.string().optional().or(z.literal("")),
+  learningObjectives: z.array(z.string()).default([]),
   coverImageUrl: z.string().optional().or(z.literal("")),
   blocks: z.array(trainingBlockSchema).default([]),
   status: z.enum(["draft", "published", "archived"]),

@@ -53,6 +53,16 @@ export function TrainingListPage() {
                     </div>
                   ) : null}
                   <h3><Link to={`/formacion/${course.slug}`}>{course.title}</Link></h3>
+                  {course.learningObjectives?.length ? (
+                    <ul className="card-objectives">
+                      {course.learningObjectives.slice(0, 4).map((obj, i) => (
+                        <li key={i}>{obj}</li>
+                      ))}
+                      {course.learningObjectives.length > 4 ? (
+                        <li className="card-objectives-more">+{course.learningObjectives.length - 4} más</li>
+                      ) : null}
+                    </ul>
+                  ) : null}
                   <div className="compact-card-footer">
                     <div className="card-meta">
                       {numBlocks > 0 ? (

@@ -145,6 +145,17 @@ export function TrainingDetailPage() {
         </div>
       ) : null}
 
+      {(course.data as any).learningObjectives?.length ? (
+        <div className="training-objectives-block">
+          <h2>Objetivos de aprendizaje</h2>
+          <ul className="training-objectives-list">
+            {((course.data as any).learningObjectives as string[]).map((obj, i) => (
+              <li key={i}>{obj}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       {/* Locked gate */}
       {locked ? (
         <section className="access-gate admin-panel">

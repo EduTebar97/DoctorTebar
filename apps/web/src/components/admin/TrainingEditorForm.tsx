@@ -3,9 +3,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { TrainingCourse } from "@doctor-tebar/shared";
 import {
   BookOpen, ChevronDown, ChevronRight, ChevronUp, EyeOff, FileText,
-  FolderOpen, ImageUp, Info, Plus, RefreshCw, Save, Send, Settings, Trash2
+  FolderOpen, ImageUp, Info, Plus, RefreshCw, Save, Send, Settings, Trash2, X
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { trainingFormSchema, type TrainingFormData } from "../../schemas/training.schema";
@@ -14,6 +14,61 @@ import { adminCreate, adminGet, adminUpdate, uploadMedia } from "../../services/
 import { Button } from "../common/Button";
 import { ErrorMessage } from "../common/ErrorMessage";
 import { RichTextEditor } from "./RichTextEditor";
+
+// ── Auto-resize textarea ───────────────────────────────────────────────────────
+const AutoResizeTextarea = forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  function AutoResizeTextareaInner(props, forwardedRef) {
+    const localRef = useRef<HTMLTextAreaElement>(null);
+
+    function setRef(el: HTMLTextAreaElement | null) {
+      (localRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+      if (typeof forwardedRef === "function") forwardedRef(el);
+      else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+    }
+
+    function resize() {
+      const el = localRef.current;
+      if (!el) return;
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight + 2}px`;
+    }
+
+    useEffect(() => { resize(); });
+
+    return (
+      <textarea
+        {...props}
+        ref={setRef}
+        rows={1}
+        style={{ ...props.style, resize: "none", overflow: "hidden", minHeight: "44px" }}
+      />
+    );
+  }
+);
+
+// ── Learning objectives editor ─────────────────────────────────────────────────
+function ObjectivesEditor({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  return (
+    <div className="objectives-editor">
+      {value.map((obj, i) => (
+        <div key={i} className="objective-row">
+          <input
+            className="objective-input"
+            value={obj}
+            onChange={(e) => { const next = [...value]; next[i] = e.target.value; onChange(next); }}
+            placeholder={`Objetivo ${i + 1}: el alumno será capaz de…`}
+          />
+          <button type="button" className="icon-btn danger" onClick={() => onChange(value.filter((_, j) => j !== i))} title="Eliminar objetivo">
+            <X size={14} />
+          </button>
+        </div>
+      ))}
+      <button type="button" className="tree-add-btn" style={{ marginTop: 4 }} onClick={() => onChange([...value, ""])}>
+        <Plus size={13} /> Añadir objetivo
+      </button>
+    </div>
+  );
+}
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type SelectedNode =
@@ -39,7 +94,7 @@ export function TrainingEditorForm() {
 
   const { register, handleSubmit, reset, setValue, watch, control, formState } = useForm<TrainingFormData>({
     resolver: zodResolver(trainingFormSchema),
-    defaultValues: { status: "draft", featured: false, order: 0, blocks: [] }
+    defaultValues: { status: "draft", featured: false, order: 0, blocks: [], learningObjectives: [] }
   });
 
   const blocks = useFieldArray({ control, name: "blocks" });
@@ -56,6 +111,7 @@ export function TrainingEditorForm() {
     reset({
       title: data.title,
       description: data.description ?? "",
+      learningObjectives: data.learningObjectives ?? [],
       coverImageUrl: data.coverImageUrl ?? "",
       blocks: data.blocks?.map((block, bi) => ({
         title: block.title,
@@ -325,7 +381,7 @@ interface RootEditorProps {
   blocks: any; addBlock: () => void; setSelected: (n: SelectedNode) => void;
 }
 
-function RootEditor({ register, formState, watch, imageUpload, blocks, addBlock, setSelected }: RootEditorProps) {
+function RootEditor({ register, formState, watch, control, imageUpload, blocks, addBlock, setSelected }: RootEditorProps) {
   const [tab, setTab] = useState<"info" | "org" | "pub">("info");
   const values = watch();
 
@@ -356,8 +412,19 @@ function RootEditor({ register, formState, watch, imageUpload, blocks, addBlock,
           </label>
           <label className="span-2">
             Descripción
-            <textarea rows={6} {...register("description")} placeholder="Descripción general del curso." />
+            <AutoResizeTextarea {...register("description")} placeholder="Descripción general del curso." />
           </label>
+          <div className="span-2">
+            <label style={{ display: "block", marginBottom: 6 }}>Objetivos de aprendizaje</label>
+            <p className="field-note" style={{ marginBottom: 8 }}>¿Qué será capaz de hacer el alumno al terminar? Añade uno por línea.</p>
+            <Controller
+              control={control}
+              name="learningObjectives"
+              render={({ field }) => (
+                <ObjectivesEditor value={field.value ?? []} onChange={field.onChange} />
+              )}
+            />
+          </div>
           <div className="post-image-field span-2">
             <label>
               Imagen destacada
@@ -482,7 +549,7 @@ function BlockEditor({ blockIndex, register, control, watch, formState, onRemove
           </label>
           <label className="span-2">
             Descripción del bloque
-            <textarea rows={3} {...register(`blocks.${blockIndex}.description`)} placeholder="Descripción breve del bloque (opcional)" />
+            <AutoResizeTextarea {...register(`blocks.${blockIndex}.description`)} placeholder="Descripción breve del bloque (opcional)" />
           </label>
         </div>
       )}
@@ -584,7 +651,7 @@ function TopicEditor({ blockIndex, topicIndex, register, control, setValue: _set
           </label>
           <label className="span-2">
             Descripción breve
-            <textarea rows={3} {...register(`blocks.${blockIndex}.topics.${topicIndex}.description`)} placeholder="Descripción breve del tema (opcional)" />
+            <AutoResizeTextarea {...register(`blocks.${blockIndex}.topics.${topicIndex}.description`)} placeholder="Descripción breve del tema (opcional)" />
           </label>
         </div>
       )}

@@ -23,6 +23,7 @@ const trainingCourseSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, default: "" },
+    learningObjectives: [{ type: String }],
     coverImageUrl: { type: String, default: "" },
     status: { type: String, enum: ["draft", "published", "archived"], default: "draft" },
     featured: { type: Boolean, default: false },

@@ -95,6 +95,7 @@ export interface TrainingCourse {
   title: string;
   slug: string;
   description?: string;
+  learningObjectives?: string[];
   coverImageUrl?: string;
   blocks: TrainingBlock[];
   status: ContentStatus;
