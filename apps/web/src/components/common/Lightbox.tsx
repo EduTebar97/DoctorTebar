@@ -13,13 +13,19 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
     function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
     window.addEventListener("keydown", onKey);
 
-    // Lock body scroll (fixes position:fixed on mobile Safari)
-    const prev = document.body.style.overflow;
+    // Lock scroll and force overlay above sticky nav
+    const html = document.documentElement;
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = html.style.overflow;
     document.body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    html.setAttribute("data-lightbox-open", "true");
 
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prevBodyOverflow;
+      html.style.overflow = prevHtmlOverflow;
+      html.removeAttribute("data-lightbox-open");
     };
   }, [onClose]);
 
