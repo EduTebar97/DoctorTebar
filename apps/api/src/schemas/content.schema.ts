@@ -10,7 +10,7 @@ export const postSchema = z.object({
     thesis: z.string().max(800).optional().or(z.literal("")),
     content: z.string().min(1),
     coverImageUrl: z.string().url().optional().or(z.literal("")),
-    category: z.enum(["causalidad", "prediccion", "reporte", "stata", "errores", "general"]).default("general"),
+    category: z.string().min(1).max(60).default("general"),
     tags: z.array(z.string().max(40)).default([]),
     status: z.enum(["draft", "published", "archived"]).default("draft"),
     featured: z.boolean().default(false),

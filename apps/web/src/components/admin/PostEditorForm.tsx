@@ -4,9 +4,9 @@ import { EyeOff, ImageUp, RefreshCw, Save, Send } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import type { NewsItem, Post } from "@doctor-tebar/shared";
+import type { BlogCategory, NewsItem, Post } from "@doctor-tebar/shared";
 import { postFormSchema, type PostFormData } from "../../schemas/post.schema";
-import { adminCreate, adminGet, adminUpdate, uploadMedia } from "../../services/contentService";
+import { adminCreate, adminGet, adminUpdate, getCategories, uploadMedia } from "../../services/contentService";
 import { Button } from "../common/Button";
 import { ErrorMessage } from "../common/ErrorMessage";
 import { RichTextEditor } from "./RichTextEditor";
@@ -33,6 +33,11 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
     queryKey: ["admin", type, id],
     queryFn: () => adminGet<Post | NewsItem>(type, id!),
     enabled: Boolean(id)
+  });
+  const { data: categories = [] } = useQuery<BlogCategory[]>({
+    queryKey: ["blog-categories"],
+    queryFn: getCategories,
+    staleTime: 5 * 60 * 1000
   });
   const { register, handleSubmit, control, setValue, reset, watch, formState } = useForm<PostFormData>({
     resolver: zodResolver(postFormSchema),
@@ -104,7 +109,14 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
         <textarea data-tour="post-thesis" rows={4} {...register("thesis")} placeholder="Escribe una tesis o argumento principal del artículo que se mostrará en la lista de blogs..." />
       </label>
       <label>Extracto para SEO (opcional)<textarea data-tour="post-excerpt" rows={2} {...register("excerpt")} placeholder="Se genera automaticamente si lo dejas vacio" /></label>
-      <label>Categoria<select data-tour="post-category" {...register("category")}><option value="causalidad">Causalidad</option><option value="prediccion">Prediccion</option><option value="reporte">Reporte</option><option value="stata">STATA</option><option value="errores">Errores</option><option value="general">General</option></select></label>
+      <label>Categoria
+        <select data-tour="post-category" {...register("category")}>
+          {categories.length > 0
+            ? categories.map((c) => <option key={c._id} value={c.slug}>{c.name}</option>)
+            : (<><option value="causalidad">Causalidad</option><option value="prediccion">Predicción</option><option value="reporte">Reporte</option><option value="stata">STATA</option><option value="errores">Errores</option><option value="general">General</option></>)
+          }
+        </select>
+      </label>
       <div className="post-image-field">
         <label>Imagen destacada<input data-tour="post-cover-image" {...register("coverImageUrl")} placeholder="https://..." /></label>
         <label className="upload-inline">

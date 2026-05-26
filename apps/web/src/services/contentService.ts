@@ -1,4 +1,4 @@
-import type { ClinicalService, Inquiry, NewsItem, Post, Resource, SiteSettings, TrainingChatMessage, TrainingCourse } from "@doctor-tebar/shared";
+import type { BlogCategory, ClinicalService, Inquiry, NewsItem, Post, Resource, SiteSettings, TrainingChatMessage, TrainingCourse } from "@doctor-tebar/shared";
 import { apiClient } from "./apiClient";
 
 export async function getPosts(params?: Record<string, string>) {
@@ -28,6 +28,11 @@ export async function getResources() {
 
 export async function getServices() {
   const { data } = await apiClient.get<ClinicalService[]>("/services");
+  return data;
+}
+
+export async function getCategories() {
+  const { data } = await apiClient.get<BlogCategory[]>("/blog-categories");
   return data;
 }
 

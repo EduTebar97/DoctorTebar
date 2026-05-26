@@ -66,6 +66,16 @@ export interface Resource {
   updatedAt: string;
 }
 
+export interface BlogCategory {
+  _id: string;
+  name: string;
+  slug: string;
+  color: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ClinicalService {
   _id: string;
   title: string;

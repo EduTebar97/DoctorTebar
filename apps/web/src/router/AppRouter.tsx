@@ -13,6 +13,7 @@ import { AdminInquiriesPage } from "../pages/admin/AdminInquiriesPage";
 import { AdminMediaPage } from "../pages/admin/AdminMediaPage";
 import { AdminPostEditorPage } from "../pages/admin/AdminPostEditorPage";
 import { AdminResourceEditorPage } from "../pages/admin/AdminResourceEditorPage";
+import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage";
 import { AdminServiceEditorPage } from "../pages/admin/AdminServiceEditorPage";
 import { AdminSettingsPage } from "../pages/admin/AdminSettingsPage";
 import { AdminTrainingEditorPage } from "../pages/admin/AdminTrainingEditorPage";
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: "services", element: <AdminGenericListPage path="services" title="Servicios" editBase="/admin/services" /> },
       { path: "services/new", element: <AdminServiceEditorPage /> },
       { path: "services/:id/edit", element: <AdminServiceEditorPage /> },
+      { path: "categories", element: <AdminCategoriesPage /> },
       { path: "training", element: <AdminTrainingListPage /> },
       { path: "training/import", element: <AdminTrainingImportPage /> },
       { path: "training/new", element: <AdminTrainingEditorPage /> },
