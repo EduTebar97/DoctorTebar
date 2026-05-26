@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ImageUp, Save, Send } from "lucide-react";
+import { EyeOff, ImageUp, RefreshCw, Save, Send } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -36,7 +36,7 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
   });
   const { register, handleSubmit, control, setValue, reset, watch, formState } = useForm<PostFormData>({
     resolver: zodResolver(postFormSchema),
-    defaultValues: { category: "general", status: "published", content: "", excerpt: "", thesis: "", featured: false }
+    defaultValues: { category: "general", status: "draft", content: "", excerpt: "", thesis: "", featured: false }
   });
   const values = watch();
   const quality = score(values);
@@ -66,7 +66,10 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
     });
   }, [data, reset]);
 
-  async function save(values: PostFormData) {
+  const isPublished = values.status === "published";
+
+  async function save(formValues: PostFormData) {
+    const values = formValues;
     console.info("[BLOG] Intentando crear blog", { editing: Boolean(id) });
     const payload = { ...values, tags: values.tags?.split(",").map((tag) => tag.trim()).filter(Boolean) ?? [] };
     console.info("[BLOG] Payload preparado para crear blog", {
@@ -147,9 +150,38 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
       <label data-tour="post-seo">SEO title<input {...register("seoTitle")} /></label>
       <label>SEO description<input {...register("seoDescription")} /></label>
       <div className="form-actions span-2">
-        <Button type="submit" data-tour="post-save-draft" disabled={formState.isSubmitting || imageUpload.isPending}><Save size={18} /> Guardar y publicar</Button>
-        <Button type="button" data-tour="post-publish" disabled={formState.isSubmitting || imageUpload.isPending} onClick={() => { setValue("status", "published"); void handleSubmit(save)(); }}><Send size={18} /> Publicar</Button>
-        <Button type="button" className="secondary" onClick={() => document.querySelector<HTMLInputElement>(".upload-inline input")?.click()} disabled={imageUpload.isPending}><ImageUp size={18} /> Subir imagen</Button>
+        {isPublished ? (
+          <>
+            <Button type="button" disabled={formState.isSubmitting || imageUpload.isPending} onClick={() => void handleSubmit(save)()}>
+              <RefreshCw size={18} /> Guardar cambios
+            </Button>
+            <Button
+              type="button"
+              className="secondary"
+              disabled={formState.isSubmitting}
+              onClick={() => { setValue("status", "draft"); void handleSubmit(save)(); }}
+            >
+              <EyeOff size={18} /> Deshacer publicación
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button type="submit" data-tour="post-save-draft" disabled={formState.isSubmitting || imageUpload.isPending}>
+              <Save size={18} /> Guardar borrador
+            </Button>
+            <Button
+              type="button"
+              data-tour="post-publish"
+              disabled={formState.isSubmitting || imageUpload.isPending}
+              onClick={() => { setValue("status", "published"); void handleSubmit(save)(); }}
+            >
+              <Send size={18} /> Publicar
+            </Button>
+          </>
+        )}
+        <Button type="button" className="secondary" onClick={() => document.querySelector<HTMLInputElement>(".upload-inline input")?.click()} disabled={imageUpload.isPending}>
+          <ImageUp size={18} /> Subir imagen
+        </Button>
       </div>
     </form>
   );

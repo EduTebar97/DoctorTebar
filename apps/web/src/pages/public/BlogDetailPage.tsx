@@ -28,6 +28,12 @@ export function BlogDetailPage() {
           onClick={() => setLightbox({ src: post.data!.coverImageUrl!, alt: post.data!.title })}
         />
       ) : null}
+      {(post.data.thesis || post.data.excerpt) ? (
+        <div className="article-description-block">
+          <span className="article-description-label">Resumen</span>
+          <p>{post.data.thesis || post.data.excerpt}</p>
+        </div>
+      ) : null}
       <div
         className="article-html"
         dangerouslySetInnerHTML={{ __html: post.data.content }}

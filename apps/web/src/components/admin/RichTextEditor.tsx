@@ -26,6 +26,33 @@ import {
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+function cleanWordHtml(html: string): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  // Remove Word-specific tags and comments
+  doc.querySelectorAll("style, meta, link, o\\:p, w\\:*, m\\:*, v\\:*").forEach((el) => el.remove());
+  doc.querySelectorAll("[class]").forEach((el) => el.removeAttribute("class"));
+  doc.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
+  doc.querySelectorAll("[lang]").forEach((el) => el.removeAttribute("lang"));
+  doc.querySelectorAll("span").forEach((el) => {
+    if (!el.childNodes.length) { el.remove(); return; }
+    const onlyWhitespace = Array.from(el.childNodes).every((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim() === "");
+    if (!el.attributes.length && !onlyWhitespace) {
+      el.replaceWith(...Array.from(el.childNodes));
+    } else if (onlyWhitespace) {
+      el.remove();
+    }
+  });
+
+  // Normalize empty paragraphs from Word line breaks
+  doc.querySelectorAll("p").forEach((p) => {
+    if (!p.textContent?.trim() && !p.querySelector("img")) p.remove();
+  });
+
+  return doc.body.innerHTML;
+}
+
 const COLORS = [
   { label: "Predeterminado", value: "" },
   { label: "Rojo", value: "#f87171" },
@@ -83,6 +110,24 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
       updatingFromProp.current = false;
     }
   }, [value, editor]);
+
+  // Word paste handler: intercept before Tiptap to clean up Word HTML
+  useEffect(() => {
+    if (!editor) return;
+    const dom = editor.view.dom;
+    function handleWordPaste(e: ClipboardEvent) {
+      const html = e.clipboardData?.getData("text/html") ?? "";
+      if (!html) return;
+      const isWord = /MsoNormal|mso-|urn:schemas-microsoft-com/i.test(html);
+      if (!isWord) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const cleaned = cleanWordHtml(html);
+      editor.chain().focus().insertContent(cleaned, { parseOptions: { preserveWhitespace: false } }).run();
+    }
+    dom.addEventListener("paste", handleWordPaste as EventListener, true);
+    return () => dom.removeEventListener("paste", handleWordPaste as EventListener, true);
+  }, [editor]);
 
   if (!editor) return null;
 

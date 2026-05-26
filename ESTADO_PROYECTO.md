@@ -1,6 +1,25 @@
 # Estado Del Proyecto Doctor Tebar
 
-Fecha de revision: 18 de mayo de 2026
+Fecha de revision: 26 de mayo de 2026
+
+## Sprint 21 — UX completo, árbol editor, modales y página de inicio (26/05/2026)
+
+Implementados 12 cambios de UX/funcionalidad:
+
+1. **Lightbox arreglado** — imagen visible en modal (max-width: 90vw, display: block, guard src vacío).
+2. **Tarjetas compactas blogs y formaciones** — sin descripción larga, solo título + botón "Ver descripción" que abre modal.
+3. **DescriptionModal** — componente reutilizable para mostrar descripción completa en modal elegante.
+4. **Bloque descripción diferenciado** — en BlogDetailPage y TrainingDetailPage aparece con borde verde izquierdo.
+5. **Botones inteligentes por estado** — publicado: "Guardar cambios" + "Deshacer publicación"; borrador: "Guardar borrador" + "Publicar". Aplicado en blogs y formaciones.
+6. **Confirmación de borrado** — modal de confirmación antes de eliminar blogs o formaciones (ContentTable).
+7. **Pegado desde Word mejorado** — RichTextEditor detecta HTML de Word, limpia estilos basura y preserva párrafos, listas y headings.
+8. **Imagen de perfil en inicio** — Perfil.jpeg añadida en hero con diseño circular profesional.
+9. **Homepage mejorada** — sección de servicios (3 pilares), sección de formación con texto científico, llamadas a la acción.
+10. **Editor de formación con árbol lateral** — panel izquierdo con árbol navegable (formación > bloques > temas), área de edición derecha mostrando solo elemento seleccionado, subpestañas internas (Info/Organización/Publicación para formación, Info/Temas para bloque, Info básica/Contenido/Recursos para tema).
+11. **Imagen perfil en build** — `apps/web/public/perfil.jpeg` incluida en dist de producción.
+12. **TypeScript limpio** — 0 errores en tsc --noEmit, build producción OK.
+
+## Fecha de revision anterior: 18 de mayo de 2026
 
 ## Resumen Ejecutivo
 

@@ -1,1155 +1,998 @@
-# PROMPT PARA AGENTE DE DESARROLLO: CORRECCIÓN Y REESTRUCTURACIÓN DEL MÓDULO DE FORMACIÓN
+Prompt único acumulativo para mejorar parte pública, visor de imágenes, editor privado, seguridad, publicación y testing
 
-## CONTEXTO GENERAL
+Quiero que actualices mi proyecto web implementando todos los cambios descritos a continuación.
 
-Estoy trabajando sobre una aplicación web que tiene una parte pública y una parte privada.
+El proyecto tiene dos grandes zonas:
 
-La aplicación debe quedar simplificada y centrada solo en tres bloques principales:
+Parte pública
+Página de inicio.
+Visualización de blogs.
+Visualización de formaciones.
+Tarjetas de blogs/formaciones.
+Blogs relacionados.
+Formaciones accesibles según login.
+Imágenes asociadas a contenidos.
+Parte privada / panel de administración
+Gestión de blogs.
+Gestión de formaciones.
+Edición manual de bloques, temas, contenidos, imágenes y recursos.
+Publicación, actualización, borrado y administración del contenido.
 
-1. Blog.
-2. Formación.
-3. Chat asociado a formación.
+Quiero que todos estos cambios sean reales, funcionales, persistentes y testeados. No quiero solo cambios visuales aparentes.
 
-Este documento se centra especialmente en corregir y rediseñar el módulo de Formación, porque actualmente hay un problema grave en la parte privada al intentar guardar o publicar temas/contenidos.
+1. Rediseñar tarjetas públicas de blogs y formaciones
+Problema actual
 
----
+En la parte pública, las tarjetas de blogs y formaciones muestran descripciones demasiado largas directamente dentro de la tarjeta.
 
-# OBJETIVO PRINCIPAL DE ESTA FASE
+Esto provoca que:
 
-Quiero que corrijas, rediseñes y pruebes completamente el módulo de Formación.
+Las tarjetas sean muy grandes.
+Haya demasiado texto visible.
+El diseño se vea sobrecargado.
+La navegación sea poco visual.
+Los blogs relacionados ocupen demasiado espacio.
+La experiencia no sea limpia ni profesional.
+Objetivo
 
-Hay dos grandes objetivos:
+Quiero que las tarjetas sean compactas, visuales y modernas, con un estilo tipo catálogo, biblioteca visual o plataforma tipo Netflix.
 
-1. Corregir el error actual de guardado/publicación de temas de formación.
-2. Reestructurar el modelo de formación para que funcione por bloques, temas/puntos y contenidos.
+Cada tarjeta debe mostrar principalmente:
 
-La estructura deseada es:
+Imagen opcional, si existe.
+Título.
+Botón para ver la descripción.
+Acceso al contenido al hacer clic en la tarjeta.
 
-```text
+La descripción no debe aparecer directamente visible dentro de la tarjeta.
+
+Estructura esperada de la tarjeta
+┌─────────────────────────────┐
+│ Imagen opcional             │
+├─────────────────────────────┤
+│ Título del blog/formación    │
+│ [Ver descripción]           │
+└─────────────────────────────┘
+Botón “Ver descripción”
+
+Cada tarjeta debe incluir un botón:
+
+Ver descripción
+
+Al hacer clic en ese botón:
+
+Debe abrirse una ventana modal.
+La ventana debe mostrar la descripción completa.
+La descripción debe verse con letra grande, clara y legible.
+El diseño debe ser elegante y profesional.
+Debe aparecer una X arriba a la derecha para cerrar.
+El fondo puede oscurecerse suavemente.
+Al cerrar, el usuario debe volver al listado sin perder el contexto.
+Importante: separar clic de tarjeta y clic del botón
+
+Debe haber dos acciones distintas:
+
+Clic en la tarjeta o en el título
+Abre el blog o la formación.
+Clic en “Ver descripción”
+Abre solo el modal de descripción.
+
+El botón de descripción no debe abrir accidentalmente el blog o la formación.
+
+Usar event.stopPropagation() o una solución equivalente si es necesario.
+
+Aplicar este cambio en
+
+Este cambio debe aplicarse en:
+
+Listado público de blogs.
+Listado público de formaciones.
+Blogs relacionados al final de cada blog.
+Formaciones relacionadas, si existen.
+Cualquier zona pública donde aparezcan tarjetas con título + descripción larga.
+2. Arreglar el visor ampliado de imágenes
+Problema actual
+
+Ya existe una funcionalidad para ampliar imágenes al hacer clic, pero está rota.
+
+Actualmente:
+
+Se abre una ventana/modal.
+Aparece la X de cierre.
+Pero la imagen no se ve.
+La pantalla queda negra, blanca o vacía.
+El visor se abre sin renderizar correctamente la imagen.
+Objetivo
+
+Quiero que el visor de imágenes funcione correctamente.
+
+Al hacer clic en una imagen:
+
+Debe abrirse un modal.
+La imagen debe verse correctamente.
+Debe respetar su proporción.
+Debe adaptarse al tamaño de la pantalla.
+Debe tener una X visible arriba a la derecha.
+Debe cerrarse con la X.
+Idealmente debe cerrarse también haciendo clic fuera de la imagen o pulsando Escape.
+Revisión técnica obligatoria
+
+Revisar especialmente:
+
+Que la URL o src de la imagen se pasa correctamente al modal.
+Que el estado de imagen seleccionada no está vacío.
+Que el modal no se renderiza sin imagen válida.
+Que no hay conflicto entre rutas relativas, base64, blobs, localStorage o archivos subidos.
+Que el CSS no oculta la imagen.
+Que no hay display: none, opacity: 0, z-index incorrecto o tamaños imposibles.
+Que el modal tiene un z-index superior al resto.
+Que la imagen usa estilos seguros:
+max-width: 90vw;
+max-height: 90vh;
+object-fit: contain;
+Comportamiento esperado
+Usuario hace clic en miniatura
+→ se guarda la imagen seleccionada
+→ se abre modal
+→ se renderiza imagen ampliada
+→ usuario puede cerrar con X
+→ vuelve al contenido anterior
+
+No debe abrirse nunca un modal vacío.
+
+Aplicar en
+
+Debe funcionar en:
+
+Imágenes dentro de blogs.
+Imágenes dentro de formaciones.
+Imágenes de temas.
+Imágenes de recursos.
+Miniaturas de tarjetas, si aplica.
+3. Diferenciar visualmente la descripción dentro de blogs y formaciones
+Problema actual
+
+Cuando entro en un blog o una formación, la descripción aparece antes del contenido, pero visualmente no se diferencia bien del cuerpo principal.
+
+Parece parte del contenido normal y no queda claro que es una introducción, resumen o descripción.
+
+Objetivo
+
+Quiero que la descripción inicial del blog o formación se muestre en un bloque visual diferenciado.
+
+Debe quedar claro que es una descripción introductoria y no el cuerpo principal del contenido.
+
+Diseño esperado
+
+La descripción debe aparecer en un recuadro especial, por ejemplo:
+
+┌──────────────────────────────────────────────┐
+│ Descripción / Resumen                         │
+│ Texto introductorio del blog o formación      │
+└──────────────────────────────────────────────┘
+
+Debe tener:
+
+Buen espaciado.
+Letra legible.
+Fondo ligeramente diferenciado.
+Bordes o sombra suave.
+Diseño profesional.
+Separación clara respecto al contenido principal.
+Aplicar en
+Página individual de blog.
+Página individual de formación.
+Cualquier página pública donde se muestre una descripción antes del contenido.
+4. Rediseñar el editor privado de formaciones con árbol lateral
+Problema actual
+
+El editor privado de formaciones es poco visual y poco intuitivo.
+
+Actualmente:
+
+Los bloques y temas se van acumulando hacia abajo.
+Todo queda en una página larguísima.
+Hay que hacer mucho scroll.
+Es difícil saber en qué bloque o tema estoy.
+Es difícil volver del bloque 5 al bloque 1.
+No queda claro dónde empieza o termina cada tema.
+Editar formaciones largas se vuelve caótico.
+Objetivo
+
+Quiero transformar el editor privado de formaciones en una interfaz profesional con:
+
+Árbol lateral izquierdo.
+Navegación rápida por bloques y temas.
+Edición por unidad seleccionada.
+Subpestañas internas.
+Acciones rápidas para añadir bloques y temas.
+Nueva estructura visual esperada
+┌──────────────────────────────────────────────────────────────┐
+│ Panel privado                                                │
+├───────────────┬──────────────────────────────────────────────┤
+│ Menú general  │ Editor de formación                          │
+│ Blog          │                                              │
+│ Formación     │ ┌───────────────┬──────────────────────────┐ │
+│ Chat          │ │ Árbol lateral │ Área de edición           │ │
+│               │ │ Formación     │                          │ │
+│               │ │ ├ Bloque 1    │  Elemento seleccionado    │ │
+│               │ │ │ ├ Tema 1    │                          │ │
+│               │ │ │ ├ Tema 2    │                          │ │
+│               │ │ ├ Bloque 2    │                          │ │
+│               │ │ │ ├ Tema 1    │                          │ │
+│               │ └───────────────┴──────────────────────────┘ │
+└───────────────┴──────────────────────────────────────────────┘
+Árbol lateral izquierdo
+
+El árbol debe mostrar toda la estructura de la formación actual:
+
 Formación
-└── Bloque 1
-    ├── Tema/Punto 1
-    │   └── Contenido: texto, imágenes, vídeos, adjuntos
-    ├── Tema/Punto 2
-    │   └── Contenido
-    └── Tema/Punto 3
-        └── Contenido
+├── Información general
+├── Bloque 1
+│   ├── Tema 1
+│   ├── Tema 2
+│   └── Tema 3
+├── Bloque 2
+│   ├── Tema 1
+│   └── Tema 2
+└── Bloque 3
+    ├── Tema 1
 
-└── Bloque 2
-    ├── Tema/Punto 1
-    ├── Tema/Punto 2
-    └── Tema/Punto 3
-```
+Cada elemento debe ser clicable.
 
-No quiero que los temas estén todos juntos en una lista plana. Tienen que organizarse por bloques.
+Comportamiento del árbol
 
----
+Cuando añado un bloque nuevo:
 
-# ERROR ACTUAL QUE HAY QUE CORREGIR
+Debe aparecer automáticamente en el árbol lateral.
+Debe seleccionarse automáticamente para editarlo.
 
-Actualmente, en la parte privada de Formación ocurre lo siguiente:
+Cuando añado un tema nuevo dentro de un bloque:
 
-1. Entro en Formación.
-2. Subo o creo un tema.
-3. Relleno información.
-4. Pulso en “Guardar” o “Publicar”.
-5. No ocurre nada.
-6. No se guarda nada.
-7. No aparece nada en consola del navegador.
-8. No aparece ningún error visible.
-9. No parece ejecutarse ninguna función.
-10. El único cambio visual es que se ilumina o queda enfocado el apartado de descripción.
-11. No se lanza ninguna petición visible.
-12. No se crea contenido.
-13. No se persiste nada.
-14. La funcionalidad está bloqueada.
+Debe aparecer automáticamente debajo de ese bloque.
+Debe seleccionarse automáticamente para editarlo.
 
-Este error debe tratarse como prioridad absoluta.
+Cuando cambio el título de un bloque:
 
----
+El árbol debe actualizar el nombre visible.
 
-# DESCRIPCIÓN DEL ERROR PARA CONTEXTO
+Cuando cambio el título de un tema:
 
-El problema parece estar en el evento del botón o en el formulario.
+El árbol debe actualizar el nombre visible.
 
-Posibles causas a investigar:
+Cuando elimino un bloque o tema:
 
-- El botón “Guardar” o “Publicar” no tiene `onClick`.
-- El botón está dentro de un formulario pero no dispara `onSubmit`.
-- El botón tiene `type="button"` cuando debería disparar una acción.
-- El botón tiene `type="submit"` pero el formulario no tiene manejador.
-- Hay validación silenciosa que bloquea el guardado.
-- El foco se mueve al campo descripción porque hay un campo requerido o validación HTML nativa.
-- Hay un `preventDefault()` mal colocado.
-- La función de guardado no está conectada.
-- La función existe pero no se llama.
-- La función se llama pero no hace petición.
-- La petición no aparece porque hay una condición previa que la bloquea.
-- Hay campos requeridos ocultos o no cumplidos.
-- Hay un estado React que no cambia.
-- Hay un error capturado silenciosamente sin `console.error`.
-- El componente no está recibiendo correctamente props o contexto.
-- La ruta/API de guardado de formación no existe o no está conectada.
-- El botón “Publicar” y “Guardar” no están diferenciados correctamente.
-- El estado de publicación no se está enviando.
-- El backend no recibe nada.
-- El frontend no está mostrando feedback de carga, éxito o error.
+Debe desaparecer del árbol.
 
-No asumas una causa sin revisar el código.
+Cuando selecciono un bloque o tema:
 
----
+Debe resaltarse visualmente en el árbol.
+El área central debe mostrar solo ese bloque o tema.
+No debe mostrarse toda la formación completa como una página infinita.
+5. Añadir bloques y temas desde el árbol lateral
+Problema actual
 
-# PRIMERA PRIORIDAD: HACER VISIBLE LO INVISIBLE
+Para añadir nuevos bloques o temas, normalmente hay que bajar hasta el final del editor.
 
-Antes de modificar el diseño de Formación, debes conseguir que el problema sea observable.
+Esto es incómodo, especialmente en formaciones largas.
 
-Actualmente no aparece nada en consola ni se ve ningún error. Eso es inaceptable.
+Objetivo
 
-Añade logs para que cualquier clic, validación, intento de guardado, error o bloqueo quede visible.
+Quiero poder crear bloques y temas directamente desde el árbol lateral.
 
----
+Acciones esperadas en el árbol
 
-# LOGS OBLIGATORIOS EN FRONTEND PARA FORMACIÓN
+El árbol debe incluir botones o acciones rápidas como:
 
-Añadir logs claros y seguros para:
++ Añadir bloque
 
-```text
-[FORMACION ADMIN] Renderizando formulario de formación
-[FORMACION ADMIN] Renderizando formulario de bloque
-[FORMACION ADMIN] Renderizando formulario de tema
-[FORMACION ADMIN] Click en botón Guardar
-[FORMACION ADMIN] Click en botón Publicar
-[FORMACION ADMIN] Submit de formulario detectado
-[FORMACION ADMIN] preventDefault ejecutado
-[FORMACION ADMIN] Validando formulario
-[FORMACION ADMIN] Resultado validación
-[FORMACION ADMIN] Campo bloqueante detectado
-[FORMACION ADMIN] Campos obligatorios presentes
-[FORMACION ADMIN] Título formación presente: sí/no
-[FORMACION ADMIN] Título bloque presente: sí/no
-[FORMACION ADMIN] Título tema presente: sí/no
-[FORMACION ADMIN] Contenido presente: sí/no
-[FORMACION ADMIN] Estado actual del formulario
-[FORMACION ADMIN] Payload preparado para guardar
-[FORMACION ADMIN] Enviando petición de guardado
-[FORMACION ADMIN] Endpoint usado
-[FORMACION ADMIN] Método usado
-[FORMACION ADMIN] Respuesta recibida
-[FORMACION ADMIN] Guardado correcto
-[FORMACION ADMIN] Publicación correcta
-[FORMACION ADMIN] Error guardando
-[FORMACION ADMIN] Error publicando
-[FORMACION ADMIN] Error capturado en try/catch
-[FORMACION ADMIN] No se envía petición porque:
-[FORMACION ADMIN] Imagen seleccionada
-[FORMACION ADMIN] Vídeo añadido
-[FORMACION ADMIN] Documento/Word añadido
-[FORMACION ADMIN] Contenido importado correctamente
-```
+Y dentro de cada bloque:
 
-No debe quedar ningún fallo silencioso.
++ Añadir tema
 
----
+Ejemplo:
 
-# LOGS OBLIGATORIOS EN BACKEND PARA FORMACIÓN
-
-Añadir logs claros en servidor para:
-
-```text
-[FORMACION API] Petición recibida
-[FORMACION API] Método
-[FORMACION API] Endpoint
-[FORMACION API] Usuario autenticado
-[FORMACION API] Rol usuario
-[FORMACION API] Crear formación
-[FORMACION API] Actualizar formación
-[FORMACION API] Publicar formación
-[FORMACION API] Crear bloque
-[FORMACION API] Actualizar bloque
-[FORMACION API] Crear tema
-[FORMACION API] Actualizar tema
-[FORMACION API] Guardar contenido
-[FORMACION API] Payload recibido
-[FORMACION API] Formación ID
-[FORMACION API] Bloque ID
-[FORMACION API] Tema ID
-[FORMACION API] Contenido recibido
-[FORMACION API] Imágenes recibidas
-[FORMACION API] Vídeos recibidos
-[FORMACION API] Adjuntos recibidos
-[FORMACION API] Guardado en base de datos correcto
-[FORMACION API] Error de validación
-[FORMACION API] Error de base de datos
-[FORMACION API] Error de permisos
-[FORMACION API] Error inesperado
-```
-
-No imprimir contraseñas, tokens completos ni datos sensibles.
-
----
-
-# FEEDBACK VISUAL OBLIGATORIO
-
-Cuando el usuario pulse Guardar o Publicar, la interfaz debe mostrar algo.
-
-Debe haber feedback visible para:
-
-- Guardando...
-- Publicando...
-- Guardado correctamente.
-- Publicado correctamente.
-- Error al guardar.
-- Error al publicar.
-- Faltan datos mínimos.
-- No tienes permisos.
-- Sesión caducada.
-
-No puede ocurrir que el usuario pulse y no pase nada.
-
----
-
-# NUEVA ESTRUCTURA FUNCIONAL DE FORMACIÓN
-
-Quiero que el módulo de Formación se reestructure para trabajar de forma cómoda con esta jerarquía:
-
-```text
 Formación
-└── Bloques
-    └── Temas/Puntos
-        └── Contenido
-```
+[+ Añadir bloque]
+
+Bloque 1
+  Tema 1
+  Tema 2
+  [+ Añadir tema]
+
+Bloque 2
+  Tema 1
+  [+ Añadir tema]
+Comportamiento esperado
+
+Al pulsar + Añadir bloque:
+
+Se crea un bloque nuevo.
+Se añade al árbol.
+Se selecciona automáticamente.
+El área central muestra la edición de ese bloque.
+El usuario puede completar título, descripción y demás campos.
+
+Al pulsar + Añadir tema dentro de un bloque:
+
+Se crea un tema nuevo dentro de ese bloque.
+Se añade al árbol bajo ese bloque.
+Se selecciona automáticamente.
+El área central muestra la edición de ese tema.
+El usuario puede completar título, descripción, contenido, imágenes y recursos.
+6. El editor no debe ser una página infinita
+Nuevo comportamiento
+
+El usuario debe trabajar sobre una unidad seleccionada.
+
+Si selecciono la formación general
+
+El área central muestra solo:
+
+Título de la formación.
+Descripción general.
+Categoría.
+Etiquetas.
+Imagen principal.
+Estado de publicación.
+Opciones globales.
+Si selecciono un bloque
+
+El área central muestra solo:
+
+Título del bloque.
+Descripción del bloque.
+Botones para añadir temas.
+Opciones del bloque.
+Si selecciono un tema
+
+El área central muestra solo ese tema:
+
+Título del tema.
+Descripción del tema.
+Contenido del tema.
+Vídeo del tema.
+Imágenes del tema.
+Recursos del tema.
+
+No deben aparecer todos los bloques y temas abiertos al mismo tiempo.
+
+7. Subpestañas internas dentro de cada unidad seleccionada
+
+Cuando se seleccione una unidad, el área central debe organizarse con subpestañas.
 
-## Formación
+Para la formación general
+
+Subpestañas recomendadas:
 
-Cada formación debe tener:
+Información general | Organización | Publicación
+Información general
+Título de la formación.
+Descripción.
+Imagen principal.
+Categoría.
+Etiquetas.
+Organización
+Lista resumida de bloques.
+Botón para añadir bloque.
+Opciones de ordenación.
+Publicación
+Estado.
+Botón para publicar o actualizar según estado.
+Vista previa.
+Para un bloque
 
-- Título.
-- Descripción.
-- Imagen principal opcional.
-- Estado: borrador/publicada.
-- Orden si hay varias formaciones.
-- Fecha de creación.
-- Fecha de actualización.
-- Bloques asociados.
+Subpestañas recomendadas:
 
-Ejemplo:
+Información del bloque | Temas del bloque
+Información del bloque
+Título del bloque.
+Descripción del bloque.
+Temas del bloque
+Lista de temas del bloque.
+Botón para añadir tema.
+Reordenación de temas.
+Acceso rápido a cada tema.
+Para un tema
 
-```text
-Formación: Modelos predictivos en investigación clínica
-Descripción: Curso introductorio sobre modelos predictivos, validación y aplicación clínica.
-Imagen principal: opcional
-```
+Subpestañas recomendadas:
 
-## Bloques
+Información básica | Contenido | Recursos
+Información básica
+Título del tema.
+Descripción del tema.
+Duración estimada.
+Orden.
+Contenido
+Editor del contenido principal.
+Texto principal.
+Editor visual o Markdown, según lo que ya use el proyecto.
+Recursos
+Imágenes.
+Vídeo.
+Archivos adjuntos.
+Enlaces.
+Otros recursos.
+8. Corregir botones cuando un blog o formación ya está publicado
+Problema actual
 
-Cada formación puede tener varios bloques.
+Cuando un blog o formación ya está publicado y vuelvo a editarlo, siguen apareciendo botones como:
 
-Ejemplo:
+Guardar borrador
+Publicar
 
-```text
-Bloque 1: Fundamentos de los modelos predictivos
-Bloque 2: Desarrollo del modelo
-Bloque 3: Validación interna y externa
-Bloque 4: Aplicación clínica e interpretación
-```
+Eso es incorrecto porque el contenido ya no está en estado de borrador ni necesita publicarse otra vez.
 
-Cada bloque debe tener:
+Objetivo
 
-- Título.
-- Descripción breve opcional.
-- Orden.
-- Estado.
-- Temas/puntos asociados.
+El sistema debe distinguir claramente entre:
 
-## Temas o puntos dentro de cada bloque
+Contenido nuevo.
+Contenido en borrador.
+Contenido ya publicado.
+Comportamiento esperado
+Si el blog o formación es nuevo o está en borrador
 
-Cada bloque puede tener varios temas o puntos.
+Mostrar:
 
-Ejemplo:
+Guardar borrador
+Publicar
+Si el blog o formación ya está publicado
 
-```text
-Bloque 1: Fundamentos de los modelos predictivos
+Mostrar solo:
 
-1. Qué es un modelo predictivo
-2. Diferencia entre causalidad y predicción
-3. Variables candidatas
-4. Riesgo de sobreajuste
-5. Medidas de rendimiento
-```
+Guardar cambios
+Deshacer publicación
 
-Cada tema/punto debe tener:
+No quiero que aparezcan:
 
-- Título.
-- Descripción breve opcional.
-- Orden.
-- Contenido principal.
-- Imágenes opcionales.
-- Vídeos opcionales.
-- Adjuntos opcionales.
-- Estado: borrador/publicado.
+Publicar
+Guardar borrador
 
----
+cuando el contenido ya está publicado.
 
-# DOS FORMAS DE TRABAJO QUE DEBEN SER POSIBLES
+Reglas esperadas
 
-El sistema debe permitir dos formas de creación de cursos.
+Si status === "draft":
 
-## Forma 1: Crear primero la estructura y después rellenar contenidos
+Guardar borrador
+Publicar
 
-El administrador puede:
+Si status === "published":
 
-1. Crear una formación.
-2. Añadir título, descripción e imagen.
-3. Crear todos los bloques.
-4. Dentro de cada bloque, crear todos los temas/puntos.
-5. Guardar la estructura vacía o semivacía.
-6. Volver después.
-7. Rellenar los contenidos de cada tema.
+Guardar cambios
+Deshacer publicación
+Importante
 
-Esta forma es útil cuando primero se diseña el índice completo.
+Cuando se guarda un contenido publicado:
 
-## Forma 2: Crear estructura y contenido progresivamente
+No debe duplicarse.
+No debe pasar a borrador automáticamente.
+Debe actualizar el contenido publicado existente.
+La parte pública debe reflejar los cambios.
+La acción principal debe ser Guardar cambios.
 
-El administrador puede:
+Cuando se pulsa Deshacer publicación:
 
-1. Crear una formación.
-2. Crear bloque 1.
-3. Crear tema 1 dentro del bloque 1.
-4. Añadir contenido completo al tema 1.
-5. Crear tema 2.
-6. Añadir contenido al tema 2.
-7. Crear bloque 2.
-8. Continuar progresivamente.
+El contenido debe dejar de aparecer públicamente.
+Debe cambiar a estado borrador o estado no publicado.
+Debe poder editarse después.
+Debe poder volver a publicarse.
 
-Esta forma es útil cuando se va construyendo el curso poco a poco.
+Aplicar esto tanto a:
 
-Ambas formas deben funcionar.
+Blogs.
+Formaciones.
+9. Confirmación de seguridad antes de eliminar blogs o formaciones
+Problema actual
 
----
+En el listado privado de blogs y formaciones aparece cada registro con botones como:
 
-# FACILIDAD DE USO EN LA CARGA DE CONTENIDOS
+Editar
+Eliminar
 
-Quiero que subir contenidos sea muy rápido y sencillo.
+Actualmente, al pulsar Eliminar, el registro se elimina directamente.
 
-El administrador debe poder pegar o subir contenidos largos, por ejemplo textos de 3 o 4 páginas de Word.
+Esto es peligroso porque puedo pulsar sin querer y perder contenido.
 
-Debe poder:
+Objetivo
 
-- Pegar texto largo directamente.
-- Mantener saltos de línea y estructura básica.
-- Mantener títulos y subtítulos si es posible.
-- Añadir imágenes.
-- Añadir vídeos.
-- Añadir adjuntos si procede.
-- Guardar rápidamente.
-- Publicar rápidamente.
+Quiero añadir una medida de seguridad antes de eliminar cualquier blog o formación.
 
-No quiero un sistema complejo que obligue a rellenar muchos campos para cada tema.
+Comportamiento esperado
 
-Para cada tema/punto, lo mínimo obligatorio debe ser:
+Al pulsar Eliminar:
 
-- Título del tema.
-- Contenido si se quiere publicar.
+No se debe eliminar inmediatamente.
+Debe abrirse una ventana modal de confirmación.
+La ventana debe preguntar si realmente quiero eliminar ese registro.
+Debe mostrar el nombre exacto del blog o formación.
+Debe haber dos opciones claras:
+Sí, eliminar
+Cancelar
 
-Para guardar como borrador, debería poder guardarse incluso sin contenido completo.
+o:
 
----
+Eliminar definitivamente
+No eliminar
+Ejemplo de mensaje
+¿Seguro que deseas eliminar la formación “Modelos predictivos clínicos”?
+Esta acción no se puede deshacer.
 
-# IMPORTACIÓN O PEGADO DESDE WORD
+Para blogs:
 
-Quiero que el sistema esté preparado para contenidos que vienen de Word.
+¿Seguro que deseas eliminar el blog “Predicción clínica frente a causalidad”?
+Esta acción no se puede deshacer.
+Comportamiento de los botones
 
-Debe permitir, si es viable:
+Si el usuario pulsa Sí, eliminar:
 
-1. Pegar texto desde Word en un editor.
-2. Limpiar estilos innecesarios.
-3. Mantener estructura básica:
-   - Párrafos.
-   - Negritas si es posible.
-   - Listas.
-   - Títulos.
-   - Subtítulos.
-4. Evitar que se rompa el diseño.
-5. Evitar código HTML basura.
-6. Guardar el contenido limpio.
+El registro se elimina.
+El listado se actualiza.
+Se muestra mensaje de éxito.
 
-Si se implementa subida de archivo Word directamente, debe documentarse bien.
+Si el usuario pulsa Cancelar:
 
-Pero como mínimo, debe funcionar bien el pegado de textos largos desde Word.
+No se elimina nada.
+Se cierra el modal.
+El usuario vuelve al listado.
+Aplicar en
+Eliminación de blogs.
+Eliminación de formaciones.
+Cualquier otra eliminación importante relacionada con bloques o temas, si ya existe esa opción.
+10. Mejorar pegado de texto desde Word en el editor
+Problema actual
 
----
+Cuando escribo un contenido en Word y luego lo copio y lo pego en el editor del blog o formación:
 
-# CONTENIDO MULTIMEDIA EN TEMAS
+No se respetan bien los párrafos.
+Se pierden separaciones.
+Se pierden saltos de línea.
+Se pierde estructura visual.
+Tengo que volver a separar manualmente muchas partes.
+Esto me hace perder tiempo.
+Objetivo
 
-Cada tema/punto debe permitir añadir:
+Quiero que el editor respete lo máximo posible la estructura del texto pegado desde Word.
 
-- Texto largo.
-- Imágenes.
-- Varias imágenes.
-- Vídeos embebidos o enlaces de vídeo.
-- Adjuntos si procede.
-- Recursos complementarios.
+Comportamiento esperado
 
-Debe visualizarse correctamente en la parte pública.
+Cuando pego contenido desde Word:
 
-Las imágenes y vídeos pueden ser opcionales.
+Deben respetarse los párrafos.
+Deben mantenerse saltos de línea razonables.
+Deben conservarse listas si existen.
+Deben conservarse títulos o subtítulos si el editor lo permite.
+Deben evitarse pegados en un único bloque de texto sin separación.
+Debe limpiarse el HTML innecesario de Word para no ensuciar el contenido.
+Implementación sugerida
 
-No deben bloquear el guardado si no existen.
+Analizar cuál es el editor actual y aplicar la solución más adecuada.
 
----
+Posibles soluciones:
 
-# VISUALIZACIÓN PÚBLICA DE FORMACIÓN
+Capturar el evento paste.
+Leer event.clipboardData.
+Detectar si viene HTML desde Word.
+Convertirlo a HTML limpio o Markdown limpio.
+Mantener párrafos y listas.
+Eliminar estilos basura de Word.
+Insertar el contenido limpio en el editor.
+Requisitos importantes
 
-La parte pública debe visualizar la formación de forma atractiva, dinámica e interactiva.
+No quiero copiar todos los estilos visuales de Word.
 
-## Página de listado de formaciones
+Quiero conservar principalmente:
 
-Debe mostrar:
+Párrafos.
+Saltos de línea.
+Listas.
+Encabezados si se detectan.
+Negritas y cursivas si el editor lo soporta.
 
-- Tarjetas de formaciones.
-- Imagen principal.
-- Título.
-- Descripción.
-- Número de bloques.
-- Número de temas.
-- Estado o disponibilidad si procede.
+Pero quiero evitar:
 
-## Página interna de una formación
+Estilos raros de Word.
+Fuentes incrustadas.
+Colores innecesarios.
+HTML sucio.
+Tablas rotas, salvo que el editor las soporte.
+Resultado esperado
 
-Debe mostrar:
+Si en Word tengo:
 
-- Cabecera visual.
-- Imagen principal.
-- Título de la formación.
-- Descripción.
-- Bloques organizados.
-- Dentro de cada bloque, los temas/puntos.
-- Progreso visual si se implementa.
-- Diseño tipo curso.
+Título
 
-## Página de contenido de un tema
+Párrafo uno.
 
-Cuando el usuario haga clic en un tema/punto, debe abrirse una página o vista atractiva con:
+Párrafo dos.
 
-- Título del tema.
-- Bloque al que pertenece.
-- Contenido principal.
-- Imágenes.
-- Vídeos.
-- Adjuntos.
-- Botón anterior.
-- Botón siguiente.
-- Volver al índice.
-- Chat asociado a esa formación/tema si ya existe el módulo de chat.
+- Punto uno
+- Punto dos
 
-Debe ser una experiencia de curso, no una lista plana de textos.
+Al pegarlo en el editor debe quedar aproximadamente:
 
----
+Título
 
-# PERMISOS EN LA PARTE PÚBLICA
+Párrafo uno.
 
-Mantener la lógica:
+Párrafo dos.
 
-## Usuario no autenticado
+- Punto uno
+- Punto dos
 
-Puede ver:
+No debe quedar todo pegado en una sola línea.
 
-- Listado de formaciones.
-- Título de cada formación.
-- Descripción.
-- Bloques.
-- Índice de temas/puntos.
+11. Añadir imagen perfil a la página de inicio pública
+Contexto
 
-No puede ver:
+En la carpeta raíz del proyecto hay una imagen llamada:
 
-- Contenido completo del tema.
-- Imágenes internas del contenido.
-- Vídeos.
-- Adjuntos.
-- Chat.
+perfil
 
-Si intenta acceder al contenido completo, mostrar:
+Puede tener extensión como .jpg, .png, .webp u otra. Hay que localizarla.
 
-```text
-Para acceder al contenido completo de esta formación debes iniciar sesión.
-```
+Esta imagen corresponde a la persona/doctora/doctora responsable de la página, el doctor o profesional que ofrece los servicios.
 
-## Usuario autenticado
+Objetivo
 
-Puede ver:
+Quiero que esta imagen aparezca en la parte pública, en la página de inicio.
 
-- Todo el contenido completo.
-- Textos.
-- Imágenes.
-- Vídeos.
-- Adjuntos.
-- Chat asociado.
+Debe estar bien integrada visualmente, no simplemente pegada sin diseño.
 
-La protección debe existir en frontend y backend.
+Tareas
+Buscar en la raíz del proyecto la imagen llamada perfil.
+Moverla o copiarla a la carpeta adecuada de assets públicos, si es necesario.
+Referenciarla correctamente desde la página de inicio.
+Añadirla en un lugar lógico y estético.
+Asegurar que se ve bien en escritorio y móvil.
+Asegurar que no se deforma.
+Asegurar que no se solapa con otros elementos.
+Diseño esperado
 
-No basta con ocultar botones.
+La imagen debe aparecer en una sección profesional de presentación, por ejemplo:
 
----
+┌──────────────────────────────────────────────┐
+│ Imagen perfil       Texto presentación        │
+│                     Servicios / enfoque       │
+│                     Botón ver blogs           │
+│                     Botón ver formación       │
+└──────────────────────────────────────────────┘
 
-# CHAT ASOCIADO A FORMACIÓN Y TEMA
+Puede usarse como:
 
-Si el módulo de chat está implementado o se está implementando, debe quedar asociado a la nueva estructura:
+Imagen del hero.
+Tarjeta de presentación del doctor.
+Sección “Sobre mí”.
+Bloque visual junto a los servicios.
+Apartado de autoridad profesional.
 
-- Usuario.
-- Formación.
-- Bloque si procede.
-- Tema/punto si procede.
-- Mensaje.
-- Fecha.
-- Estado.
+El agente debe elegir el lugar más coherente con el diseño actual.
 
-Ejemplo:
+12. Mejorar la página de inicio pública
+Objetivo
 
-```text
-Usuario: Ana García
-Formación: Modelos predictivos en investigación clínica
-Bloque: Validación del modelo
-Tema: Validación externa
-Mensaje: No entiendo cuándo una validación externa es realmente independiente.
-```
+Quiero mejorar la página de inicio para que explique mejor el propósito del sitio.
 
-En el panel privado de chat debe poder filtrarse por:
+La página representa a un doctor/profesional que:
 
-- Formación.
-- Bloque.
-- Tema.
-- Usuario.
+Ofrece servicios profesionales.
+Publica blogs.
+Comparte información científica.
+Tiene contenidos conectados con redes sociales.
+Tiene un apartado de formación.
+La formación solo puede accederse si el usuario ha iniciado sesión.
+Contenido que debe quedar representado
 
----
+La página de inicio debe comunicar mejor:
 
-# MODELO DE DATOS ESPERADO
+Quién es el profesional.
+Qué servicios ofrece.
+Qué tipo de contenido publica en el blog.
+Que existe una sección de formación.
+Que la formación está pensada para científicos, clínicos, investigadores y personas que aman la ciencia.
+Que parte del contenido puede requerir iniciar sesión.
+Que el sitio combina práctica clínica, ciencia, metodología y formación.
+Texto orientativo para la sección de formación
 
-Revisar el modelo de datos actual y adaptarlo si hace falta.
+Añadir una sección al final o en una zona visible de la página de inicio con una idea similar:
 
-Modelo conceptual recomendado:
+Formación para personas que aman la ciencia
 
-```text
-Course / Formation
-- id
-- title
-- description
-- coverImage
-- status
-- order
-- createdAt
-- updatedAt
+Accede a recursos formativos diseñados para profesionales sanitarios, investigadores y lectores interesados en comprender mejor la metodología clínica, la investigación biomédica y el razonamiento científico.
 
-CourseBlock
-- id
-- courseId
-- title
-- description
-- order
-- status
-- createdAt
-- updatedAt
+Algunos contenidos formativos pueden requerir iniciar sesión.
+Elementos visuales sugeridos
 
-CourseTopic
-- id
-- blockId
-- courseId
-- title
-- description
-- content
-- status
-- order
-- createdAt
-- updatedAt
+La página de inicio puede incluir:
 
-CourseTopicMedia
-- id
-- topicId
-- type
-- url
-- caption
-- order
-- createdAt
+Sección hero mejorada.
+Imagen perfil.
+Bloque de servicios.
+Bloque de blog/conocimiento.
+Bloque de formación.
+Llamadas a la acción:
+Ver blogs.
+Acceder a formación.
+Iniciar sesión.
+Contactar.
+Diseño limpio, moderno y profesional.
+13. Compatibilidad y persistencia
 
-ChatConversation
-- id
-- userId
-- courseId
-- blockId optional
-- topicId optional
-- status
-- createdAt
-- updatedAt
+Todos los cambios deben respetar el sistema actual.
 
-ChatMessage
-- id
-- conversationId
-- senderId
-- message
-- createdAt
-```
+No quiero perder contenido existente.
 
-No hay que usar exactamente estos nombres si el proyecto ya tiene otros, pero la lógica relacional debe quedar clara.
+Debe mantenerse la compatibilidad con:
 
----
+Blogs ya creados.
+Formaciones ya creadas.
+Imágenes existentes.
+Estados publicados.
+Estados borrador.
+Contenido guardado.
+Visualización pública.
+Sistema de login.
+Acceso restringido a formación, si ya existe.
+14. Testing obligatorio en desarrollo y producción
 
-# API ESPERADA
+Quiero que se testee absolutamente todo lo implementado.
 
-Revisar las rutas existentes y crear/adaptar las necesarias.
+No quiero que se dé por hecho que funciona solo porque compila.
 
-Rutas orientativas:
+Hay que probar cada acción en:
 
-```text
-GET    /api/admin/courses
-POST   /api/admin/courses
-GET    /api/admin/courses/:id
-PUT    /api/admin/courses/:id
-DELETE /api/admin/courses/:id
+Entorno de desarrollo
+Entorno de producción, si existe o si el proyecto permite build/preview
+Reglas generales de testing
 
-POST   /api/admin/courses/:courseId/blocks
-PUT    /api/admin/blocks/:blockId
-DELETE /api/admin/blocks/:blockId
+Para cada funcionalidad:
 
-POST   /api/admin/blocks/:blockId/topics
-PUT    /api/admin/topics/:topicId
-DELETE /api/admin/topics/:topicId
+Crear datos de prueba si hace falta.
+Probar el flujo completo.
+Verificar que funciona.
+Eliminar después los datos de prueba creados.
+No dejar basura en la aplicación.
+No romper datos reales existentes.
+Documentar brevemente qué se ha probado y el resultado.
+15. Tests específicos obligatorios
+Test 1: tarjetas sin descripción visible
 
-POST   /api/admin/topics/:topicId/media
+Crear o usar varios blogs con descripciones largas.
 
-GET    /api/public/courses
-GET    /api/public/courses/:id
-GET    /api/public/courses/:id/outline
+Resultado esperado:
 
-GET    /api/courses/:courseId/topics/:topicId/content
-```
+Las tarjetas muestran título e imagen opcional.
+No muestran descripción larga.
+La tarjeta queda compacta.
+El botón Ver descripción aparece correctamente.
+Test 2: modal de descripción
 
-La ruta de contenido completo debe estar protegida si el contenido es solo para usuarios autenticados.
+Al hacer clic en Ver descripción:
 
----
+Se abre el modal.
+Se ve la descripción completa.
+La letra es legible.
+La X cierra el modal.
+No se abre el blog accidentalmente.
+Test 3: clic en tarjeta
 
-# METODOLOGÍA OBLIGATORIA POR SPRINTS
+Al hacer clic en la tarjeta, pero no en el botón de descripción:
 
-El trabajo debe organizarse por sprints independientes, testeables y bloqueantes.
+Se abre el blog o formación correspondiente.
+Test 4: visor de imágenes
 
-No pases al siguiente sprint si el sprint actual no está:
+Al hacer clic en una imagen:
 
-- Implementado.
-- Compilado.
-- Probado.
-- Sin errores críticos.
-- Documentado.
+Se abre el modal.
+La imagen se ve correctamente.
+No aparece pantalla negra, blanca ni vacía.
+La X cierra el visor.
+La imagen se adapta a la pantalla.
+Test 5: descripción diferenciada dentro del contenido
 
-Cada sprint debe incluir:
+Entrar en un blog o formación con descripción.
 
-1. Objetivo.
-2. Cambios realizados.
-3. Archivos modificados.
-4. Logs añadidos.
-5. Tests ejecutados.
-6. Resultado de tests.
-7. Errores encontrados.
-8. Correcciones aplicadas.
-9. Confirmación de cierre.
+Resultado esperado:
 
----
+La descripción aparece en un recuadro diferenciado.
+Se distingue claramente del contenido principal.
+El diseño es legible y profesional.
+Test 6: editor de formación con árbol lateral
 
-# SPRINT 0: DIAGNÓSTICO DEL ERROR ACTUAL DE GUARDADO
+Crear una formación con:
 
-## Objetivo
+5 bloques.
+3 temas por bloque.
 
-Hacer visible y diagnosticar por qué al pulsar Guardar/Publicar en Formación no ocurre nada.
+Resultado esperado:
 
-## Tareas
+El árbol muestra toda la estructura.
+Al hacer clic en cada bloque, se edita solo ese bloque.
+Al hacer clic en cada tema, se edita solo ese tema.
+No hay página infinita con todos los temas abiertos.
+Test 7: añadir bloques y temas desde el árbol
 
-1. Localizar componente del formulario de formación.
-2. Localizar componente de bloques.
-3. Localizar componente de temas.
-4. Localizar botones Guardar/Publicar.
-5. Comprobar si tienen `onClick`.
-6. Comprobar si están dentro de un formulario.
-7. Comprobar si hay `onSubmit`.
-8. Comprobar tipo de botón.
-9. Comprobar validaciones.
-10. Comprobar si algún campo required bloquea el submit.
-11. Comprobar si se está enfocando descripción por validación nativa.
-12. Añadir logs de clic.
-13. Añadir logs de submit.
-14. Añadir logs de validación.
-15. Añadir logs antes de enviar API.
-16. Añadir logs de error.
+Desde el árbol lateral:
 
-## Tests obligatorios
+Añadir un bloque.
+Añadir un tema dentro de un bloque.
 
-1. Abrir formulario de formación.
-2. Pulsar Guardar.
-3. Confirmar que aparece log de clic.
-4. Pulsar Publicar.
-5. Confirmar que aparece log de clic.
-6. Confirmar si hay submit o no.
-7. Confirmar si hay validación bloqueante.
-8. Confirmar si se lanza petición o no.
-9. Documentar causa exacta.
+Resultado esperado:
 
-## Criterio de cierre
+Se crean correctamente.
+Aparecen en el árbol.
+Se seleccionan automáticamente.
+Se pueden editar y guardar.
+Test 8: actualización dinámica del árbol
 
-No cerrar este sprint hasta saber exactamente por qué no se ejecuta el guardado/publicación.
+Cambiar el título de un bloque o tema.
 
----
+Resultado esperado:
 
-# SPRINT 1: CORRECCIÓN DEL GUARDADO Y PUBLICACIÓN
+El árbol actualiza automáticamente el nombre.
 
-## Objetivo
+Eliminar un tema.
 
-Conseguir que Guardar y Publicar funcionen.
+Resultado esperado:
 
-## Requisitos
+Desaparece del árbol.
+Test 9: subpestañas internas
 
-1. El botón Guardar debe ejecutar función.
-2. El botón Publicar debe ejecutar función.
-3. Debe haber feedback visual.
-4. Debe capturar errores.
-5. Debe llamar al backend o persistir correctamente.
-6. Debe diferenciar borrador/publicado.
-7. Debe mostrar éxito o error.
-8. No debe haber fallos silenciosos.
+Seleccionar un tema.
 
-## Tests obligatorios
+Resultado esperado:
 
-1. Crear formación mínima.
-2. Pulsar Guardar.
-3. Confirmar log.
-4. Confirmar petición.
-5. Confirmar persistencia.
-6. Recargar.
-7. Confirmar que sigue guardada.
-8. Pulsar Publicar.
-9. Confirmar estado publicado.
-10. Confirmar visualización pública si procede.
-11. Forzar error.
-12. Confirmar mensaje de error.
+Aparecen subpestañas tipo:
+Información básica.
+Contenido.
+Recursos.
+Cada pestaña muestra solo su contenido correspondiente.
+Test 10: botones en blog publicado
 
-## Criterio de cierre
+Publicar un blog.
 
-No cerrar este sprint hasta que Guardar y Publicar funcionen y no haya fallos silenciosos.
+Volver a editarlo.
 
----
+Resultado esperado:
 
-# SPRINT 2: REDISEÑO DE ESTRUCTURA FORMACIÓN → BLOQUES → TEMAS
+No aparece Publicar.
+No aparece Guardar borrador.
+Solo aparecen:
+Guardar cambios
+Deshacer publicación
+Al guardar cambios, no se duplica el blog.
+La parte pública refleja los cambios.
+Test 11: botones en formación publicada
 
-## Objetivo
+Publicar una formación.
 
-Reestructurar la formación para que no sea una lista plana de temas.
+Volver a editarla.
 
-## Requisitos
+Resultado esperado:
 
-1. Crear formación.
-2. Crear bloques dentro de formación.
-3. Crear temas dentro de cada bloque.
-4. Ordenar bloques.
-5. Ordenar temas dentro de cada bloque.
-6. Guardar estructura.
-7. Editar estructura.
-8. Borrar bloques.
-9. Borrar temas.
-10. Persistir todo.
+No aparece Publicar.
+No aparece Guardar borrador.
+Solo aparecen:
+Guardar cambios
+Deshacer publicación
+Al guardar cambios, no se duplica la formación.
+La parte pública refleja los cambios.
+Test 12: confirmación antes de eliminar blog
 
-## Tests obligatorios
+Pulsar eliminar en un blog.
 
-1. Crear formación “Modelos predictivos”.
-2. Crear Bloque 1.
-3. Crear Bloque 2.
-4. Crear varios temas dentro del Bloque 1.
-5. Crear varios temas dentro del Bloque 2.
-6. Guardar.
-7. Recargar.
-8. Confirmar estructura jerárquica.
-9. Editar título de bloque.
-10. Editar título de tema.
-11. Borrar un tema.
-12. Borrar un bloque.
-13. Confirmar persistencia.
+Resultado esperado:
 
-## Criterio de cierre
+Se abre modal de confirmación.
+Aparece el nombre del blog.
+Si se cancela, no se elimina.
+Si se confirma, se elimina.
+El listado se actualiza.
+Test 13: confirmación antes de eliminar formación
 
-No cerrar este sprint hasta que la estructura jerárquica funcione completa.
+Pulsar eliminar en una formación.
 
----
+Resultado esperado:
 
-# SPRINT 3: DOS MODOS DE CREACIÓN DE CURSOS
+Se abre modal de confirmación.
+Aparece el nombre de la formación.
+Si se cancela, no se elimina.
+Si se confirma, se elimina.
+El listado se actualiza.
+Test 14: pegado desde Word
 
-## Objetivo
+Copiar desde Word un texto con:
 
-Permitir las dos formas de trabajo del administrador.
+Título.
+Párrafos separados.
+Lista.
+Negrita o cursiva si aplica.
 
-## Modo A: primero estructura, luego contenidos
+Pegar en el editor.
 
-Debe permitir:
+Resultado esperado:
 
-1. Crear formación.
-2. Crear bloques.
-3. Crear temas vacíos o semivacíos.
-4. Guardar estructura.
-5. Volver después.
-6. Añadir contenidos.
+Se mantienen párrafos.
+Se mantienen saltos de línea razonables.
+Se mantienen listas.
+No se pega todo en una sola línea.
+No se introduce HTML basura visible.
+Test 15: imagen perfil en inicio
 
-## Modo B: estructura y contenido progresivo
+Abrir la página de inicio.
 
-Debe permitir:
+Resultado esperado:
 
-1. Crear formación.
-2. Crear bloque.
-3. Crear tema.
-4. Añadir contenido.
-5. Guardar.
-6. Continuar con siguiente tema.
+La imagen perfil se ve correctamente.
+No se deforma.
+No se solapa.
+Se adapta a escritorio y móvil.
+Queda integrada en el diseño.
+Test 16: página de inicio mejorada
 
-## Tests obligatorios
+Abrir la página de inicio.
 
-1. Crear curso con estructura completa sin contenidos.
-2. Confirmar que se guarda.
-3. Volver y añadir contenido.
-4. Crear otro curso progresivamente con contenidos.
-5. Confirmar que ambos flujos funcionan.
-6. Confirmar que no obliga a rellenar todo desde el principio.
+Resultado esperado:
 
-## Criterio de cierre
+Se entiende mejor quién es el profesional.
+Se ven los servicios.
+Se ve el acceso al blog.
+Se ve el acceso o explicación de formación.
+Se comunica que la formación es para científicos, clínicos, investigadores y personas que aman la ciencia.
+El diseño es profesional.
+16. Limpieza después del testing
 
-No cerrar este sprint hasta que ambos modos sean cómodos y funcionales.
+Si para probar se crean blogs, formaciones, bloques, temas o imágenes de prueba:
 
----
+Deben eliminarse al terminar.
+No deben quedar registros de prueba.
+No deben quedar archivos temporales.
+No deben quedar estados falsos.
+No deben alterarse datos reales salvo que sea necesario y seguro.
+17. Prioridad de implementación
 
-# SPRINT 4: CARGA RÁPIDA DE CONTENIDOS LARGOS
+Implementar en este orden:
 
-## Objetivo
+Arreglar visor ampliado de imágenes.
+Rediseñar tarjetas públicas para ocultar descripciones largas.
+Crear modal de descripción.
+Diferenciar descripción inicial dentro de blogs/formaciones.
+Corregir botones de blogs publicados.
+Corregir botones de formaciones publicadas.
+Añadir confirmación antes de eliminar blogs.
+Añadir confirmación antes de eliminar formaciones.
+Mejorar pegado desde Word en el editor.
+Añadir imagen perfil a la página de inicio.
+Mejorar página de inicio.
+Crear árbol lateral del editor de formaciones.
+Permitir añadir bloques y temas desde el árbol.
+Cambiar editor para mostrar solo el elemento seleccionado.
+Añadir subpestañas internas.
+Asegurar persistencia con datos existentes.
+Testear todo en desarrollo.
+Testear todo en producción o build/preview.
+Eliminar datos de prueba.
+18. Criterio de éxito
 
-Permitir pegar o subir contenidos largos de forma sencilla.
+La actualización estará correctamente terminada cuando:
 
-## Requisitos
+Las tarjetas públicas ya no estén sobrecargadas de texto.
+Las descripciones se abran en un modal elegante y legible.
+Las imágenes ampliadas funcionen y no se abran en negro o vacío.
+La descripción interna del blog/formación se vea en un recuadro diferenciado.
+Los contenidos publicados muestren solo Guardar cambios y Deshacer publicación.
+El botón eliminar tenga confirmación previa.
+El editor respete mejor el texto pegado desde Word.
+La imagen perfil aparezca correctamente en la página de inicio.
+La página de inicio comunique mejor servicios, blog y formación.
+El editor privado de formaciones tenga un árbol lateral navegable.
+Se puedan añadir bloques y temas desde ese árbol.
+El editor deje de ser una página infinita.
+Cada bloque o tema se edite como una unidad independiente.
+Las subpestañas organicen información, contenido y recursos.
+Las formaciones y blogs existentes sigan funcionando.
+Todo haya sido probado en desarrollo y producción/build.
+No queden datos de prueba ni archivos temporales.
 
-1. Editor cómodo para texto largo.
-2. Pegar texto de 3 o 4 páginas de Word.
-3. Mantener saltos de línea.
-4. Mantener estructura básica.
-5. Limpiar estilos basura si procede.
-6. No romper diseño.
-7. Guardar contenido largo.
-8. Recuperar contenido largo.
-9. Visualizarlo bien en público.
-
-## Tests obligatorios
-
-1. Pegar texto largo.
-2. Guardar.
-3. Recargar.
-4. Confirmar que sigue.
-5. Ver en parte pública.
-6. Confirmar que se lee bien.
-7. Confirmar que no rompe maquetación.
-8. Confirmar que no se pierde formato básico.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que el contenido largo se pueda guardar y visualizar correctamente.
-
----
-
-# SPRINT 5: MULTIMEDIA EN CADA TEMA
-
-## Objetivo
-
-Permitir imágenes, vídeos y adjuntos dentro de cada tema.
-
-## Requisitos
-
-Cada tema debe permitir:
-
-- Texto.
-- Imágenes.
-- Varias imágenes.
-- Vídeos embebidos o enlaces.
-- Adjuntos si procede.
-
-Todo debe ser opcional.
-
-No debe bloquear el guardado si no hay multimedia.
-
-## Tests obligatorios
-
-1. Crear tema solo con texto.
-2. Crear tema con texto e imagen.
-3. Crear tema con varias imágenes.
-4. Crear tema con vídeo.
-5. Crear tema con adjunto si procede.
-6. Guardar.
-7. Recargar.
-8. Confirmar persistencia.
-9. Ver en público.
-10. Confirmar visualización correcta.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que el multimedia funcione por tema.
-
----
-
-# SPRINT 6: VISUALIZACIÓN PÚBLICA DINÁMICA E INTERACTIVA
-
-## Objetivo
-
-Mostrar la formación en público como una plataforma de curso, no como una lista plana.
-
-## Requisitos
-
-1. Página de listado de formaciones.
-2. Tarjetas visuales.
-3. Página interna de formación.
-4. Bloques visibles.
-5. Temas dentro de bloques.
-6. Al hacer clic en un tema, abrir contenido.
-7. Página/vista de tema atractiva.
-8. Botón anterior.
-9. Botón siguiente.
-10. Volver al índice.
-11. Mostrar imágenes/vídeos/adjuntos.
-12. Integrar chat si procede.
-
-## Tests obligatorios
-
-1. Ver listado de formaciones.
-2. Entrar en formación.
-3. Ver bloques.
-4. Ver temas dentro de bloques.
-5. Clicar tema.
-6. Ver contenido.
-7. Navegar al siguiente.
-8. Volver al índice.
-9. Confirmar diseño limpio.
-10. Confirmar responsive básico.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que la experiencia pública sea clara, atractiva y funcional.
-
----
-
-# SPRINT 7: PERMISOS EN FORMACIÓN PÚBLICA
-
-## Objetivo
-
-Mantener acceso restringido al contenido completo.
-
-## Tests obligatorios
-
-1. Entrar sin login.
-2. Ver formaciones.
-3. Ver bloques.
-4. Ver índice de temas.
-5. Intentar abrir contenido.
-6. Confirmar bloqueo.
-7. Confirmar que backend no entrega contenido protegido.
-8. Iniciar sesión.
-9. Abrir contenido.
-10. Confirmar acceso completo.
-11. Cerrar sesión.
-12. Confirmar bloqueo de nuevo.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que los permisos funcionen en frontend y backend.
-
----
-
-# SPRINT 8: CHAT ADAPTADO A BLOQUES Y TEMAS
-
-## Objetivo
-
-Adaptar el chat a la nueva estructura.
-
-## Requisitos
-
-El chat debe poder asociarse a:
-
-- Usuario.
-- Formación.
-- Bloque.
-- Tema.
-- Mensajes.
-
-## Tests obligatorios
-
-1. Entrar como usuario.
-2. Abrir formación.
-3. Abrir bloque.
-4. Abrir tema.
-5. Enviar consulta desde ese tema.
-6. Confirmar que el chat guarda formación, bloque y tema.
-7. Entrar como admin.
-8. Ver chat.
-9. Filtrar por formación.
-10. Filtrar por bloque.
-11. Filtrar por tema.
-12. Filtrar por usuario.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que el chat respete la nueva jerarquía.
-
----
-
-# SPRINT 9: TESTEO INTEGRAL LOCAL
-
-## Objetivo
-
-Probar todo el módulo de formación completo en local.
-
-## Tests obligatorios
-
-1. Crear formación.
-2. Crear bloques.
-3. Crear temas.
-4. Guardar borrador.
-5. Publicar.
-6. Pegar contenido largo.
-7. Añadir imágenes.
-8. Añadir vídeos.
-9. Ver público sin login.
-10. Confirmar restricción.
-11. Ver público con login.
-12. Abrir tema.
-13. Navegar por temas.
-14. Enviar chat.
-15. Ver chat en admin.
-16. Filtrar chat.
-17. Borrar datos de prueba.
-18. Confirmar limpieza.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que todo funcione en local sin errores críticos.
-
----
-
-# SPRINT 10: TESTEO EN PRODUCCIÓN
-
-## Objetivo
-
-Probar todo el módulo de formación desplegado.
-
-## Tests obligatorios
-
-1. Hacer build.
-2. Desplegar si procede.
-3. Abrir producción.
-4. Confirmar sin errores críticos de consola.
-5. Crear formación de prueba.
-6. Crear bloques.
-7. Crear temas.
-8. Guardar.
-9. Publicar.
-10. Ver pública sin login.
-11. Confirmar restricción.
-12. Login usuario.
-13. Ver contenido completo.
-14. Añadir chat.
-15. Ver chat en admin.
-16. Borrar datos de prueba.
-17. Confirmar limpieza.
-18. Revisar logs de servidor/despliegue.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que producción funcione correctamente.
-
----
-
-# SPRINT 11: LIMPIEZA DE DATOS DE PRUEBA
-
-## Objetivo
-
-Borrar todo lo creado para pruebas.
-
-## Borrar
-
-- Formaciones de prueba.
-- Bloques de prueba.
-- Temas de prueba.
-- Imágenes de prueba.
-- Vídeos de prueba.
-- Adjuntos de prueba.
-- Chats de prueba.
-- Mensajes de prueba.
-
-## Tests obligatorios
-
-1. Confirmar que no aparecen formaciones de prueba.
-2. Confirmar que no aparecen bloques de prueba.
-3. Confirmar que no aparecen temas de prueba.
-4. Confirmar que no aparecen chats de prueba.
-5. Confirmar que no se borró contenido real.
-6. Confirmar que la app sigue funcionando.
-
-## Criterio de cierre
-
-No cerrar este sprint hasta que la limpieza esté comprobada.
-
----
-
-# SPRINT 12: INFORME FINAL
-
-## Objetivo
-
-Entregar un informe final claro.
-
-Debe incluir:
-
-1. Causa exacta del error de Guardar/Publicar.
-2. Cómo se corrigió.
-3. Archivos modificados.
-4. Logs añadidos.
-5. Nueva estructura de datos.
-6. Nueva estructura visual.
-7. Rutas API creadas o modificadas.
-8. Tests realizados.
-9. Tests superados.
-10. Datos de prueba creados.
-11. Datos de prueba eliminados.
-12. Confirmación local.
-13. Confirmación en producción.
-14. Problemas pendientes si existen.
-15. Cómo repetir las pruebas.
-16. Cómo ver logs.
-
----
-
-# CRITERIOS DE ACEPTACIÓN FINAL
-
-La tarea solo está terminada si:
-
-1. Al pulsar Guardar en Formación ocurre algo visible.
-2. Al pulsar Publicar en Formación ocurre algo visible.
-3. No hay fallos silenciosos.
-4. Hay logs de clic, submit, validación, payload, API, éxito y error.
-5. Se puede crear una formación.
-6. Se pueden crear bloques.
-7. Se pueden crear temas dentro de bloques.
-8. Se puede guardar estructura sin contenido.
-9. Se puede añadir contenido después.
-10. Se puede crear estructura y contenido progresivamente.
-11. Se puede pegar texto largo desde Word.
-12. El texto largo se guarda.
-13. El texto largo se visualiza bien.
-14. Se pueden añadir imágenes por tema.
-15. Se pueden añadir vídeos por tema.
-16. Se visualiza todo en la parte pública.
-17. La parte pública muestra formación por bloques y temas.
-18. Al clicar un tema se abre una vista atractiva de contenido.
-19. Usuario no autenticado solo ve índice.
-20. Usuario autenticado ve contenido completo.
-21. Backend protege contenido restringido.
-22. Chat se asocia a formación/bloque/tema.
-23. Panel privado puede filtrar chats por formación/bloque/tema/usuario.
-24. Todo persiste tras recargar.
-25. Todo funciona en local.
-26. Todo funciona en producción si hay despliegue.
-27. Se han borrado datos de prueba.
-28. No quedan errores críticos.
-29. Se entrega informe final.
+Puedes seguir diciéndome más cambios y lo voy acumulando en este mismo prompt final.

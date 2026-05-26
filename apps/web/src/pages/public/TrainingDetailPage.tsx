@@ -137,7 +137,8 @@ export function TrainingDetailPage() {
         />
       ) : null}
       {course.data.description ? (
-        <div className="article-html">
+        <div className="article-description-block">
+          <span className="article-description-label">Descripción del curso</span>
           {course.data.description.split("\n").map((paragraph: string, i: number) =>
             paragraph.trim() ? <p key={i}>{paragraph}</p> : null
           )}
