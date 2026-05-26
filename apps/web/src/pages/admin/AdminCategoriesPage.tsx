@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { BlogCategory } from "@doctor-tebar/shared";
 import { adminCreate, adminDelete, adminList, adminUpdate } from "../../services/contentService";
 import { Button } from "../../components/common/Button";
+import { ConfirmDeleteModal } from "../../components/common/ConfirmDeleteModal";
 import { Loader } from "../../components/common/Loader";
 
 const COLORS = ["#16a34a", "#0284c7", "#7c3aed", "#db2777", "#ea580c", "#ca8a04", "#0f766e", "#475569"];
@@ -27,6 +28,7 @@ export function AdminCategoriesPage() {
   const [editForm, setEditForm] = useState<CategoryFormState>(empty);
   const [newForm, setNewForm] = useState<CategoryFormState>(empty);
   const [showNew, setShowNew] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<BlogCategory | null>(null);
 
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: ["admin", "blog-categories"] });
@@ -57,6 +59,13 @@ export function AdminCategoriesPage() {
 
   return (
     <div className="admin-categories-page">
+      {pendingDelete ? (
+        <ConfirmDeleteModal
+          itemName={pendingDelete.name}
+          onConfirm={() => { remove.mutate(pendingDelete._id); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      ) : null}
       <div className="admin-heading">
         <h1>Categorías del blog</h1>
         <Button onClick={() => { setShowNew(true); setEditingId(null); }}>
@@ -103,7 +112,7 @@ export function AdminCategoriesPage() {
                 <span className="category-slug">/{cat.slug}</span>
                 <div className="category-row-actions">
                   <button className="icon-btn" onClick={() => startEdit(cat)} title="Editar"><Edit2 size={15} /></button>
-                  <button className="icon-btn danger" onClick={() => remove.mutate(cat._id)} title="Eliminar"><Trash2 size={15} /></button>
+                  <button className="icon-btn danger" onClick={() => setPendingDelete(cat)} title="Eliminar"><Trash2 size={15} /></button>
                 </div>
               </div>
             )}

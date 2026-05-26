@@ -2,11 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Trash2, Upload } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Button } from "../../components/common/Button";
+import { ConfirmDeleteModal } from "../../components/common/ConfirmDeleteModal";
 import { apiClient } from "../../services/apiClient";
 
 export function AdminMediaPage() {
   const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ _id: string; name: string } | null>(null);
   const { data } = useQuery({ queryKey: ["admin", "media"], queryFn: async () => (await apiClient.get<any[]>("/admin/media")).data });
   const upload = useMutation({
     mutationFn: async () => {
@@ -36,6 +38,13 @@ export function AdminMediaPage() {
 
   return (
     <>
+      {pendingDelete ? (
+        <ConfirmDeleteModal
+          itemName={pendingDelete.name}
+          onConfirm={() => { remove.mutate(pendingDelete._id); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      ) : null}
       <div className="admin-heading"><h1>Biblioteca de medios</h1></div>
       <form className="admin-panel media-upload" onSubmit={submit} data-tour="media-upload">
         <label>Subir archivo<input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} /></label>
@@ -52,7 +61,7 @@ export function AdminMediaPage() {
             <label>Caption<input defaultValue={asset.caption ?? ""} onBlur={(e) => update.mutate({ id: asset._id, payload: { altText: asset.altText, caption: e.target.value, credit: asset.credit } })} /></label>
             <div className="toolbar">
               <Button type="button" className="secondary" data-tour="media-copy-url" onClick={() => navigator.clipboard?.writeText(asset.url)}><Copy size={16} /> URL</Button>
-              <Button type="button" className="danger icon-only" onClick={() => remove.mutate(asset._id)}><Trash2 size={16} /></Button>
+              <Button type="button" className="danger icon-only" onClick={() => setPendingDelete({ _id: asset._id, name: asset.originalName ?? asset.publicId ?? "archivo" })}><Trash2 size={16} /></Button>
             </div>
           </article>
         ))}

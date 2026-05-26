@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MessageCircle, Trash2, User, BookOpen, Tag, Filter, BarChart2, Users } from "lucide-react";
+import { ConfirmDeleteModal } from "../../components/common/ConfirmDeleteModal";
 import {
   deleteChatMessage,
   getAdminChatMessages,
@@ -68,6 +69,7 @@ function TabButton({ active, onClick, icon, label }: { active: boolean; onClick:
 
 function MessagesTab() {
   const qc = useQueryClient();
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; label: string } | null>(null);
   const [filterCourse, setFilterCourse] = useState("");
   const [filterUser, setFilterUser] = useState("");
   const [filterTopic, setFilterTopic] = useState("");
@@ -111,6 +113,13 @@ function MessagesTab() {
 
   return (
     <>
+      {pendingDelete ? (
+        <ConfirmDeleteModal
+          itemName={pendingDelete.label}
+          onConfirm={() => { deleteMutation.mutate(pendingDelete.id); setPendingDelete(null); }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      ) : null}
       <section className="admin-panel" style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <Filter size={14} /><strong style={{ fontSize: 14 }}>Filtros</strong>
@@ -175,7 +184,7 @@ function MessagesTab() {
         {messages.map(msg => (
           <ChatMessageCard key={msg._id} msg={msg}
             onStatus={status => statusMutation.mutate({ id: msg._id, status })}
-            onDelete={() => { if (confirm("¿Eliminar este mensaje?")) deleteMutation.mutate(msg._id); }}
+            onDelete={() => setPendingDelete({ id: msg._id, label: `${msg.name} — "${msg.message.slice(0, 50)}${msg.message.length > 50 ? "…" : ""}"` })}
           />
         ))}
       </section>
