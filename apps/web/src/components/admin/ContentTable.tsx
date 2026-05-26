@@ -1,5 +1,6 @@
 import { AlertTriangle, Edit, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { Button } from "../common/Button";
 
@@ -31,7 +32,7 @@ interface ConfirmDeleteModalProps {
 }
 
 function ConfirmDeleteModal({ itemName, onConfirm, onCancel }: ConfirmDeleteModalProps) {
-  return (
+  return createPortal(
     <div className="desc-modal-overlay" onClick={onCancel}>
       <div className="desc-modal confirm-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <button className="desc-modal-close" onClick={onCancel} aria-label="Cancelar">
@@ -52,7 +53,8 @@ function ConfirmDeleteModal({ itemName, onConfirm, onCancel }: ConfirmDeleteModa
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface DescriptionModalProps {
@@ -14,7 +15,7 @@ export function DescriptionModal({ title, description, onClose }: DescriptionMod
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div className="desc-modal-overlay" onClick={onClose}>
       <div className="desc-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="desc-modal-title">
         <button className="desc-modal-close" onClick={onClose} aria-label="Cerrar">
@@ -23,6 +24,7 @@ export function DescriptionModal({ title, description, onClose }: DescriptionMod
         <h3 id="desc-modal-title">{title}</h3>
         <p>{description}</p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

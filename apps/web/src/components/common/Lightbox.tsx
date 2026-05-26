@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface LightboxProps {
@@ -16,7 +17,7 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
 
   if (!src) return null;
 
-  return (
+  return createPortal(
     <div className="lightbox-overlay" onClick={onClose}>
       <button className="lightbox-close" onClick={onClose} aria-label="Cerrar">
         <X size={20} />
@@ -27,6 +28,7 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
         onClick={(e) => e.stopPropagation()}
         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
       />
-    </div>
+    </div>,
+    document.body
   );
 }
