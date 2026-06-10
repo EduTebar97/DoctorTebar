@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 async function login(page: Page) {
   await page.goto("/login");
-  await page.fill('input[name="email"]', "admin@example.com");
+  await page.fill('input[name="email"]', "dr.tebar@gmail.com");
   await page.fill('input[name="password"]', "AdminPassword123!");
   await page.getByRole("button", { name: /entrar/i }).click();
   await expect(page).toHaveURL(/\/admin/);
@@ -24,6 +24,6 @@ test.describe("interactive guides", () => {
     await page.goto("/admin/guides");
     await page.getByTestId("start-guide-create-blog-post").click();
     await expect(page).toHaveURL(/\/admin\/posts\/new/);
-    await expect(page.getByText("Titulo del articulo")).toBeVisible();
+    await expect(page.getByLabel("Titulo", { exact: true })).toBeVisible();
   });
 });

@@ -8,7 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 export function LoginPage() {
   const { user, login, loginError } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("admin@example.com");
+  const [email, setEmail] = useState("dr.tebar@gmail.com");
   const [password, setPassword] = useState("");
   if (user) return <Navigate to="/admin" replace />;
 

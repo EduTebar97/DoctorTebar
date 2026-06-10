@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 async function login(page: Page) {
   await page.goto("/login");
-  await page.fill('input[name="email"]', "admin@example.com");
+  await page.fill('input[name="email"]', "dr.tebar@gmail.com");
   await page.fill('input[name="password"]', "AdminPassword123!");
   await page.getByRole("button", { name: /entrar/i }).click();
   await expect(page).toHaveURL(/\/admin/);
@@ -27,12 +27,13 @@ test.describe("admin operational modules", () => {
     }
   });
 
-  test("post editor exposes scientific template and quality checklist", async ({ page }) => {
+  test("post editor exposes an editable rich text content block", async ({ page }) => {
     await login(page);
     await page.goto("/admin/posts/new");
-    await expect(page.getByText(/calidad editorial/i)).toBeVisible();
-    await page.getByLabel(/plantilla cientifica/i).selectOption("critica");
-    await expect(page.getByTestId("rich-editor")).toHaveValue(/Frase habitual/);
-    await expect(page.getByText(/control metodologico/i)).toBeVisible();
+    await expect(page.getByText(/estado del post/i)).toBeVisible();
+    const editor = page.locator(".ProseMirror");
+    await expect(editor).toBeVisible();
+    await editor.fill("Contenido editable desde la zona privada del blog.");
+    await expect(editor).toContainText("Contenido editable desde la zona privada del blog.");
   });
 });

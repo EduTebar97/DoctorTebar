@@ -2,7 +2,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 async function login(page: Page) {
   await page.goto("/login");
-  await page.fill('input[name="email"]', "admin@example.com");
+  await page.fill('input[name="email"]', "dr.tebar@gmail.com");
   await page.fill('input[name="password"]', "AdminPassword123!");
   await page.getByRole("button", { name: /entrar/i }).click();
   await expect(page).toHaveURL(/\/admin/);
@@ -12,6 +12,7 @@ async function deleteRow(page: Page, title: string) {
   const row = page.getByRole("row").filter({ hasText: title });
   await expect(row).toBeVisible();
   await row.getByRole("button").click();
+  await page.getByRole("button", { name: /eliminar definitivamente/i }).click();
   await expect(row).toBeHidden();
 }
 
@@ -29,8 +30,8 @@ test.describe("admin CRUD", () => {
 
     await page.goto("/admin/posts/new");
     await page.getByLabel("Titulo", { exact: true }).fill(postTitle);
-    await page.getByLabel("Extracto", { exact: true }).fill("Extracto suficientemente largo para validar el formulario e2e.");
-    await page.getByTestId("rich-editor").fill("<p>Contenido suficientemente largo para validar el flujo completo e2e.</p>");
+    await page.getByLabel(/extracto/i).fill("Extracto suficientemente largo para validar el formulario e2e.");
+    await page.locator(".ProseMirror").fill("Contenido suficientemente largo para validar el flujo completo e2e.");
     await page.locator('select[name="category"]').selectOption("general");
     await page.locator('input[name="tags"]').fill("e2e, test");
     await page.getByRole("button", { name: /publicar/i }).click();
@@ -44,8 +45,8 @@ test.describe("admin CRUD", () => {
 
     await page.goto("/admin/news/new");
     await page.getByLabel("Titulo", { exact: true }).fill(newsTitle);
-    await page.getByLabel("Extracto", { exact: true }).fill("Extracto suficientemente largo para una noticia e2e.");
-    await page.getByTestId("rich-editor").fill("<p>Contenido suficientemente largo para la noticia e2e.</p>");
+    await page.getByLabel(/extracto/i).fill("Extracto suficientemente largo para una noticia e2e.");
+    await page.locator(".ProseMirror").fill("Contenido suficientemente largo para la noticia e2e.");
     await page.getByRole("button", { name: /publicar/i }).click();
     await expect(page).toHaveURL(/\/admin\/news$/);
     await expect(page.getByRole("row").filter({ hasText: newsTitle })).toBeVisible();

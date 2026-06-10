@@ -146,8 +146,8 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
         name="content"
         control={control}
         render={({ field }) => (
-          <label className="span-2" data-tour="rich-editor">
-            Contenido
+          <div className="span-2 rte-field-wrap" data-tour="rich-editor">
+            <span className="field-label-text">Contenido</span>
             <RichTextEditor
               value={field.value}
               onChange={field.onChange}
@@ -156,7 +156,7 @@ export function PostEditorForm({ type = "posts" }: { type?: "posts" | "news" }) 
                 return asset.url;
               }}
             />
-          </label>
+          </div>
         )}
       />
       <label data-tour="post-seo">SEO title<input {...register("seoTitle")} /></label>

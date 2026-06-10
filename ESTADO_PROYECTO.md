@@ -1987,3 +1987,35 @@ Tests automatizados: 14 tests pasados, 0 fallidos.
 - Sprint 17 (Google OAuth): pendiente de credenciales Google Cloud (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET).
 - Code splitting del bundle web (~1030 KB; umbral Vite 500 KB).
 - Test user `6a0c88aed2e505ffcb2f3b29` (email: test_sprint18_prod@example.com) pendiente de eliminar directamente en MongoDB (no hay ruta DELETE /admin/users/:id).
+
+## Correccion zona privada blog — 10 de junio de 2026
+
+### Incidencia detectada
+
+En el formulario privado de posts/noticias, el editor Tiptap de `Contenido` estaba envuelto en un `<label>`. Ese contenedor podia interferir con los clicks dentro del `contenteditable`, especialmente despues de pegar contenido, porque el navegador trataba el bloque como parte de la activacion del label en lugar de como un editor independiente.
+
+### Correccion aplicada
+
+- `apps/web/src/components/admin/PostEditorForm.tsx`: el campo `Contenido` deja de envolver el editor en un `<label>` y usa un contenedor `div.rte-field-wrap` con texto visual separado.
+- `apps/web/src/tests/components/RichTextEditor.test.tsx`: nuevo test de regresion para pegar contenido y seguir editandolo tras clicar dentro del editor.
+- `apps/web/src/tests/setup.ts`: polyfills minimos de geometria DOM para que Tiptap/ProseMirror pueda ejecutarse en jsdom.
+- `e2e/tests/admin-blog-editor.spec.ts`: nuevo e2e Chromium que entra en admin, pega HTML en el editor del blog, clica el contenido, escribe texto adicional, guarda un borrador y lo elimina.
+- E2E de administracion actualizados para usar el admin real del seed (`dr.tebar@gmail.com`) y el selector real `.ProseMirror`.
+
+### Verificacion ejecutada
+
+```bash
+npm --workspace @doctor-tebar/web run test
+npm --workspace @doctor-tebar/api run test
+npm run build
+npx playwright test tests/admin-*.spec.ts --project=chromium
+```
+
+Resultado:
+
+- Web unit tests: 3 archivos, 45 tests pasados.
+- API unit tests: 4 archivos, 19 tests pasados.
+- Build global: API, web y shared OK.
+- E2E admin Chromium: 8 tests pasados.
+
+Estado: zona privada del blog verificada. El flujo de pegar contenido, clicar para editar, modificar, guardar y limpiar el post funciona correctamente.

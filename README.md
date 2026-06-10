@@ -54,5 +54,5 @@ npm run test:e2e
 
 Credenciales de desarrollo del seed:
 
-- Email: `admin@example.com`
+- Email: `dr.tebar@gmail.com`
 - Password: `AdminPassword123!`
