@@ -1,16 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { ErrorMessage } from "../../components/common/ErrorMessage";
 import { Lightbox } from "../../components/common/Lightbox";
 import { Loader } from "../../components/common/Loader";
 import { getPost, getPosts } from "../../services/contentService";
+import { renderMathInContainer } from "../../utils/renderMath";
 
 export function BlogDetailPage() {
   const { slug = "" } = useParams();
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const post = useQuery({ queryKey: ["post", slug], queryFn: () => getPost(slug) });
+
+  useEffect(() => {
+    renderMathInContainer(contentRef.current);
+  }, [post.data]);
   const related = useQuery({ queryKey: ["related", slug], queryFn: () => getPosts() });
   if (post.isLoading) return <Loader />;
   if (post.isError) return <section className="section"><ErrorMessage message="No se ha podido cargar el articulo." /></section>;
@@ -35,6 +41,7 @@ export function BlogDetailPage() {
         </div>
       ) : null}
       <div
+        ref={contentRef}
         className="article-html"
         dangerouslySetInnerHTML={{ __html: post.data.content }}
         onClick={(e) => {

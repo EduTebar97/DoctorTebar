@@ -21,10 +21,13 @@ import {
   Bold, Code, Code2, Eraser, Heading1, Heading2, Heading3, Heading4,
   Highlighter, ImageIcon, Italic, Link2, Link2Off,
   List, ListOrdered, ListTodo, Minus, Pilcrow, Quote,
-  Redo, Strikethrough, Subscript as SubscriptIcon, Superscript as SuperscriptIcon,
+  Redo, Sigma, Square, Strikethrough, Subscript as SubscriptIcon, Superscript as SuperscriptIcon,
   Table2, Underline as UnderlineIcon, Undo
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BlockMath } from "./extensions/BlockMath";
+import { InlineMath } from "./extensions/InlineMath";
+import { MathFormulaModal } from "./MathFormulaModal";
 
 function cleanWordHtml(html: string): string {
   // Strip Word XML namespace elements via regex BEFORE DOM parsing —
@@ -57,6 +60,36 @@ function cleanWordHtml(html: string): string {
   return doc.body.innerHTML;
 }
 
+// Extract LaTeX from MathML elements (Word pastes MathML with embedded LaTeX annotation)
+function extractMathFromWordHtml(html: string): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const mathEls = doc.querySelectorAll("math");
+  if (!mathEls.length) return html;
+
+  mathEls.forEach((mathEl) => {
+    const annotation =
+      mathEl.querySelector('annotation[encoding="application/x-tex"]') ??
+      mathEl.querySelector('annotation[encoding="TeX"]') ??
+      mathEl.querySelector("annotation");
+
+    const latex = annotation?.textContent?.trim() ?? "";
+    const isBlock = mathEl.getAttribute("display") === "block";
+
+    if (latex) {
+      const replacement = doc.createElement(isBlock ? "div" : "span");
+      replacement.setAttribute(isBlock ? "data-math-block" : "data-math-inline", latex);
+      replacement.textContent = latex;
+      mathEl.parentNode?.replaceChild(replacement, mathEl);
+    } else {
+      // No LaTeX annotation — remove the math element gracefully
+      mathEl.parentNode?.removeChild(mathEl);
+    }
+  });
+
+  return doc.body.innerHTML;
+}
+
 const COLORS = [
   { label: "Predeterminado", value: "" },
   { label: "Rojo", value: "#f87171" },
@@ -69,6 +102,12 @@ const COLORS = [
   { label: "Gris", value: "#9ca3af" },
 ];
 
+interface MathModalState {
+  mode: "inline" | "block";
+  initialLatex: string;
+  pos?: number; // if editing an existing node
+}
+
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -79,6 +118,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: RichTextEditorProps) {
   const updatingFromProp = useRef(false);
   const imageInput = useRef<HTMLInputElement>(null);
+  const [mathModal, setMathModal] = useState<MathModalState | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -99,12 +139,27 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
       Subscript,
       Superscript,
       Placeholder.configure({ placeholder: placeholder ?? "Escribe el contenido aquí..." }),
+      InlineMath,
+      BlockMath,
     ],
     content: value,
     onUpdate: ({ editor }) => {
       if (!updatingFromProp.current) onChange(editor.getHTML());
     }
   });
+
+  // Register the math modal opener in extension storage so NodeViews can call it
+  useEffect(() => {
+    if (!editor) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (editor.storage as any).inlineMath = {
+      ...(editor.storage as any).inlineMath,
+      openEditor: (latex: string, mode: "inline" | "block") => {
+        const { from } = editor.state.selection;
+        setMathModal({ mode, initialLatex: latex, pos: from });
+      },
+    };
+  }, [editor]);
 
   useEffect(() => {
     if (!editor) return;
@@ -123,15 +178,34 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
       const html = e.clipboardData?.getData("text/html") ?? "";
       if (!html) return;
       const isWord = /MsoNormal|mso-|urn:schemas-microsoft-com/i.test(html);
-      if (!isWord) return;
+      const hasMath = /<math[\s>]/i.test(html);
+      if (!isWord && !hasMath) return;
       e.preventDefault();
       e.stopImmediatePropagation();
-      const cleaned = cleanWordHtml(html);
+      // First extract any MathML formulas as data-math-* spans
+      const withMath = hasMath ? extractMathFromWordHtml(html) : html;
+      const cleaned = isWord ? cleanWordHtml(withMath) : withMath;
       editor.chain().focus().insertContent(cleaned, { parseOptions: { preserveWhitespace: false } }).run();
     }
     dom.addEventListener("paste", handleWordPaste as EventListener, true);
     return () => dom.removeEventListener("paste", handleWordPaste as EventListener, true);
   }, [editor]);
+
+  const handleMathConfirm = useCallback(
+    (latex: string, mode: "inline" | "block") => {
+      if (!editor) return;
+      setMathModal(null);
+
+      const chain = editor.chain().focus();
+
+      if (mode === "inline") {
+        chain.insertContent({ type: "inlineMath", attrs: { latex } }).run();
+      } else {
+        chain.insertContent({ type: "blockMath", attrs: { latex } }).run();
+      }
+    },
+    [editor]
+  );
 
   if (!editor) return null;
 
@@ -252,6 +326,21 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
         ) : null}
         <span className="rte-sep" />
 
+        {/* Fórmulas matemáticas */}
+        {btn(
+          "Fórmula en línea (∑)",
+          <Sigma size={s(15)} />,
+          () => setMathModal({ mode: "inline", initialLatex: "" }),
+          false
+        )}
+        {btn(
+          "Fórmula en bloque destacado",
+          <span className="rte-math-block-icon"><Sigma size={12} /><Square size={10} /></span>,
+          () => setMathModal({ mode: "block", initialLatex: "" }),
+          false
+        )}
+        <span className="rte-sep" />
+
         {/* Otros */}
         {btn("Bloque de código", <Code2 size={s(15)} />, () => editor.chain().focus().toggleCodeBlock().run(), editor.isActive("codeBlock"))}
         {btn("Separador horizontal", <Minus size={s(15)} />, () => editor.chain().focus().setHorizontalRule().run())}
@@ -266,6 +355,15 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
       </div>
 
       <EditorContent editor={editor} className="rte-content" />
+
+      {mathModal && (
+        <MathFormulaModal
+          initialLatex={mathModal.initialLatex}
+          initialMode={mathModal.mode}
+          onConfirm={handleMathConfirm}
+          onCancel={() => setMathModal(null)}
+        />
+      )}
     </div>
   );
 }

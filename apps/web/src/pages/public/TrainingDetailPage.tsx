@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, BookOpen, Lock } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Badge } from "../../components/common/Badge";
 import { ErrorMessage } from "../../components/common/ErrorMessage";
@@ -9,6 +9,7 @@ import { Loader } from "../../components/common/Loader";
 import { TrainingChatForm } from "../../components/public/TrainingChatForm";
 import { useAuth } from "../../hooks/useAuth";
 import { getTrainingCourse } from "../../services/contentService";
+import { renderMathInContainer } from "../../utils/renderMath";
 import type { TrainingBlock, TrainingTopic } from "@doctor-tebar/shared";
 
 export function TrainingDetailPage() {
@@ -16,12 +17,21 @@ export function TrainingDetailPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const topicContentRef = useRef<HTMLDivElement>(null);
+
+  // Derive activeTopic before the query so it's available for useEffect
+  const activeTopic = searchParams.get("tema");
 
   const course = useQuery({
     queryKey: ["training", slug],
     queryFn: () => getTrainingCourse(slug),
     enabled: Boolean(slug)
   });
+
+  // Render math formulas after topic content loads (must be before any early returns)
+  useEffect(() => {
+    renderMathInContainer(topicContentRef.current);
+  }, [activeTopic, course.data]);
 
   if (course.isLoading) return <Loader />;
   if (course.isError) return <section className="section"><ErrorMessage message="No se ha podido cargar esta formación." /></section>;
@@ -38,7 +48,6 @@ export function TrainingDetailPage() {
     });
   });
 
-  const activeTopic = searchParams.get("tema");
   const activeTopicData = activeTopic
     ? allTopics.find((t) => t.topic._id === activeTopic || String(t.topicIndex) === activeTopic)
     : null;
@@ -89,6 +98,7 @@ export function TrainingDetailPage() {
 
         {topic.content ? (
           <div
+            ref={topicContentRef}
             className="article-html"
             dangerouslySetInnerHTML={{ __html: topic.content }}
             onClick={(e) => {
