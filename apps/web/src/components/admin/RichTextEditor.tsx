@@ -28,6 +28,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BlockMath } from "./extensions/BlockMath";
 import { InlineMath } from "./extensions/InlineMath";
 import { MathFormulaModal } from "./MathFormulaModal";
+import { convertLatexDelimiters, mathmlElementToLatex } from "../../utils/mathmlToLatex";
 
 function cleanWordHtml(html: string): string {
   // Strip Word XML namespace elements via regex BEFORE DOM parsing —
@@ -60,7 +61,8 @@ function cleanWordHtml(html: string): string {
   return doc.body.innerHTML;
 }
 
-// Extract LaTeX from MathML elements (Word pastes MathML with embedded LaTeX annotation)
+// Extract LaTeX from MathML elements (Word pastes MathML with embedded LaTeX annotation).
+// Falls back to structural MathML→LaTeX conversion when no annotation is present.
 function extractMathFromWordHtml(html: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
@@ -68,12 +70,7 @@ function extractMathFromWordHtml(html: string): string {
   if (!mathEls.length) return html;
 
   mathEls.forEach((mathEl) => {
-    const annotation =
-      mathEl.querySelector('annotation[encoding="application/x-tex"]') ??
-      mathEl.querySelector('annotation[encoding="TeX"]') ??
-      mathEl.querySelector("annotation");
-
-    const latex = annotation?.textContent?.trim() ?? "";
+    const latex = mathmlElementToLatex(mathEl);
     const isBlock = mathEl.getAttribute("display") === "block";
 
     if (latex) {
@@ -82,11 +79,19 @@ function extractMathFromWordHtml(html: string): string {
       replacement.textContent = latex;
       mathEl.parentNode?.replaceChild(replacement, mathEl);
     } else {
-      // No LaTeX annotation — remove the math element gracefully
       mathEl.parentNode?.removeChild(mathEl);
     }
   });
 
+  return doc.body.innerHTML;
+}
+
+// Detect $$...$$, \[...\] (block) and \(...\) (inline) LaTeX delimiters in any HTML.
+function applyLatexDelimiters(html: string): string {
+  if (!html.includes("$$") && !html.includes("\\[") && !html.includes("\\(")) return html;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  convertLatexDelimiters(doc.body);
   return doc.body.innerHTML;
 }
 
@@ -179,12 +184,16 @@ export function RichTextEditor({ value, onChange, onUploadImage, placeholder }: 
       if (!html) return;
       const isWord = /MsoNormal|mso-|urn:schemas-microsoft-com/i.test(html);
       const hasMath = /<math[\s>]/i.test(html);
-      if (!isWord && !hasMath) return;
+      const hasLatexDelimiters = html.includes("$$") || html.includes("\\[") || html.includes("\\(");
+      if (!isWord && !hasMath && !hasLatexDelimiters) return;
       e.preventDefault();
       e.stopImmediatePropagation();
-      // First extract any MathML formulas as data-math-* spans
+      // 1. Extract MathML formulas → data-math-* nodes (with LaTeX annotation or structural conversion)
       const withMath = hasMath ? extractMathFromWordHtml(html) : html;
-      const cleaned = isWord ? cleanWordHtml(withMath) : withMath;
+      // 2. Detect $$...$$, \[...\], \(...\) delimiters
+      const withDelimiters = applyLatexDelimiters(withMath);
+      // 3. Strip Word-specific HTML cruft
+      const cleaned = isWord ? cleanWordHtml(withDelimiters) : withDelimiters;
       editor.chain().focus().insertContent(cleaned, { parseOptions: { preserveWhitespace: false } }).run();
     }
     dom.addEventListener("paste", handleWordPaste as EventListener, true);

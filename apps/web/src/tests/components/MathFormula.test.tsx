@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { RichTextEditor } from "../../components/admin/RichTextEditor";
+import { mathmlElementToLatex, convertLatexDelimiters } from "../../utils/mathmlToLatex";
 
 function pasteHtml(element: HTMLElement, html: string) {
   fireEvent.paste(element, {
@@ -158,5 +159,217 @@ describe("Math formula support", () => {
       const editor = screen.getByTestId("rich-editor");
       expect(editor).toBeInTheDocument();
     });
+  });
+
+  it("converts MathML without LaTeX annotation using structural fallback", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    // Word equation without TeX annotation — pure MathML
+    const wordMathNoAnnotation = `
+      <p>Fracción:</p>
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mfrac><mi>a</mi><mi>b</mi></mfrac>
+      </math>
+    `;
+
+    pasteHtml(editor, wordMathNoAnnotation);
+
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      // Should produce a math node (not silently drop it)
+      expect(lastCall).toContain("data-math-inline");
+      expect(lastCall).toContain("frac");
+    });
+  });
+
+  it("converts MathML subscripts and superscripts without annotation", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    const wordMathSubSup = `
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <msub><mi>H</mi><mn>0</mn></msub>
+      </math>
+    `;
+    pasteHtml(editor, wordMathSubSup);
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      expect(lastCall).toContain("data-math-inline");
+      expect(lastCall).toContain("H");
+      expect(lastCall).toContain("0");
+    });
+  });
+
+  it("converts Greek letters in MathML without annotation", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    const wordGreekMath = `
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow><mi>α</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>05</mn></mrow>
+      </math>
+    `;
+    pasteHtml(editor, wordGreekMath);
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      expect(lastCall).toContain("data-math-inline");
+      expect(lastCall).toContain("alpha");
+    });
+  });
+
+  it("detects $$...$$ block math delimiters in pasted HTML", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    const latexBlockHtml = `<p>La fórmula es: $$\\frac{a}{b}$$ como se muestra.</p>`;
+    pasteHtml(editor, latexBlockHtml);
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      expect(lastCall).toContain("data-math-block");
+      expect(lastCall).toContain("frac");
+    });
+  });
+
+  it("detects \\(...\\) inline math delimiters in pasted HTML", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    const latexInlineHtml = `<p>El valor \\(p < 0.05\\) es significativo.</p>`;
+    pasteHtml(editor, latexInlineHtml);
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      expect(lastCall).toContain("data-math-inline");
+    });
+  });
+
+  it("handles mixed Word paste: text paragraphs + multiple MathML formulas", async () => {
+    const handleChange = vi.fn();
+    render(<RichTextEditor value="" onChange={handleChange} />);
+    const editor = screen.getByRole("textbox");
+
+    const mixedWordHtml = `
+      <p class="MsoNormal">Prueba estadística:</p>
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <semantics>
+          <mrow><mi>χ</mi><msup><mi></mi><mn>2</mn></msup></mrow>
+          <annotation encoding="application/x-tex">\\chi^2</annotation>
+        </semantics>
+      </math>
+      <p class="MsoNormal">Con nivel:</p>
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow><mi>α</mi><mo>=</mo><mn>0</mn><mo>.</mo><mn>05</mn></mrow>
+      </math>
+    `;
+    pasteHtml(editor, mixedWordHtml);
+    await waitFor(() => {
+      const lastCall = handleChange.mock.calls[handleChange.mock.calls.length - 1]?.[0] ?? "";
+      // Both formulas must be present
+      const mathCount = (lastCall.match(/data-math/g) ?? []).length;
+      expect(mathCount).toBeGreaterThanOrEqual(2);
+      expect(lastCall).toContain("chi");
+    });
+  });
+});
+
+// ── Unit tests for mathmlToLatex utilities ─────────────────────────────────
+describe("mathmlToLatex utilities", () => {
+  function parseMath(mathml: string): Element {
+    const doc = new DOMParser().parseFromString(mathml, "text/html");
+    return doc.querySelector("math")!;
+  }
+
+  it("prefers LaTeX annotation when present", () => {
+    const el = parseMath(`
+      <math><semantics><mrow><mi>x</mi></mrow>
+        <annotation encoding="application/x-tex">x</annotation>
+      </semantics></math>
+    `);
+    expect(mathmlElementToLatex(el)).toBe("x");
+  });
+
+  it("converts mfrac to \\frac{}{}", () => {
+    const el = parseMath(`<math><mfrac><mi>a</mi><mi>b</mi></mfrac></math>`);
+    const result = mathmlElementToLatex(el);
+    expect(result).toContain("\\frac{a}{b}");
+  });
+
+  it("converts msub to base_{sub}", () => {
+    const el = parseMath(`<math><msub><mi>H</mi><mn>0</mn></msub></math>`);
+    const result = mathmlElementToLatex(el);
+    expect(result).toBe("H_{0}");
+  });
+
+  it("converts msup to base^{exp}", () => {
+    const el = parseMath(`<math><msup><mi>x</mi><mn>2</mn></msup></math>`);
+    const result = mathmlElementToLatex(el);
+    expect(result).toBe("x^{2}");
+  });
+
+  it("converts msubsup to base_{sub}^{sup}", () => {
+    const el = parseMath(`<math><msubsup><mi>σ</mi><mn>1</mn><mn>2</mn></msubsup></math>`);
+    const result = mathmlElementToLatex(el);
+    expect(result).toContain("_{1}");
+    expect(result).toContain("^{2}");
+  });
+
+  it("converts Greek letter mi to LaTeX command", () => {
+    const el = parseMath(`<math><mi>α</mi></math>`);
+    expect(mathmlElementToLatex(el)).toBe("\\alpha");
+  });
+
+  it("converts msqrt to \\sqrt{}", () => {
+    const el = parseMath(`<math><msqrt><mi>x</mi></msqrt></math>`);
+    expect(mathmlElementToLatex(el)).toBe("\\sqrt{x}");
+  });
+
+  it("converts munderover sum to \\sum_{from}^{to}", () => {
+    const el = parseMath(`
+      <math><munderover>
+        <mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi>
+      </munderover></math>
+    `);
+    const result = mathmlElementToLatex(el);
+    expect(result).toContain("\\sum");
+  });
+
+  it("convertLatexDelimiters converts $$...$$ to data-math-block", () => {
+    const doc = new DOMParser().parseFromString(
+      "<p>Texto $$\\frac{a}{b}$$ más texto</p>",
+      "text/html"
+    );
+    convertLatexDelimiters(doc.body);
+    expect(doc.body.innerHTML).toContain("data-math-block");
+    expect(doc.body.innerHTML).toContain("frac");
+  });
+
+  it("convertLatexDelimiters converts \\[...\\] to data-math-block", () => {
+    const doc = new DOMParser().parseFromString(
+      "<p>Texto \\[E = mc^2\\] fin</p>",
+      "text/html"
+    );
+    convertLatexDelimiters(doc.body);
+    expect(doc.body.innerHTML).toContain("data-math-block");
+  });
+
+  it("convertLatexDelimiters converts \\(...\\) to data-math-inline", () => {
+    const doc = new DOMParser().parseFromString(
+      "<p>p \\(p < 0.05\\) valor</p>",
+      "text/html"
+    );
+    convertLatexDelimiters(doc.body);
+    expect(doc.body.innerHTML).toContain("data-math-inline");
+  });
+
+  it("convertLatexDelimiters does not modify text without delimiters", () => {
+    const original = "<p>Texto normal sin fórmulas $100 precio</p>";
+    const doc = new DOMParser().parseFromString(original, "text/html");
+    convertLatexDelimiters(doc.body);
+    expect(doc.body.innerHTML).not.toContain("data-math");
   });
 });
